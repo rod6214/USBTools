@@ -15,8 +15,7 @@ extern "C" {
 #include <stdint.h>
 #include <usb.h>
 
-volatile BDnSTAT_t BD1STAT __at(BDMEM(1));
-volatile DeviceDescriptor_t BUFFER __at(0x500);
+//volatile BDnSTAT_t BD1STAT __at(BDMEM(1));
 
 extern const unsigned char deviceDescriptor[];
 

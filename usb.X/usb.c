@@ -11,72 +11,62 @@
 #include <pic18f2550.h>
 #include "usb.h"
 
-volatile BDnSTAT_t BD0STAT __at(BDMEM(0));
+#define MAX_BUFFER_SIZE 0x2ff
 
-void USB_enumerate() {
-    
-    switch(USTATbits.ENDP) {
-        case EP0:
-        {
-            if (USTATbits.DIR) {
-                // Process IN token (to host)
-            }
-            else {
-                // Process OUT or SETUP token (from host)
-                if (UADDR) {
-                    // Device has been enumerated
-                    
-                }
-                else {
-                    // Could be SETUP
-                    
-                    
-                    while(1) {
-                        if (!BD0STAT.UOWN) {
-                            // check PID
-                            switch(BD0STAT.PID) {
-                                case SETUP:
-                                    break;
-                                case IN:
-                                    break;
-                                case OUT:
-                                    break;
-                                case DATA0:
-                                    break;
-                                case DATA1:
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-            break;
-        case EP1:
-        {
-        }
-            break;
-        default:
-            break;
+volatile BDnSTAT_t BD0STAT __at(BDMEM(0));
+volatile BDnSTAT_t BD1STAT __at(BDMEM(1));
+volatile DeviceDescriptor_t BUFFER __at(0x500);
+
+//int __memCounter = 0;
+char __transaction = 0;
+
+static void preferredConfig(BYTE package);
+
+void USB_enumeration() {
+    if (BD0STAT.UOWN) {
+        PORTB = 1;
     }
 }
 
+int ff = 1;
+
 void __interrupt(high_priority) genInt(void) {
-//    PORTB = deviceDescriptor[0];
-    if (INT0F) {
-        INT0F = 0;
-    }
-    else if (INT1IF) {
-        INT1IF = 0;
-    }
-    else if (USBIF) {
-        if (SOFIF) {}
-        else if (STALLIF) {}
-        else if (IDLEIF) {}
-        else if (TRNIF) {}
-        else if (ACTVIF) {}
-        else if (UERRIF) {}
-        else if (URSTIF) {}
+    
+    if (TRNIF && ff) {
+        USB_enumeration();
+        ff = 1;
     }
     
+}
+
+void USB_init() {
+    // Set hardware configuration and attach
+    BYTE* ucfg = ((BYTE*)&UCFGbits);
+    BYTE* uep0 = ((BYTE*)&UEP0bits);
+    BYTE* uep1 = ((BYTE*)&UEP1bits);
+    
+    *ucfg = 0x54;
+    *uep0 = 0x17;
+    *uep1 = 0x17;
+    UCONbits.USBEN = 1;
+    UCONbits.SUSPND = 0;
+    UCONbits.RESUME = 0;
+    
+    // Configure buffer descriptor
+    BD0STAT.address = (unsigned int)&BUFFER;
+    BD1STAT.address = (unsigned int)&BUFFER + 0x40;
+//    preferedConfig();
+}
+
+void externTest() {
+    USB_init();
+}
+
+static void preferredConfig(BYTE package) {
+//    BD0STAT.DTS = 0;// This item must alternate data transaction
+    BD0STAT.DTS = package;
+    BD0STAT.KEN = 0;
+    BD0STAT.INCDIS = 0;
+    BD0STAT.DTSEN = 1;
+    BD0STAT.BSTALL = 1;
 }
