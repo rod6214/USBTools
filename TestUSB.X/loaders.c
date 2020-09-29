@@ -10,10 +10,10 @@
 #include <string.h>
 #include "usb.h"
 
-void load_descriptor(void* pDevdesc, void* descriptor) {
-    unsigned char len = ((unsigned char*)descriptor)[0];
-    if (pDevdesc) {
-        memcpy(pDevdesc, descriptor, len);
+void load_descriptor(void* dest, void* srcDesc) {
+    unsigned char len = ((unsigned char*)srcDesc)[0];
+    if (dest) {
+        memcpy(dest, srcDesc, len);
     }
 }
 

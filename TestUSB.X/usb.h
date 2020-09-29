@@ -51,10 +51,27 @@ extern "C" {
 #define ENDPOINT 5
 #define DEVICE_QUALIFIER 6
 #define OTHER_SPEED_CONFIGURATION 7
-#define INTERFACE_POWER 8    
+#define INTERFACE_POWER 8 
     
+// Buffer descriptor registers
+// Buffer status bits
+#define _UOWN 7
+//--- CPU mode only ---/
+#define _DTS 6
+#define _KEN 5
+#define _INCDIS 4
+#define _DTSEN 3
+#define _BSTALL 2
+//---------------------/
+#define _BC9 1
+#define _BC8 0
+
+// USTAT register
+#define DIR_IN 4
+#define DIR_OUT 0
+
 typedef unsigned char BYTE;
-    
+
 typedef struct {
     union {
         struct {
@@ -114,11 +131,11 @@ typedef struct {
 } DeviceDescriptor_t;
 
 typedef struct {
-    unsigned char bmRequestType;
-    unsigned char bRequest;
-    unsigned int wValue;
-    unsigned int wIndex;
-    unsigned int wLength;
+    unsigned char bmRequestType;// 1
+    unsigned char bRequest;// 1
+    unsigned int wValue;// 2
+    unsigned int wIndex;// 2
+    unsigned int wLength;// 2
     void* data;
 } USBRequest;
 
@@ -130,9 +147,9 @@ typedef struct {
 
 #define BDMEM(x) (400 + 4*x)
 
-extern void load_descriptor(void* pDevdesc, void* descriptor);
+extern void load_descriptor(void* dest, void* srcDesc);
 extern volatile BDnSTAT_t BD0STAT;
-extern volatile DeviceDescriptor_t BUFFER;
+//extern volatile DeviceDescriptor_t BUFFER;
 extern void externTest();
 
 #ifdef	__cplusplus

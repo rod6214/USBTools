@@ -32,9 +32,9 @@ const unsigned char deviceDescriptor[] = {
     0x00, // bDeviceSubClass
     0x00, // bDeviceProtocol
     0x40, // bMaxPacketSize0
-    0xd8,0x04, // idVendor
-    0x01,0x00, // idProduct 
-    0x00,0x00, // bcdDevice
+    0x08,0x04, // idVendor
+    0x0A,0x00, // idProduct 
+    0x01,0x00, // bcdDevice
     0x01, // iManufacturer
     0x02, // iProduct
     0x00, // iSerialnumber
