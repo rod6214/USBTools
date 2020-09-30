@@ -128,6 +128,27 @@ volatile BDT ep2_i __at (0x0404+2*8);
 volatile BDT ep3_o __at (0x0400+3*8);
 volatile BDT ep3_i __at (0x0404+3*8);
 
+// Descriptor Types
+#define DEVICE_DESCRIPTOR        0x01
+#define CONFIGURATION_DESCRIPTOR 0x02
+#define STRING_DESCRIPTOR        0x03
+#define INTERFACE_DESCRIPTOR     0x04
+#define ENDPOINT_DESCRIPTOR      0x05
+#define QUALIFIER_DESCRIPTOR     0x06
+
+
+typedef struct _setup_packet_struct
+{
+    unsigned char bmrequesttype; // D7: Direction, D6..5: Type, D4..0: Recipient
+    unsigned char brequest;      // Specific request
+    unsigned char wvalue0;       // LSB of wValue
+    unsigned char wvalue1;       // MSB of wValue
+    unsigned char windex0;       // LSB of wIndex
+    unsigned char windex1;       // MSB of wIndex
+    unsigned short wlength;       // Number of unsigned chars to transfer if there's a data stage
+    unsigned char extra[56];     // Fill out to same size as Endpoint 0 max buffer
+} setup_packet_struct;
+
 typedef struct {
     union {
         struct {

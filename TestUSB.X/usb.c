@@ -48,178 +48,46 @@ void __interrupt(low_priority) genIntL(void) {
     return;
 }
 
+static void get_descriptor(void) {
+    setup_packet_struct* setup_packet = (setup_packet_struct*)(&BUFFER0[0]);
+
+	if (setup_packet->bmrequesttype == 0x80) {
+		unsigned char descriptorType = setup_packet->wvalue1;
+//		unsigned char descriptorIndex = setup_packet->wvalue0;
+        
+		if (descriptorType == DEVICE_DESCRIPTOR) {
+			request_handled = 1;
+            load_descriptor(&(BUFFER1[0]), deviceDescriptor);
+			// code_ptr = (codePtr) &device_descriptor;
+			// dlen = *code_ptr;//DEVICE_DESCRIPTOR_SIZE;
+		} else if (descriptorType == QUALIFIER_DESCRIPTOR) {
+			// request_handled = 1;
+			// code_ptr = (codePtr) &device_qualifier_descriptor;
+			// dlen = sizeof(device_qualifier_descriptor);
+		} else if (descriptorType == CONFIGURATION_DESCRIPTOR) {
+			// request_handled = 1;
+            
+			// code_ptr = (codePtr) &config_descriptor;
+			// dlen = *(code_ptr + 2);
+            
+		} else if (descriptorType == STRING_DESCRIPTOR) {
+			// request_handled = 1;
+			// if (descriptorIndex == 0) {
+			// 	code_ptr = (codePtr) &string_descriptor0;
+			// } else if (descriptorIndex == 1) {
+			// 	code_ptr = (codePtr) &string_descriptor1;
+			// } else {
+			// 	code_ptr = (codePtr) &string_descriptor2;
+			// }
+			// dlen = *code_ptr;
+		}
+	}
+}
+
 static int counter = 0;
 
 #define EP_CTRL 6
 #define HSHK_EN 16
-
-//void _test01 () {
-//    //    USBRequest* requestOut = (USBRequest*)(&BUFFER0[0]);
-////    USBRequest* requestIn = (USBRequest*)(&BUFFER1[0]);
-//    if (USBIF) {
-//        
-//        if(STALLIF)
-//        {
-//            if(UEP0bits.EPSTALL)
-//            {
-//                UEP0bits.EPSTALL = 0;
-//            }
-//            UIRbits.STALLIF = 0;
-//        }
-//        
-//        if (ACTVIF) {
-//            SUSPND = 0;
-//            ACTVIF = 0;
-//        }
-//        
-////        if (counter) {
-////            while(BD1STAT.UOWN);
-////            PORTB++; 
-////        }
-//        
-//        if(UERRIF) {
-////            PORTB++;
-//            UERRIF = 0;
-//        }
-//        
-//        if (SOFIF) {
-//            SOFIF = 0;
-//        }
-//        
-////        if (SUSPND) return;
-//        
-//        if(URSTIF)
-//        {
-//            
-//            while(UIRbits.TRNIF)            // Flush any pending transactions
-//            {
-//                UIRbits.TRNIF = 0;
-//                
-//            }
-//            UIR   = 0;                      // Clears all USB interrupts
-//            UIE   = 0x6B;                   // Enable all interrupts except ACTVIE & IDLE
-//            UADDR = 0;                      // Reset to default address
-//            UEP0  = EP_CTRL | HSHK_EN;      // Init EP0 as a Ctrl EP
-////            USBPrepareForNextSetupTrf();    // ���������� BDT ��� ��ɣ�� SETUP
-//            UCONbits.PKTDIS = 0;            // Make sure packet processing is enabled
-//        }
-//        
-//        if (TRNIF){
-//            int pid = DIR ? BD1STAT.PID : BD0STAT.PID;
-//            
-//            if (USTAT == DIR_OUT) 
-//            {
-//            }
-//            
-//            PORTB++;
-//            
-//            if (PORTB >= 4){
-//                PORTC = 0;
-//                PORTC = 0;
-//                PORTC = 0;
-//            }
-//            
-//            switch(pid){
-//                case IN:
-//                {
-//                    BD0STAT.UOWN = 0;
-//                    BD1STAT.UOWN = 0;
-//                    while(UEP0bits.EPSTALL) { UEP0bits.EPSTALL = 0; }
-////                    BD1STAT.BSTALL = 0;
-//////                    BD0STAT.BSTALL = 0;
-////                    BD1STAT.count = 8;
-////                    BD1STAT.address = 0x548;
-////                    BD1STAT.DTSEN = 1;
-////                    BD1STAT.DTS = 0;
-////                    BD1STAT.UOWN = 1;
-////                    PKTDIS = 0;
-////                    TRNIF = 0;
-////                    
-////                    while(BD1STAT.UOWN);
-////                    PORTB++;
-//                    while(TRNIF) TRNIF = 0;
-//                    BD1STAT.BSTALL = 0;
-//                    BD0STAT.BSTALL = 0;
-//                    BD0STAT.count = 0;
-//                    BD0STAT.address = 0x540;
-//                    BD0STAT.DTSEN = 0;
-//                    BD0STAT.DTS = 0;
-//                    BD0STAT.UOWN = 1;
-//                    BD1STAT.UOWN = 1;
-//                    PKTDIS = 0;
-//                    TRNIF = 0;
-//                    PORTB = 5;
-//                    BD1STAT.UOWN = 1;
-////                    TRNIF = 0;
-////                    BD0STAT.BSTALL = 0;
-////                    BD1STAT.BSTALL = 0;
-////                    BD1STAT.DTSEN = 1;
-////                    BD1STAT.DTS = 1;
-////                    BD1STAT.count = 2;
-////                    BD1STAT.address = &(BUFFER1[16]);
-////                    BD1STAT.UOWN = 1;
-////                    while(TRNIF) TRNIF = 0;
-//                }
-//                return;
-//                case OUT:
-//                {
-//                    PORTB = 7;
-//                    while(TRNIF) TRNIF = 0;
-//                }
-//                return;
-//                case SETUP:
-//                {
-////                    while(1);
-////                    di();
-//                    // Data stage
-//                    USBRequest* request = (USBRequest*)(&BUFFER0[0]);
-//                    TRNIF = 0;
-//                    load_descriptor(&(BUFFER1[0]), deviceDescriptor);
-//                    BD0STAT.BSTALL = 0;
-//                    BD1STAT.BSTALL = 0;
-//                    BD1STAT.DTSEN = 1;
-//                    BD1STAT.DTS = 1;
-//                    BD1STAT.count = 16;
-//                    BD1STAT.address = (int)&(BUFFER1[0]);
-//                    
-//                    
-//                    
-////                    BD1STAT.DTS = 0;
-////                    BD1STAT.count = 2;
-////                    BD1STAT.address = &(BUFFER1[16]);
-////                    PKTDIS = 0;
-////                    BD1STAT.UOWN = 1;
-////                    while(BD1STAT.UOWN);
-////                    PORTB = 3;
-//                    
-////                    BD0STAT.BSTALL = 0;
-////                    BD1STAT.BSTALL = 0;
-////                    BD1STAT.DTSEN = 1;
-////                    BD1STAT.DTS = 0;
-////                    BD1STAT.count = 2;
-////                    BD1STAT.address = &(BUFFER1[16]);
-//                    
-//                    PKTDIS = 0;
-////                    TRNIF = 0;
-////                    BD0STAT.UOWN = 1;
-//                    BD1STAT.UOWN = 1;
-//                    TRNIF = 0;
-//                    
-////                    while(TRNIF) TRNIF = 0;
-//                }
-//                return;
-//            }
-//        }
-//        
-//        if (IDLEIF) {
-//            SUSPND = 1;
-//            IDLEIF = 0;
-//        }
-//        USBIF = 0;
-//    }
-//    return;
-//}
-//
 
 void prepare_for_setup_stage(void) {
     USBRequest* setup_packet = (USBRequest*)(&BUFFER0[0]);
@@ -282,42 +150,43 @@ void _test02 () {
                         
                         if (request == SET_ADDRESS) {
                             
-                            request_handled = 1;
+                            // request_handled = 1;
 
                         } else if (request == GET_DESCRIPTOR) {
 
-                            request_handled = 1;
+                            // request_handled = 1;
+                            get_descriptor();
 
-                            load_descriptor(&(BUFFER1[0]), deviceDescriptor);
+                            // load_descriptor(&(BUFFER1[0]), deviceDescriptor);
 
                         } else if (request == SET_CONFIGURATION) {
 
-                            request_handled = 1;
+                            // request_handled = 1;
                             
                         } else if (request == GET_CONFIGURATION) { // Never seen in Windows
 
-                            request_handled = 1;
+                            // request_handled = 1;
 
                         } else if (request == GET_STATUS) {  // Never seen in Windows
 
-                            request_handled = 1;
+                            // request_handled = 1;
 
                         } else if ((request == CLEAR_FEATURE) || (request == SET_FEATURE)) {  // Never seen in Windows
 
-                            request_handled = 1;
+                            // request_handled = 1;
 
                         } else if (request == GET_INTERFACE) { // Never seen in Windows
                             
-                            request_handled = 1;
+                            // request_handled = 1;
                             
                         } else if ((request == SET_INTERFACE) || (request == SET_LINE_CODING) || (request == SET_CONTROL_LINE_STATE)) {
                             // No support for alternate interfaces - just ignore.
                             
-                            request_handled = 1;
+                            // request_handled = 1;
 
                         } else if (request == GET_LINE_CODING) {
 
-                            request_handled = 1;
+                            // request_handled = 1;
                         }
                         
                     }
@@ -331,7 +200,7 @@ void _test02 () {
                         ep0_o.STAT = __UOWN | __BSTALL;
                         ep0_i.STAT = __UOWN | __BSTALL;
                     } else if (setup_packet->bmRequestType & 0x80) {
-                        PORTB = 1;
+                        // PORTB = 1;
                         // Device-to-host
                         // if (setup_packet.wlength < dlen)//9.4.3, p.253
                         // 	dlen = setup_packet.wlength;
@@ -347,7 +216,7 @@ void _test02 () {
                         // Give to SIE, DATA1 packet, enable data toggle checks
                         ep0_i.STAT = __UOWN | __DTS | __DTSEN;
                     } else {
-                        PORTB = 2;
+                        // PORTB = 2;
                         // Host-to-device
                         control_stage = DATA_OUT_STAGE;
                         // Clear the input buffer descriptor
