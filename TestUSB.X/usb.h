@@ -55,22 +55,78 @@ extern "C" {
     
 // Buffer descriptor registers
 // Buffer status bits
-#define _UOWN 7
-//--- CPU mode only ---/
-#define _DTS 6
-#define _KEN 5
-#define _INCDIS 4
-#define _DTSEN 3
-#define _BSTALL 2
-//---------------------/
-#define _BC9 1
-#define _BC8 0
+// #define _UOWN 7
+// //--- CPU mode only ---/
+// #define _DTS 6
+// #define _KEN 5
+// #define _INCDIS 4
+// #define _DTSEN 3
+// #define _BSTALL 2
+// //---------------------/
+// #define _BC9 1
+// #define _BC8 0
+
+// Buffer Descriptor bit masks (from PIC datasheet)
+#define __UOWN   0x80 // USB Own Bit
+#define __DTS    0x40 // Data Toggle Synchronization Bit
+#define __KEN    0x20 // BD Keep Enable Bit
+#define __INCDIS 0x10 // Address Increment Disable Bit
+#define __DTSEN  0x08 // Data Toggle Synchronization Enable Bit
+#define __BSTALL 0x04 // Buffer Stall Enable Bit
+#define __BC9    0x02 // Byte count bit 9
+#define __BC8    0x01 // Byte count bit 8
 
 // USTAT register
 #define DIR_IN 4
 #define DIR_OUT 0
 
+//
+// Standard Request Codes USB 2.0 Spec Ref Table 9-4
+//
+#define GET_STATUS         0
+#define CLEAR_FEATURE      1
+#define SET_FEATURE        3
+#define SET_ADDRESS        5
+#define GET_DESCRIPTOR     6
+#define SET_DESCRIPTOR     7
+#define GET_CONFIGURATION  8
+#define SET_CONFIGURATION  9
+#define GET_INTERFACE     10
+#define SET_INTERFACE     11
+#define SYNCH_FRAME       12
+
+/* Class-Specific Requests */
+#define SEND_ENCAPSULATED_COMMAND   0x00
+#define GET_ENCAPSULATED_RESPONSE   0x01
+#define SET_COMM_FEATURE            0x02
+#define GET_COMM_FEATURE            0x03
+#define CLEAR_COMM_FEATURE          0x04
+#define SET_LINE_CODING             0x20
+#define GET_LINE_CODING             0x21
+#define SET_CONTROL_LINE_STATE      0x22
+#define SEND_BREAK                  0x23
+
+
 typedef unsigned char BYTE;
+
+#define E0SZ 16
+
+typedef struct _BDT
+{
+    unsigned char STAT;
+    unsigned char CNT;
+    unsigned int ADDR;
+} BDT; //Buffer Descriptor Table
+
+//endpoints
+volatile BDT ep0_o __at (0x0400+0*8);
+volatile BDT ep0_i __at (0x0404+0*8);
+volatile BDT ep1_o __at (0x0400+1*8);
+volatile BDT ep1_i __at (0x0404+1*8);
+volatile BDT ep2_o __at (0x0400+2*8);
+volatile BDT ep2_i __at (0x0404+2*8);
+volatile BDT ep3_o __at (0x0400+3*8);
+volatile BDT ep3_i __at (0x0404+3*8);
 
 typedef struct {
     union {
