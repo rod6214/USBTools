@@ -101,6 +101,13 @@ void prepare_for_setup_stage(void) {
 // Data stage for a Control Transfer that sends data to the host
 void in_data_stage(void) {
     load_descriptor(&(BUFFER1[0]), deviceDescriptor);
+
+    // Load the high two bits of the unsigned char dlen into BC8:BC9
+	ep0_i.STAT = 0; // Clear BC8 and BC9
+	//ep0_i.STAT |= (unsigned char) ((bufferSize & 0x0300) >> 8);
+	//ep0_i.CNT = (unsigned char) (bufferSize & 0xFF);
+	ep0_i.CNT = 18;
+	ep0_i.ADDR = (int) &(BUFFER1[0]);
 }
 
 void _test02 () {
@@ -168,7 +175,7 @@ void _test02 () {
                         
                         
                         if (request == SET_ADDRESS) {
-                            
+                            PORTB++;
                             // request_handled = 1;
 
                         } else if (request == GET_DESCRIPTOR) {
@@ -178,32 +185,32 @@ void _test02 () {
                             // load_descriptor(&(BUFFER1[0]), deviceDescriptor);
 
                         } else if (request == SET_CONFIGURATION) {
-
+                            PORTB++;
                             // request_handled = 1;
                             
                         } else if (request == GET_CONFIGURATION) { // Never seen in Windows
-
+                            PORTB++;
                             // request_handled = 1;
 
                         } else if (request == GET_STATUS) {  // Never seen in Windows
-
+                            PORTB++;
                             // request_handled = 1;
 
                         } else if ((request == CLEAR_FEATURE) || (request == SET_FEATURE)) {  // Never seen in Windows
-
+                            PORTB++;
                             // request_handled = 1;
 
                         } else if (request == GET_INTERFACE) { // Never seen in Windows
-                            
+                            PORTB++;
                             // request_handled = 1;
                             
                         } else if ((request == SET_INTERFACE) || (request == SET_LINE_CODING) || (request == SET_CONTROL_LINE_STATE)) {
                             // No support for alternate interfaces - just ignore.
-                            
+                            PORTB++;
                             // request_handled = 1;
 
                         } else if (request == GET_LINE_CODING) {
-
+                            PORTB++;
                             // request_handled = 1;
                         }
                         
@@ -211,7 +218,7 @@ void _test02 () {
                     
                     
                     if (!request_handled) {
-                        
+                         PORTB++;
                         // PORTB = 7;
                         // If this service wasn't handled then stall endpoint 0
                         ep0_o.CNT = E0SZ;
@@ -223,7 +230,6 @@ void _test02 () {
                         // Device-to-host
                         // if (setup_packet.wlength < dlen)//9.4.3, p.253
                         // 	dlen = setup_packet.wlength;
-                        
                         in_data_stage();
                         control_stage = DATA_IN_STAGE;
                         // Reset the out buffer descriptor for endpoint 0
@@ -296,7 +302,6 @@ void _test02 () {
                 // }
                 
                 if (control_stage == DATA_IN_STAGE) {
-                    PORTB++;
                     // Start (or continue) transmitting data
                     in_data_stage();
                     // Turn control over to the SIE and toggle the data bit
