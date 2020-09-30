@@ -123,6 +123,21 @@ void _test02 () {
             SOFIF = 0;
         }
 
+        if(URSTIF) {
+            
+            while(UIRbits.TRNIF)            // Flush any pending transactions
+            {
+                UIRbits.TRNIF = 0;
+                
+            }
+            UIR   = 0;                      // Clears all USB interrupts
+            UIE   = 0x6B;                   // Enable all interrupts except ACTVIE & IDLE
+            UADDR = 0;                      // Reset to default address
+            UEP0  = EP_CTRL | HSHK_EN;      // Init EP0 as a Ctrl EP
+            UCONbits.PKTDIS = 0;            // Make sure packet processing is enabled
+            URSTIF = 0;
+        }
+
         if (TRNIF) {
             if (USTAT == DIR_OUT) {
                 unsigned char PID = (unsigned char)((ep0_o.STAT & 0x3C) >> 2); // Pull PID from middle of BD0STAT
@@ -193,7 +208,7 @@ void _test02 () {
                     
                     
                     if (!request_handled) {
-                        PORTB = 7;
+                        // PORTB = 7;
                         // If this service wasn't handled then stall endpoint 0
                         ep0_o.CNT = E0SZ;
                         ep0_o.ADDR = (unsigned int)setup_packet;
@@ -275,6 +290,7 @@ void _test02 () {
                 // }
                 
                 if (control_stage == DATA_IN_STAGE) {
+                    PORTB++;
                     // Start (or continue) transmitting data
                     // in_data_stage();
                     // Turn control over to the SIE and toggle the data bit
@@ -288,21 +304,14 @@ void _test02 () {
                     prepare_for_setup_stage();
                 }
             }
+            TRNIF = 0;
         }
-        
-        if(URSTIF) {
-            
-            while(UIRbits.TRNIF)            // Flush any pending transactions
-            {
-                UIRbits.TRNIF = 0;
-                
-            }
-            UIR   = 0;                      // Clears all USB interrupts
-            UIE   = 0x6B;                   // Enable all interrupts except ACTVIE & IDLE
-            UADDR = 0;                      // Reset to default address
-            UEP0  = EP_CTRL | HSHK_EN;      // Init EP0 as a Ctrl EP
-            UCONbits.PKTDIS = 0;            // Make sure packet processing is enabled
-        }
+
+        if (IDLEIF) {
+           SUSPND = 1;
+           IDLEIF = 0;
+       }
+       USBIF = 0;
     }
 }
 
