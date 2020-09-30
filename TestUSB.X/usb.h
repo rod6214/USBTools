@@ -66,6 +66,26 @@ extern "C" {
 // #define _BC9 1
 // #define _BC8 0
 
+// Standard Feature Selectors
+#define DEVICE_REMOTE_WAKEUP    0x01
+#define ENDPOINT_HALT           0x00
+
+// Descriptor Types
+#define DEVICE_DESCRIPTOR        0x01
+#define CONFIGURATION_DESCRIPTOR 0x02
+#define STRING_DESCRIPTOR        0x03
+#define INTERFACE_DESCRIPTOR     0x04
+#define ENDPOINT_DESCRIPTOR      0x05
+#define QUALIFIER_DESCRIPTOR     0x06
+
+// Device states (Chap 9.1.1)
+#define DETACHED     0
+#define ATTACHED     1
+#define POWERED      2
+#define DEFAULT      3
+#define ADDRESS      4
+#define CONFIGURED   5
+
 // Buffer Descriptor bit masks (from PIC datasheet)
 #define __UOWN   0x80 // USB Own Bit
 #define __DTS    0x40 // Data Toggle Synchronization Bit
@@ -127,6 +147,21 @@ volatile BDT ep2_o __at (0x0400+2*8);
 volatile BDT ep2_i __at (0x0404+2*8);
 volatile BDT ep3_o __at (0x0400+3*8);
 volatile BDT ep3_i __at (0x0404+3*8);
+
+// Every device request starts with an 8 unsigned char setup packet (USB 2.0, chap 9.3)
+// with a standard layout.  The meaning of wValue and wIndex will
+// vary depending on the request type and specific request.
+typedef struct _setup_packet_struct
+{
+    unsigned char bmrequesttype; // D7: Direction, D6..5: Type, D4..0: Recipient
+    unsigned char brequest;      // Specific request
+    unsigned char wvalue0;       // LSB of wValue
+    unsigned char wvalue1;       // MSB of wValue
+    unsigned char windex0;       // LSB of wIndex
+    unsigned char windex1;       // MSB of wIndex
+    unsigned short wlength;       // Number of unsigned chars to transfer if there's a data stage
+    unsigned char extra[56];     // Fill out to same size as Endpoint 0 max buffer
+} setup_packet_struct;
 
 typedef struct {
     union {
