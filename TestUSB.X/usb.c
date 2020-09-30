@@ -49,15 +49,14 @@ void __interrupt(low_priority) genIntL(void) {
 }
 
 static void get_descriptor(void) {
-    setup_packet_struct* setup_packet = (setup_packet_struct*)(&BUFFER0[0]);
+    USBRequest* setup_packet = (USBRequest*)(&BUFFER0[0]);
 
-	if (setup_packet->bmrequesttype == 0x80) {
-		unsigned char descriptorType = setup_packet->wvalue1;
+	if (setup_packet->bmRequestType == 0x80) {
+		unsigned char descriptorType = HIGHBYTE(setup_packet->wValue);
 //		unsigned char descriptorIndex = setup_packet->wvalue0;
-        
 		if (descriptorType == DEVICE_DESCRIPTOR) {
 			request_handled = 1;
-            load_descriptor(&(BUFFER1[0]), deviceDescriptor);
+            // load_descriptor(&(BUFFER0[0]), deviceDescriptor);
 			// code_ptr = (codePtr) &device_descriptor;
 			// dlen = *code_ptr;//DEVICE_DESCRIPTOR_SIZE;
 		} else if (descriptorType == QUALIFIER_DESCRIPTOR) {
@@ -65,13 +64,13 @@ static void get_descriptor(void) {
 			// code_ptr = (codePtr) &device_qualifier_descriptor;
 			// dlen = sizeof(device_qualifier_descriptor);
 		} else if (descriptorType == CONFIGURATION_DESCRIPTOR) {
-			// request_handled = 1;
+            // request_handled = 1;
             
 			// code_ptr = (codePtr) &config_descriptor;
 			// dlen = *(code_ptr + 2);
             
 		} else if (descriptorType == STRING_DESCRIPTOR) {
-			// request_handled = 1;
+            // request_handled = 1;
 			// if (descriptorIndex == 0) {
 			// 	code_ptr = (codePtr) &string_descriptor0;
 			// } else if (descriptorIndex == 1) {
@@ -97,6 +96,11 @@ void prepare_for_setup_stage(void) {
 	ep0_o.STAT = __UOWN | __DTSEN;
 	ep0_i.STAT = 0x00;
 	UCONbits.PKTDIS = 0;
+}
+
+// Data stage for a Control Transfer that sends data to the host
+void in_data_stage(void) {
+    load_descriptor(&(BUFFER1[0]), deviceDescriptor);
 }
 
 void _test02 () {
@@ -171,7 +175,6 @@ void _test02 () {
 
                             // request_handled = 1;
                             get_descriptor();
-
                             // load_descriptor(&(BUFFER1[0]), deviceDescriptor);
 
                         } else if (request == SET_CONFIGURATION) {
@@ -208,6 +211,7 @@ void _test02 () {
                     
                     
                     if (!request_handled) {
+                        
                         // PORTB = 7;
                         // If this service wasn't handled then stall endpoint 0
                         ep0_o.CNT = E0SZ;
@@ -220,7 +224,7 @@ void _test02 () {
                         // if (setup_packet.wlength < dlen)//9.4.3, p.253
                         // 	dlen = setup_packet.wlength;
                         
-                        // in_data_stage();
+                        in_data_stage();
                         control_stage = DATA_IN_STAGE;
                         // Reset the out buffer descriptor for endpoint 0
                         ep0_o.CNT = E0SZ;
@@ -231,6 +235,7 @@ void _test02 () {
                         // Give to SIE, DATA1 packet, enable data toggle checks
                         ep0_i.STAT = __UOWN | __DTS | __DTSEN;
                     } else {
+                        
                         // PORTB = 2;
                         // Host-to-device
                         control_stage = DATA_OUT_STAGE;
@@ -247,6 +252,7 @@ void _test02 () {
                     UCONbits.PKTDIS = 0;
                     
                 } else if (control_stage == DATA_OUT_STAGE) {
+                    
                     // Complete the data stage so that all information has
                     // passed from host to device before servicing it.
                     
@@ -292,7 +298,7 @@ void _test02 () {
                 if (control_stage == DATA_IN_STAGE) {
                     PORTB++;
                     // Start (or continue) transmitting data
-                    // in_data_stage();
+                    in_data_stage();
                     // Turn control over to the SIE and toggle the data bit
                     if (ep0_i.STAT & __DTS)
                         ep0_i.STAT = __UOWN | __DTSEN;
@@ -372,15 +378,15 @@ static void preferredConfig(BYTE package) {
     
 //    BD1STAT.adrl = 0x40;
 //    BD1STAT.adrh = 0x05;
-    BD1STAT.address = 0x500;
-    BD1STAT.count = 0;
-    BD1STAT.DTS = 1;
-    BD1STAT.KEN = 0;
-    BD1STAT.INCDIS = 0;
-    BD1STAT.DTSEN = 1;
-    BD1STAT.BSTALL = 0;
-    BD1STAT.BC8 = 0;
-    BD1STAT.BC9 = 0;
-    BD1STAT.UOWN = 0;
+    // BD1STAT.address = 0x500;
+    // BD1STAT.count = 0;
+    // BD1STAT.DTS = 1;
+    // BD1STAT.KEN = 0;
+    // BD1STAT.INCDIS = 0;
+    // BD1STAT.DTSEN = 1;
+    // BD1STAT.BSTALL = 0;
+    // BD1STAT.BC8 = 0;
+    // BD1STAT.BC9 = 0;
+    // BD1STAT.UOWN = 0;
     
 }

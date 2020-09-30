@@ -136,6 +136,8 @@ volatile BDT ep3_i __at (0x0404+3*8);
 #define ENDPOINT_DESCRIPTOR      0x05
 #define QUALIFIER_DESCRIPTOR     0x06
 
+#define LOWBYTE(x) (x & 255)
+#define HIGHBYTE(x) ((x >> 8) & 255) 
 
 typedef struct _setup_packet_struct
 {
