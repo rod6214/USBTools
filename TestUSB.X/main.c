@@ -1,62 +1,85 @@
-/*
- * File:   main.c
- * Author: Nelson Amador
- *
- * Created on July 18, 2020, 2:37 PM
+/* 
+This file is licensed under the MIT license:
+
+Copyright (c) 2010,2013 Kustaa Nyholm / SpareTimeLabs
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+ Version 1.1     Compatible with SDCC 3.x
+
  */
-#define _XTAL_FREQ 48000000L
-#include <xc.h>
-#include <pic18f2550.h>
-#include <string.h>
-#include "global.h"
+
+
+#include "pic18f2550.h"
+#include "usbcdc.h"
+#include "usb_defs.h"
+#include "configuration_bits.c"
+#include "printft.h"
+
+
+void __interrupt(high_priority) high_isr(void)
+{
+	if(PIR2bits.USBIF)
+	{
+		usbcdc_handler();
+		PIR2bits.USBIF=0;
+	}
+}
+
+void __interrupt(low_priority) low_isr(void)
+{
+	;
+}
+
+
+void putchar(char c)
+{
+	if (c=='\n') {
+		usbcdc_putchar('\r');
+		}
+
+	usbcdc_putchar(c);
+	if (c=='\n')
+		usbcdc_flush();
+}
+
+char getchar() {
+	usbcdc_flush();
+	return usbcdc_getchar();
+}
 
 void main(void) {
-    
-    PORTB = 0;
-    TRISB0 = 0;
-    TRISB1 = 0;
-    TRISB2 = 0;
-//    PORTB = 7;
-    
-//    PORTBbits.RB0 = 1;
-//    PORTBbits.RB0 = 0;
-//    PORTBbits.RB1 = 0;
-//    TRNIF = 0;
-    di();
-//    INTCONbits.INT0IE = 1;
-//    USBIE = 1;
-//    TRNIE = 1;
-//    SOFIE =  1;
-//    STALLIE = 1;
-//    ACTVIE = 1;
-//    URSTIE = 1;
-//    USBIP = 1;
-//    UIEbits.
-    IPR2bits.USBIP = 1;
-    INTCONbits.PEIE = 0;
-    PIE2bits.USBIE = 1;
-    // Reset USB interrupts    
-    UIR = 0;
-//    UIEbits.URSTIE = 0;// occur 2 times
-    UIEbits.SOFIE = 0;// many times we couldn't count it
-    UIEbits.TRNIE = 1;// occur 1 time
-    UIEbits.ACTVIE = 1;// occur 1 time
-    UIEbits.IDLEIE = 1;// occur 2 times
-    UIEbits.URSTIE = 1;// occur 4 times
-    STALLIE = 0; 
-    UERRIE = 0;
-    RCONbits.IPEN = 1;
-    SUSPND = 0;
-//    ei();
-//    PIR2bits.USBIF = 1;
-    INTCONbits.GIEH = 1;
-//    INTCONbits.GIEL = 1;
-//    TRNIF = 1;
-//    di();
-    
-    
-    externTest();
-    while(1);
-    
-    return;
+	OSCCON = 0x70;
+
+	usbcdc_init();
+
+	INTCONbits.PEIE = 1;
+	INTCONbits.GIE = 1;
+
+	while (usbcdc_device_state != CONFIGURED)
+		;
+
+	printft("Wellcome!\n");
+
+
+	while (1) {
+		printft("%02d\n",getchar());
+	}
+
 }

@@ -14,11 +14,15 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>main.c</itemPath>
       <itemPath>configuration_bits.c</itemPath>
-      <itemPath>descriptors.c</itemPath>
-      <itemPath>usb.c</itemPath>
-      <itemPath>loaders.c</itemPath>
+      <itemPath>main.c</itemPath>
+      <itemPath>printft.c</itemPath>
+      <itemPath>printft.h</itemPath>
+      <itemPath>usb_defs.h</itemPath>
+      <itemPath>usbcdc.c</itemPath>
+      <itemPath>usbcdc.h</itemPath>
+      <itemPath>usbcdc_defs.h</itemPath>
+      <itemPath>usbpic_defs.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -26,6 +30,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
@@ -34,7 +41,7 @@
         <targetDevice>PIC18F2550</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>noID</platformTool>
+        <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>2.10</languageToolchainVersion>
         <platform>3</platform>
