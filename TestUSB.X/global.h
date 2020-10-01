@@ -14,10 +14,11 @@ extern "C" {
     
 #include <stdint.h>
 #include <usb.h>
-
+#include "descriptors.h"
 //volatile BDnSTAT_t BD1STAT __at(BDMEM(1));
 
-extern const unsigned char deviceDescriptor[];
+// extern const unsigned char deviceDescriptor[];
+extern const DeviceDescriptor_t deviceDescriptor;
 
 #ifdef	__cplusplus
 }

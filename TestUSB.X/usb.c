@@ -11,6 +11,7 @@
 #include <pic18f2550.h>
 #include "usb.h"
 #include "global.h"
+#include "descriptors.h"
 
 #define MAX_BUFFER_SIZE 0x2ff
 
@@ -24,6 +25,7 @@ volatile unsigned char BUFFER1[64] __at(0x540);
 //volatile char BUFFER __at(0x500);
 static unsigned char request_handled; // Set to 1 if request was understood and processed.
 static unsigned char control_stage; // Holds the current stage in a control transfer
+static unsigned int dlen; // Number of unsigned chars of data
 //int __memCounter = 0;
 char __transaction = 0;
 
@@ -56,6 +58,8 @@ static void get_descriptor(void) {
 //		unsigned char descriptorIndex = setup_packet->wvalue0;
 		if (descriptorType == DEVICE_DESCRIPTOR) {
 			request_handled = 1;
+            dlen = setup_packet->wLength;
+            PORTB++;
             // load_descriptor(&(BUFFER0[0]), deviceDescriptor);
 			// code_ptr = (codePtr) &device_descriptor;
 			// dlen = *code_ptr;//DEVICE_DESCRIPTOR_SIZE;
@@ -65,11 +69,12 @@ static void get_descriptor(void) {
 			// dlen = sizeof(device_qualifier_descriptor);
 		} else if (descriptorType == CONFIGURATION_DESCRIPTOR) {
             // request_handled = 1;
-            
+            // PORTB++;
 			// code_ptr = (codePtr) &config_descriptor;
 			// dlen = *(code_ptr + 2);
             
 		} else if (descriptorType == STRING_DESCRIPTOR) {
+            // PORTB++;
             // request_handled = 1;
 			// if (descriptorIndex == 0) {
 			// 	code_ptr = (codePtr) &string_descriptor0;
@@ -100,7 +105,7 @@ void prepare_for_setup_stage(void) {
 
 // Data stage for a Control Transfer that sends data to the host
 void in_data_stage(void) {
-    load_descriptor(&(BUFFER1[0]), deviceDescriptor);
+    load_descriptor(&(BUFFER1[0]), &deviceDescriptor);
 
     // Load the high two bits of the unsigned char dlen into BC8:BC9
 	ep0_i.STAT = 0; // Clear BC8 and BC9
@@ -109,6 +114,9 @@ void in_data_stage(void) {
 	ep0_i.CNT = 18;
 	ep0_i.ADDR = (int) &(BUFFER1[0]);
 }
+
+static int addcount = 0;
+// static int desccount = 0;
 
 void _test02 () {
     if (USBIF) {
@@ -175,42 +183,49 @@ void _test02 () {
                         
                         
                         if (request == SET_ADDRESS) {
-                            PORTB++;
+                            
+                            if (!addcount) {
+                                addcount++;
+                            }
                             // request_handled = 1;
 
                         } else if (request == GET_DESCRIPTOR) {
-
+                            // if (!addcount) {
+                            //     PORTB++;
+                            // }
+                            // PORTB++;
                             // request_handled = 1;
                             get_descriptor();
                             // load_descriptor(&(BUFFER1[0]), deviceDescriptor);
 
                         } else if (request == SET_CONFIGURATION) {
-                            PORTB++;
+                            
+                            // PORTB++;
                             // request_handled = 1;
                             
                         } else if (request == GET_CONFIGURATION) { // Never seen in Windows
-                            PORTB++;
+                            // PORTB++;
                             // request_handled = 1;
 
                         } else if (request == GET_STATUS) {  // Never seen in Windows
-                            PORTB++;
+                            // PORTB++;
                             // request_handled = 1;
 
                         } else if ((request == CLEAR_FEATURE) || (request == SET_FEATURE)) {  // Never seen in Windows
-                            PORTB++;
+                            // PORTB++;
                             // request_handled = 1;
 
                         } else if (request == GET_INTERFACE) { // Never seen in Windows
-                            PORTB++;
+                            // PORTB++;
                             // request_handled = 1;
                             
                         } else if ((request == SET_INTERFACE) || (request == SET_LINE_CODING) || (request == SET_CONTROL_LINE_STATE)) {
                             // No support for alternate interfaces - just ignore.
-                            PORTB++;
+                            // PORTB++;
                             // request_handled = 1;
 
                         } else if (request == GET_LINE_CODING) {
-                            PORTB++;
+                            // PORTB++;
                             // request_handled = 1;
                         }
                         
@@ -218,7 +233,7 @@ void _test02 () {
                     
                     
                     if (!request_handled) {
-                         PORTB++;
+                        //  PORTB++;
                         // PORTB = 7;
                         // If this service wasn't handled then stall endpoint 0
                         ep0_o.CNT = E0SZ;
@@ -228,8 +243,8 @@ void _test02 () {
                     } else if (setup_packet->bmRequestType & 0x80) {
                         // PORTB = 1;
                         // Device-to-host
-                        // if (setup_packet.wlength < dlen)//9.4.3, p.253
-                        // 	dlen = setup_packet.wlength;
+                        if (setup_packet->wLength < dlen)//9.4.3, p.253
+                        	dlen = setup_packet->wLength;
                         in_data_stage();
                         control_stage = DATA_IN_STAGE;
                         // Reset the out buffer descriptor for endpoint 0

@@ -136,6 +136,8 @@ volatile BDT ep3_i __at (0x0404+3*8);
 #define ENDPOINT_DESCRIPTOR      0x05
 #define QUALIFIER_DESCRIPTOR     0x06
 
+#define NUM_DESC 2
+
 #define LOWBYTE(x) (x & 255)
 #define HIGHBYTE(x) ((x >> 8) & 255) 
 
@@ -193,23 +195,6 @@ typedef struct {
 } BDnSTAT_t;
 
 typedef struct {
-    unsigned char bLength;
-    unsigned char bDescriptorType;
-    uint16_t bcdUSB;
-    unsigned char bDeviceClass;
-    unsigned char bDeviceSubClass;
-    unsigned char bDeviceProtocol;
-    unsigned char bMaxPacketSize0;
-    uint16_t idVendor;
-    uint16_t idProduct;
-    uint16_t bcdDevice;
-    unsigned char iManufacturer;
-    unsigned char iProduct;
-    unsigned char iSerialnumber;
-    unsigned char bNumConfigurations;
-} DeviceDescriptor_t;
-
-typedef struct {
     unsigned char bmRequestType;// 1
     unsigned char bRequest;// 1
     unsigned int wValue;// 2
@@ -218,11 +203,11 @@ typedef struct {
     void* data;
 } USBRequest;
 
-typedef struct {
-    BDnSTAT_t* sts;
-    USBRequest* request;
-    DeviceDescriptor_t* descriptor;
-} USB;
+//typedef struct {
+//    BDnSTAT_t* sts;
+//    USBRequest* request;
+//    DeviceDescriptor_t* descriptor;
+//} USB;
 
 #define BDMEM(x) (400 + 4*x)
 
