@@ -109,7 +109,7 @@ extern "C" {
 
 typedef unsigned char BYTE;
 
-#define E0SZ 16
+#define E0SZ 64
 
 typedef struct _BDT
 {

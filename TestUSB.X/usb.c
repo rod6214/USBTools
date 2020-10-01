@@ -26,6 +26,11 @@ static volatile unsigned char BUFFER1[64] __at(0x540);
 static unsigned char request_handled; // Set to 1 if request was understood and processed.
 static unsigned char control_stage; // Holds the current stage in a control transfer
 static unsigned int dlen; // Number of unsigned chars of data
+static unsigned char device_address;
+static unsigned char usb_device_state = 0;
+// static void* descriptor_ptr;
+uint32_t *descriptor_ptr;
+
 //int __memCounter = 0;
 char __transaction = 0;
 
@@ -33,6 +38,8 @@ char __transaction = 0;
 #define DATA_OUT_STAGE 1
 #define DATA_IN_STAGE  2
 #define STATUS_STAGE   3
+#define ADDRESS   4
+#define DEFAULT   3
 
 static void preferredConfig();
 void flags();
@@ -57,9 +64,11 @@ static void get_descriptor(void) {
 		unsigned char descriptorType = HIGHBYTE(setup_packet->wValue);
 //		unsigned char descriptorIndex = setup_packet->wvalue0;
 		if (descriptorType == DEVICE_DESCRIPTOR) {
+            //  PORTB++;
 			request_handled = 1;
-            dlen = setup_packet->wLength;
-            PORTB++;
+            dlen = deviceDescriptor.bLength;
+            descriptor_ptr = (uint32_t*)(&deviceDescriptor);
+            // PORTB++;
             // load_descriptor(&(BUFFER0[0]), deviceDescriptor);
 			// code_ptr = (codePtr) &device_descriptor;
 			// dlen = *code_ptr;//DEVICE_DESCRIPTOR_SIZE;
@@ -68,13 +77,15 @@ static void get_descriptor(void) {
 			// code_ptr = (codePtr) &device_qualifier_descriptor;
 			// dlen = sizeof(device_qualifier_descriptor);
 		} else if (descriptorType == CONFIGURATION_DESCRIPTOR) {
-            // request_handled = 1;
+            request_handled = 1;
+            dlen = 0x29;
+            descriptor_ptr = (uint32_t*)(&configurationDesc);
             // PORTB++;
 			// code_ptr = (codePtr) &config_descriptor;
 			// dlen = *(code_ptr + 2);
             
 		} else if (descriptorType == STRING_DESCRIPTOR) {
-            // PORTB++;
+            PORTB++;
             // request_handled = 1;
 			// if (descriptorIndex == 0) {
 			// 	code_ptr = (codePtr) &string_descriptor0;
@@ -105,17 +116,22 @@ void prepare_for_setup_stage(void) {
 
 // Data stage for a Control Transfer that sends data to the host
 void in_data_stage(void) {
-    load_descriptor(&(BUFFER1[0]), &deviceDescriptor);
-
+    unsigned char bufferSize;
+    // load_descriptor(&(BUFFER1[0]), &descriptor_ptr);
+    if (dlen < E0SZ)
+		bufferSize = dlen;
+	else
+		bufferSize = E0SZ;
     // Load the high two bits of the unsigned char dlen into BC8:BC9
 	ep0_i.STAT = 0; // Clear BC8 and BC9
 	//ep0_i.STAT |= (unsigned char) ((bufferSize & 0x0300) >> 8);
 	//ep0_i.CNT = (unsigned char) (bufferSize & 0xFF);
-	ep0_i.CNT = 18;
+    memcpy(&(BUFFER1[0]), descriptor_ptr, bufferSize);
+	ep0_i.CNT = bufferSize;
 	ep0_i.ADDR = (int) &(BUFFER1[0]);
 }
 
-static int addcount = 0;
+// static int addcount = 0;
 // static int desccount = 0;
 
 void _test02 () {
@@ -158,11 +174,12 @@ void _test02 () {
         }
 
         if (TRNIF) {
+            USBRequest* setup_packet = (USBRequest*)(&BUFFER0[0]);
+
             if (USTAT == DIR_OUT) {
                 unsigned char PID = (unsigned char)((ep0_o.STAT & 0x3C) >> 2); // Pull PID from middle of BD0STAT
 
                 if (PID == SETUP) {
-                    USBRequest* setup_packet = (USBRequest*)(&BUFFER0[0]);
                     // Setup stage
                     // Note: Microchip says to turn off the UOWN bit on the IN direction as
                     // soon as possible after detecting that a SETUP has been received.
@@ -184,10 +201,9 @@ void _test02 () {
                         
                         if (request == SET_ADDRESS) {
                             
-                            if (!addcount) {
-                                addcount++;
-                            }
-                            // request_handled = 1;
+                            request_handled = 1;
+                            device_address = LOWBYTE(setup_packet->wValue);
+                            usb_device_state = ADDRESS;
 
                         } else if (request == GET_DESCRIPTOR) {
                             // if (!addcount) {
@@ -243,8 +259,8 @@ void _test02 () {
                     } else if (setup_packet->bmRequestType & 0x80) {
                         // PORTB = 1;
                         // Device-to-host
-                        if (setup_packet->wLength < dlen)//9.4.3, p.253
-                        	dlen = setup_packet->wLength;
+                        // if (setup_packet->wLength < dlen)//9.4.3, p.253
+                        // 	dlen = setup_packet->wLength;
                         in_data_stage();
                         control_stage = DATA_IN_STAGE;
                         // Reset the out buffer descriptor for endpoint 0
@@ -290,6 +306,7 @@ void _test02 () {
                     // 		*in_ptr++ = *data_ptr++;
                         
                     // }
+                    // dlen = dlen + ep0_o.CNT;
                     
                     // Turn control over to the SIE and toggle the data bit
                     if (ep0_o.STAT & DTS)
@@ -302,17 +319,19 @@ void _test02 () {
                     prepare_for_setup_stage();
                 }
             } else if (USTAT == DIR_IN) {
-                // // Endpoint 0:in
+                // Endpoint 0:in
                 
-                // //set address
-                // if ((UADDR == 0) && (usbcdc_device_state == ADDRESS)) {
+                // set address
+                UADDR = LOWBYTE(setup_packet->wValue);
+                PORTB = UADDR;
+                // if ((UADDR == 0) && (usb_device_state == ADDRESS)) {
                 // 	// TBD: ensure that the new address matches the value of
                 // 	// "device_address" (which came in through a SET_ADDRESS).
-                // 	UADDR = setup_packet.wvalue0;
+                // 	UADDR = LOWBYTE(setup_packet->wValue);
                 // 	if (UADDR == 0) {
                 // 		// If we get a reset after a SET_ADDRESS, then we need
                 // 		// to drop back to the Default state.
-                // 		usbcdc_device_state = DEFAULT;
+                // 		usb_device_state = DEFAULT;
                 // 	}
                 // }
                 

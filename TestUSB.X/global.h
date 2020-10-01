@@ -19,6 +19,10 @@ extern "C" {
 
 // extern const unsigned char deviceDescriptor[];
 extern const DeviceDescriptor_t deviceDescriptor;
+extern const struct HIDConfigurationDescriptior_t configurationDesc;
+extern const BYTE stringDescriptor[];
+extern const BYTE iProductDesc[];
+extern const BYTE iSerialNumberDesc[];
 
 #ifdef	__cplusplus
 }

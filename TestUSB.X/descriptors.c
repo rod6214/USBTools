@@ -81,6 +81,18 @@ const unsigned char endpointOUTDescriptor[] = {
 sizeof(InterfaceDescriptor_t) + sizeof(HIDInterfaceDescriptor_t) + \
 sizeof(EndpointDescriptor_t) + sizeof(EndpointDescriptor_t))
 
+const BYTE stringDescriptor[] = {
+    4, 0x03, 0x09, 0x04
+};
+
+const BYTE iProductDesc[] = {
+    8, 0x03, 'H', 'e', 'l', 'l', 'o', '\n'
+};
+
+const BYTE iSerialNumberDesc[] = {
+    6, 0x03, '1', '2', '3', '4'
+};
+
 const DeviceDescriptor_t deviceDescriptor = {
     0x12, // bLength
     0x01, // bDescriptorType
@@ -101,7 +113,7 @@ const struct HIDConfigurationDescriptior_t configurationDesc = {
    {/*Configuration descriptor*/
        0x09, // Length
        0x02, // bDescriptorType
-       TOTAL_CONFIGURATION_LENGTH, //    0x29, // Total length
+       sizeof(configurationDesc), //    0x29, // Total length
        0x01, // NumInterfaces
        0x01, // bConfigurationValue
        0x00, // iConfiguration
@@ -146,18 +158,6 @@ const struct HIDConfigurationDescriptior_t configurationDesc = {
        0x40, // MaxPacketSize (LITLE ENDIAN)
        0x0A, // bInterval
    },
-};
-
-const BYTE stringDescriptor[] = {
-    4, 0x03, 0x09, 0x04
-};
-
-const BYTE iProductDesc[] = {
-    8, 0x03, 'H', 'e', 'l', 'l', 'o', '\n'
-};
-
-const BYTE iSerialNumberDesc[] = {
-    6, 0x03, '1', '2', '3', '4'
 };
 
 // const BYTE* StringDescTable[] = {
