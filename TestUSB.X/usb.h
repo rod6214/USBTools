@@ -67,14 +67,14 @@ extern "C" {
 // #define _BC8 0
 
 // Buffer Descriptor bit masks (from PIC datasheet)
-#define __UOWN   0x80 // USB Own Bit
-#define __DTS    0x40 // Data Toggle Synchronization Bit
-#define __KEN    0x20 // BD Keep Enable Bit
-#define __INCDIS 0x10 // Address Increment Disable Bit
-#define __DTSEN  0x08 // Data Toggle Synchronization Enable Bit
-#define __BSTALL 0x04 // Buffer Stall Enable Bit
-#define __BC9    0x02 // Byte count bit 9
-#define __BC8    0x01 // Byte count bit 8
+#define UOWN   0x80 // USB Own Bit
+#define DTS    0x40 // Data Toggle Synchronization Bit
+#define KEN    0x20 // BD Keep Enable Bit
+#define INCDIS 0x10 // Address Increment Disable Bit
+#define DTSEN  0x08 // Data Toggle Synchronization Enable Bit
+#define BSTALL 0x04 // Buffer Stall Enable Bit
+#define BC9    0x02 // Byte count bit 9
+#define BC8    0x01 // Byte count bit 8
 
 // USTAT register
 #define DIR_IN 4
@@ -119,15 +119,14 @@ typedef struct _BDT
 } BDT; //Buffer Descriptor Table
 
 //endpoints
-volatile BDT ep0_o __at (0x0400+0*8);
-volatile BDT ep0_i __at (0x0404+0*8);
-volatile BDT ep1_o __at (0x0400+1*8);
-volatile BDT ep1_i __at (0x0404+1*8);
-volatile BDT ep2_o __at (0x0400+2*8);
-volatile BDT ep2_i __at (0x0404+2*8);
-volatile BDT ep3_o __at (0x0400+3*8);
-volatile BDT ep3_i __at (0x0404+3*8);
-
+extern volatile BDT ep0_o __at(0x0400+0*8);
+extern volatile BDT ep0_i __at(0x0404+0*8);
+extern volatile BDT ep1_o __at(0x0400+1*8);
+extern volatile BDT ep1_i __at(0x0404+1*8);
+extern volatile BDT ep2_o __at(0x0400+2*8);
+extern volatile BDT ep2_i __at(0x0404+2*8);
+extern volatile BDT ep3_o __at(0x0400+3*8);
+extern volatile BDT ep3_i __at(0x0404+3*8);
 // Descriptor Types
 #define DEVICE_DESCRIPTOR        0x01
 #define CONFIGURATION_DESCRIPTOR 0x02
@@ -139,60 +138,7 @@ volatile BDT ep3_i __at (0x0404+3*8);
 #define NUM_DESC 2
 
 #define LOWBYTE(x) (x & 255)
-#define HIGHBYTE(x) ((x >> 8) & 255) 
-
-typedef struct _setup_packet_struct
-{
-    unsigned char bmrequesttype; // D7: Direction, D6..5: Type, D4..0: Recipient
-    unsigned char brequest;      // Specific request
-    unsigned char wvalue0;       // LSB of wValue
-    unsigned char wvalue1;       // MSB of wValue
-    unsigned char windex0;       // LSB of wIndex
-    unsigned char windex1;       // MSB of wIndex
-    unsigned short wlength;       // Number of unsigned chars to transfer if there's a data stage
-    unsigned char extra[56];     // Fill out to same size as Endpoint 0 max buffer
-} setup_packet_struct;
-
-typedef struct {
-    union {
-        struct {
-            unsigned BC8    :1;
-            unsigned BC9    :1;
-            unsigned        :6;
-        };
-        struct {
-            unsigned        :2;
-            unsigned BSTALL :1;
-            unsigned DTSEN  :1;
-            unsigned INCDIS :1;
-            unsigned KEN    :1;
-            unsigned DTS    :1;
-            unsigned UOWN   :1;
-        };
-        struct {
-            unsigned       :2;
-            unsigned PID0  :1;
-            unsigned PID1  :1;
-            unsigned PID2  :1;
-            unsigned PID3  :1;
-            unsigned       :2;
-        };
-        struct {
-            unsigned       :2;
-            unsigned PID   :4;
-            unsigned       :2;
-        };
-        unsigned char status;
-    };
-    unsigned char count;
-    union {
-        unsigned int address;
-        struct {
-            unsigned char adrl;
-            unsigned char adrh;
-        };
-    };
-} BDnSTAT_t;
+#define HIGHBYTE(x) ((x >> 8) & 255)
 
 typedef struct {
     unsigned char bmRequestType;// 1
@@ -203,17 +149,9 @@ typedef struct {
     void* data;
 } USBRequest;
 
-//typedef struct {
-//    BDnSTAT_t* sts;
-//    USBRequest* request;
-//    DeviceDescriptor_t* descriptor;
-//} USB;
-
 #define BDMEM(x) (400 + 4*x)
 
 extern void load_descriptor(void* dest, void* srcDesc);
-extern volatile BDnSTAT_t BD0STAT;
-//extern volatile DeviceDescriptor_t BUFFER;
 extern void externTest();
 
 #ifdef	__cplusplus

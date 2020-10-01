@@ -15,13 +15,13 @@
 
 #define MAX_BUFFER_SIZE 0x2ff
 
-static char table[1024] __at(0x400);
+//static char table[1023] __at(0x400);
 // Buffer descriptor endpoint 0 OUT
-volatile BDnSTAT_t BD0STAT __at(0x400);
+//volatile BDnSTAT_t BD0STAT __at(0x400);
 // Buffer descriptor endpoint 0 IN
-volatile BDnSTAT_t BD1STAT __at(0x404);
-volatile unsigned char BUFFER0[64] __at(0x500);
-volatile unsigned char BUFFER1[64] __at(0x540);
+//volatile BDnSTAT_t BD1STAT __at(0x404);
+static volatile unsigned char BUFFER0[64] __at(0x500);
+static volatile unsigned char BUFFER1[64] __at(0x540);
 //volatile char BUFFER __at(0x500);
 static unsigned char request_handled; // Set to 1 if request was understood and processed.
 static unsigned char control_stage; // Holds the current stage in a control transfer
@@ -34,7 +34,7 @@ char __transaction = 0;
 #define DATA_IN_STAGE  2
 #define STATUS_STAGE   3
 
-static void preferredConfig(BYTE package);
+static void preferredConfig();
 void flags();
 
 //void USB_enumeration() {
@@ -98,7 +98,7 @@ void prepare_for_setup_stage(void) {
 	control_stage = SETUP_STAGE;
 	ep0_o.CNT = E0SZ;
 	ep0_o.ADDR = (unsigned int) setup_packet;
-	ep0_o.STAT = __UOWN | __DTSEN;
+	ep0_o.STAT = UOWN | DTSEN;
 	ep0_i.STAT = 0x00;
 	UCONbits.PKTDIS = 0;
 }
@@ -166,8 +166,8 @@ void _test02 () {
                     // Setup stage
                     // Note: Microchip says to turn off the UOWN bit on the IN direction as
                     // soon as possible after detecting that a SETUP has been received.
-                    ep0_i.STAT &= ~__UOWN;
-                    ep0_o.STAT &= ~__UOWN;
+                    ep0_i.STAT &= ~UOWN;
+                    ep0_o.STAT &= ~UOWN;
                     
                     // Initialize the transfer process
                     control_stage = SETUP_STAGE;
@@ -238,8 +238,8 @@ void _test02 () {
                         // If this service wasn't handled then stall endpoint 0
                         ep0_o.CNT = E0SZ;
                         ep0_o.ADDR = (unsigned int)setup_packet;
-                        ep0_o.STAT = __UOWN | __BSTALL;
-                        ep0_i.STAT = __UOWN | __BSTALL;
+                        ep0_o.STAT = UOWN | BSTALL;
+                        ep0_i.STAT = UOWN | BSTALL;
                     } else if (setup_packet->bmRequestType & 0x80) {
                         // PORTB = 1;
                         // Device-to-host
@@ -249,12 +249,12 @@ void _test02 () {
                         control_stage = DATA_IN_STAGE;
                         // Reset the out buffer descriptor for endpoint 0
                         ep0_o.CNT = E0SZ;
-                        ep0_o.ADDR = (int)setup_packet;
-                        ep0_o.STAT = __UOWN;
+                        ep0_o.ADDR = (unsigned int)setup_packet;
+                        ep0_o.STAT = UOWN;
                         // Set the in buffer descriptor on endpoint 0 to send data
                         // NOT NEEDED ep0_i.ADDR = (int) &control_transfer_buffer;
                         // Give to SIE, DATA1 packet, enable data toggle checks
-                        ep0_i.STAT = __UOWN | __DTS | __DTSEN;
+                        ep0_i.STAT = UOWN | DTS | DTSEN;
                     } else {
                         
                         // PORTB = 2;
@@ -262,12 +262,12 @@ void _test02 () {
                         control_stage = DATA_OUT_STAGE;
                         // Clear the input buffer descriptor
                         ep0_i.CNT = 0;
-                        ep0_i.STAT = __UOWN | __DTS | __DTSEN;
+                        ep0_i.STAT = UOWN | DTS | DTSEN;
                         // Set the out buffer descriptor on endpoint 0 to receive data
                         ep0_o.CNT = E0SZ;
                         ep0_o.ADDR = (int) &BUFFER1[0];
                         // Give to SIE, DATA1 packet, enable data toggle checks
-                        ep0_o.STAT = __UOWN | __DTS | __DTSEN;
+                        ep0_o.STAT = UOWN | DTS | DTSEN;
                     }
                     // Enable SIE token and packet processing
                     UCONbits.PKTDIS = 0;
@@ -292,10 +292,10 @@ void _test02 () {
                     // }
                     
                     // Turn control over to the SIE and toggle the data bit
-                    if (ep0_o.STAT & __DTS)
-                        ep0_o.STAT = __UOWN | __DTSEN;
+                    if (ep0_o.STAT & DTS)
+                        ep0_o.STAT = UOWN | DTSEN;
                     else
-                        ep0_o.STAT = __UOWN | __DTS | __DTSEN;
+                        ep0_o.STAT = UOWN | DTS | DTSEN;
                 }
                 else {
                     // Prepare for the Setup stage of a control transfer
@@ -320,10 +320,10 @@ void _test02 () {
                     // Start (or continue) transmitting data
                     in_data_stage();
                     // Turn control over to the SIE and toggle the data bit
-                    if (ep0_i.STAT & __DTS)
-                        ep0_i.STAT = __UOWN | __DTSEN;
+                    if (ep0_i.STAT & DTS)
+                        ep0_i.STAT = UOWN | DTSEN;
                     else
-                        ep0_i.STAT = __UOWN | __DTS | __DTSEN;
+                        ep0_i.STAT = UOWN | DTS | DTSEN;
                 } 
                 else {
                     // Prepare for the Setup stage of a control transfer
@@ -371,42 +371,20 @@ void USB_init() {
     UIRbits.SOFIF = 0;
     PIR2bits.USBIF = 0;
     PKTDIS = 0;
-    BD0STAT.UOWN = 1;
+//    BD0STAT.UOWN = 1;
+    ep0_o.STAT = UOWN;
     UCONbits.USBEN = 1;
 
     while(1);
 }
 
 void externTest() {
-    table[1023] = 0;
-    preferredConfig(0);
+    preferredConfig();
     USB_init();
 }
 
-static void preferredConfig(BYTE package) {
-    
-    BD0STAT.address = 0x500;
-    BD0STAT.count = 64;
-    BD0STAT.DTS = 0;
-    BD0STAT.KEN = 0;
-    BD0STAT.INCDIS = 0;
-    BD0STAT.DTSEN = 1;
-    BD0STAT.BSTALL = 0;
-    BD0STAT.BC8 = 0;
-    BD0STAT.BC9 = 0;
-    BD0STAT.UOWN = 0;
-    
-//    BD1STAT.adrl = 0x40;
-//    BD1STAT.adrh = 0x05;
-    // BD1STAT.address = 0x500;
-    // BD1STAT.count = 0;
-    // BD1STAT.DTS = 1;
-    // BD1STAT.KEN = 0;
-    // BD1STAT.INCDIS = 0;
-    // BD1STAT.DTSEN = 1;
-    // BD1STAT.BSTALL = 0;
-    // BD1STAT.BC8 = 0;
-    // BD1STAT.BC9 = 0;
-    // BD1STAT.UOWN = 0;
-    
+static void preferredConfig() {
+    ep0_o.ADDR = 0x500;
+    ep0_o.CNT = 0x64;
+    ep0_o.STAT = DTSEN;
 }

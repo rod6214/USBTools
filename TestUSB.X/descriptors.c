@@ -76,6 +76,11 @@ const unsigned char endpointOUTDescriptor[] = {
     0x0A, // bInterval
 };
 #else
+
+#define TOTAL_CONFIGURATION_LENGTH (sizeof(ConfigurationDescriptior_t) + \
+sizeof(InterfaceDescriptor_t) + sizeof(HIDInterfaceDescriptor_t) + \
+sizeof(EndpointDescriptor_t) + sizeof(EndpointDescriptor_t))
+
 const DeviceDescriptor_t deviceDescriptor = {
     0x12, // bLength
     0x01, // bDescriptorType
@@ -85,7 +90,7 @@ const DeviceDescriptor_t deviceDescriptor = {
     0x00, // bDeviceProtocol
     0x40, // bMaxPacketSize0
     0x04D8, // idVendor
-    0x0A, // idProduct 
+    0x0D, // idProduct 
     0x01, // bcdDevice
     0x01, // iManufacturer
     0x02, // iProduct
@@ -94,9 +99,9 @@ const DeviceDescriptor_t deviceDescriptor = {
 };
 const struct HIDConfigurationDescriptior_t configurationDesc = {
    {/*Configuration descriptor*/
-       0x9, // Length
+       0x09, // Length
        0x02, // bDescriptorType
-       0x29, // Total length
+       TOTAL_CONFIGURATION_LENGTH, //    0x29, // Total length
        0x01, // NumInterfaces
        0x01, // bConfigurationValue
        0x00, // iConfiguration
@@ -115,7 +120,7 @@ const struct HIDConfigurationDescriptior_t configurationDesc = {
        0x00 // iInterface
    },
    {/*HID interface descriptor*/
-       0x9, // Length
+       0x09, // Length
        0x21, // bDescriptorType
        0x0101, // bcdHID
        0x00, // bCountryCode
@@ -123,10 +128,10 @@ const struct HIDConfigurationDescriptior_t configurationDesc = {
    },
    {/*HID class interface descriptor*/
        0x22, // bDescriptorType
-       0x2f// wItemLength
+       0x32// wItemLength (HID report size)
    },
    {/*Enpoint 1 IN descriptor*/
-       0x7, // Length
+       0x07, // Length
        0x05, // bDescriptorType
        0x81, // bEndpointAddress
        0x03, // bmAttributes
@@ -134,7 +139,7 @@ const struct HIDConfigurationDescriptior_t configurationDesc = {
        0x0A, // bInterval
    },
    {/*Endpoint 1 OUT descriptor*/
-       0x7, // Length
+       0x07, // Length
        0x05, // bDescriptorType
        0x01, // bEndpointAddress
        0x03, // bmAttributes
