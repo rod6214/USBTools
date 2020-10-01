@@ -62,39 +62,29 @@ static void get_descriptor(void) {
 
 	if (setup_packet->bmRequestType == 0x80) {
 		unsigned char descriptorType = HIGHBYTE(setup_packet->wValue);
-//		unsigned char descriptorIndex = setup_packet->wvalue0;
+		unsigned char descriptorIndex = LOWBYTE(setup_packet->wValue);
+
 		if (descriptorType == DEVICE_DESCRIPTOR) {
-            //  PORTB++;
+
 			request_handled = 1;
             dlen = deviceDescriptor.bLength;
             descriptor_ptr = (uint32_t*)(&deviceDescriptor);
-            // PORTB++;
-            // load_descriptor(&(BUFFER0[0]), deviceDescriptor);
-			// code_ptr = (codePtr) &device_descriptor;
-			// dlen = *code_ptr;//DEVICE_DESCRIPTOR_SIZE;
+
 		} else if (descriptorType == QUALIFIER_DESCRIPTOR) {
 			// request_handled = 1;
 			// code_ptr = (codePtr) &device_qualifier_descriptor;
 			// dlen = sizeof(device_qualifier_descriptor);
 		} else if (descriptorType == CONFIGURATION_DESCRIPTOR) {
+
             request_handled = 1;
             dlen = 0x29;
             descriptor_ptr = (uint32_t*)(&configurationDesc);
-            // PORTB++;
-			// code_ptr = (codePtr) &config_descriptor;
-			// dlen = *(code_ptr + 2);
             
 		} else if (descriptorType == STRING_DESCRIPTOR) {
-            PORTB++;
-            // request_handled = 1;
-			// if (descriptorIndex == 0) {
-			// 	code_ptr = (codePtr) &string_descriptor0;
-			// } else if (descriptorIndex == 1) {
-			// 	code_ptr = (codePtr) &string_descriptor1;
-			// } else {
-			// 	code_ptr = (codePtr) &string_descriptor2;
-			// }
-			// dlen = *code_ptr;
+
+            request_handled = 1;
+            descriptor_ptr = (uint32_t*)StringDescTable[descriptorIndex];
+			dlen = StringDescTable[descriptorIndex][0];
 		}
 	}
 }
@@ -206,13 +196,7 @@ void _test02 () {
                             usb_device_state = ADDRESS;
 
                         } else if (request == GET_DESCRIPTOR) {
-                            // if (!addcount) {
-                            //     PORTB++;
-                            // }
-                            // PORTB++;
-                            // request_handled = 1;
                             get_descriptor();
-                            // load_descriptor(&(BUFFER1[0]), deviceDescriptor);
 
                         } else if (request == SET_CONFIGURATION) {
                             
@@ -323,7 +307,7 @@ void _test02 () {
                 
                 // set address
                 UADDR = LOWBYTE(setup_packet->wValue);
-                PORTB = UADDR;
+                // PORTB = UADDR;
                 // if ((UADDR == 0) && (usb_device_state == ADDRESS)) {
                 // 	// TBD: ensure that the new address matches the value of
                 // 	// "device_address" (which came in through a SET_ADDRESS).

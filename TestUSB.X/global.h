@@ -23,6 +23,7 @@ extern const struct HIDConfigurationDescriptior_t configurationDesc;
 extern const BYTE stringDescriptor[];
 extern const BYTE iProductDesc[];
 extern const BYTE iSerialNumberDesc[];
+extern const BYTE* StringDescTable[];
 
 #ifdef	__cplusplus
 }

@@ -86,11 +86,59 @@ const BYTE stringDescriptor[] = {
 };
 
 const BYTE iProductDesc[] = {
-    8, 0x03, 'H', 'e', 'l', 'l', 'o', '\n'
+    12, 0x03, 
+    'H', 0x00,
+    'e', 0x00,
+    'l', 0x00,
+    'l', 0x00,
+    'o', 0x00,
 };
 
-const BYTE iSerialNumberDesc[] = {
-    6, 0x03, '1', '2', '3', '4'
+const BYTE iManufacturerDesc[] = {
+    0x20, 0x03, //
+    'U', 0x00, //
+    'S', 0x00, //
+    'B', 0x00, //
+    ' ', 0x00, //
+    'G', 0x00, //
+    'e', 0x00, //
+    'n', 0x00, //
+    'e', 0x00, //
+    'r', 0x00, //
+    'i', 0x00, //
+    'c', 0x00, //
+    ' ', 0x00, //
+    'C', 0x00, //
+    'D', 0x00, //
+    'C', 0x00, //
+};
+// const BYTE iManufacturerDesc[] = {
+//     22, 0x03, 
+//     'N', 0x00,
+//     'E', 0x00,
+//     'L', 0x00,
+//     'S', 0x00,
+//     'O', 0x00,
+//     'N', 0x00,
+//     ' ', 0x00,
+//     'I', 0x00,
+//     'N', 0x00,
+//     'C', 0x00,
+// };
+
+// const BYTE iSerialNumberDesc[] = {
+//     10, 0x03, 
+//     '1', 0x00,
+//     '2', 0x00,
+//     '3', 0x00,
+//     '4', 0x00,
+// };
+
+const BYTE* StringDescTable[] = {
+    stringDescriptor,
+    iManufacturerDesc,
+    iProductDesc,
+    // iSerialNumberDesc
 };
 
 const DeviceDescriptor_t deviceDescriptor = {
@@ -134,7 +182,7 @@ const struct HIDConfigurationDescriptior_t configurationDesc = {
    {/*HID interface descriptor*/
        0x09, // Length
        0x21, // bDescriptorType
-       0x0101, // bcdHID
+       0x101, // bcdHID
        0x00, // bCountryCode
        0x01, // bNumDescriptors
    },
@@ -160,9 +208,4 @@ const struct HIDConfigurationDescriptior_t configurationDesc = {
    },
 };
 
-// const BYTE* StringDescTable[] = {
-//     stringDescriptor,
-//     iProductDesc,
-//     iSerialNumberDesc
-// };
 #endif
