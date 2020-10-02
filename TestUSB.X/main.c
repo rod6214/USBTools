@@ -76,7 +76,7 @@ void main(void) {
 
 	while (usbcdc_device_state != CONFIGURED)
 		;
-
+	// PORTB++;
 	// printft("Wellcome!\n");
 
 	while (1) {

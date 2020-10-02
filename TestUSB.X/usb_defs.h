@@ -163,6 +163,8 @@ typedef struct {
     unsigned int bcdHID;
     unsigned char bCountryCode;
     unsigned char bNumDescriptors;
+    unsigned char bClassDescriptorType;
+    unsigned int wItemLength;
 } HIDInterfaceDescriptor_t;
 
 /******************************************************************************
@@ -181,7 +183,7 @@ typedef struct {
     unsigned char bDescriptorType;
     unsigned char bEndpointAddress;
     unsigned char bmAttributes;
-    unsigned char MaxPacketSize;
+    unsigned int wMaxPacketSize;
     unsigned char bInterval;
 } EndpointDescriptor_t;
 
