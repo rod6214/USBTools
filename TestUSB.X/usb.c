@@ -25,7 +25,7 @@ static volatile unsigned char BUFFER1[64] __at(0x540);
 //volatile char BUFFER __at(0x500);
 static unsigned char request_handled; // Set to 1 if request was understood and processed.
 static unsigned char control_stage; // Holds the current stage in a control transfer
-static unsigned int dlen; // Number of unsigned chars of data
+static uint16_t dlen; // Number of unsigned chars of data
 static unsigned char device_address;
 static unsigned char usb_device_state = 0;
 // static void* descriptor_ptr;
@@ -57,6 +57,9 @@ void __interrupt(low_priority) genIntL(void) {
     return;
 }
 
+// uint32_t debugp[3] = {0, 0, 0};
+int debug = 0;
+
 static void get_descriptor(void) {
     USBRequest* setup_packet = (USBRequest*)(&BUFFER0[0]);
 
@@ -64,28 +67,55 @@ static void get_descriptor(void) {
 		unsigned char descriptorType = HIGHBYTE(setup_packet->wValue);
 		unsigned char descriptorIndex = LOWBYTE(setup_packet->wValue);
 
-		if (descriptorType == DEVICE_DESCRIPTOR) {
+        // PORTB++;
 
+		if (descriptorType == DEVICE_DESCRIPTOR) {
+            // PORTB++; // 2
 			request_handled = 1;
             dlen = deviceDescriptor.bLength;
             descriptor_ptr = (uint32_t*)(&deviceDescriptor);
 
 		} else if (descriptorType == QUALIFIER_DESCRIPTOR) {
+            // PORTB++;
 			// request_handled = 1;
 			// code_ptr = (codePtr) &device_qualifier_descriptor;
 			// dlen = sizeof(device_qualifier_descriptor);
 		} else if (descriptorType == CONFIGURATION_DESCRIPTOR) {
-
+            // PORTB++; // 1
             request_handled = 1;
-            dlen = 0x29;
+            debug++;
+            // dlen = configurationDesc.configDesc.wTotalLength;
+            dlen = configurationDesc.configDesc.bLength;
+            // dlen = 34;
             descriptor_ptr = (uint32_t*)(&configurationDesc);
             
 		} else if (descriptorType == STRING_DESCRIPTOR) {
+            // debugp[descriptorIndex] = 
+            // PORTB++;
+            if (descriptorIndex == 0) {
+                // PORTB = setup_packet->wLength;
+            } else if (descriptorIndex == 1) {
+                // PORTB |= 1 << 1;
+            } else if (descriptorIndex == 2) {
+                // debug++;
+                // PORTB |= 1 << 2;
+            } else if (descriptorIndex == 3) {
+                // PORTB = StringDescTable[descriptorIndex][0];
+                // PORTB |= 1 << 3;
+            }
 
             request_handled = 1;
             descriptor_ptr = (uint32_t*)StringDescTable[descriptorIndex];
 			dlen = StringDescTable[descriptorIndex][0];
-		}
+
+		} else if (descriptorType == DESC_HID) {
+            PORTB++;
+        } else if (descriptorType == DESC_REPORT) {
+            PORTB++;
+        }
+        else {
+            PORTB++;
+        }
 	}
 }
 
@@ -112,6 +142,9 @@ void in_data_stage(void) {
 		bufferSize = dlen;
 	else
 		bufferSize = E0SZ;
+    if (debug) {
+        PORTB = bufferSize;
+    }
     // Load the high two bits of the unsigned char dlen into BC8:BC9
 	ep0_i.STAT = 0; // Clear BC8 and BC9
 	//ep0_i.STAT |= (unsigned char) ((bufferSize & 0x0300) >> 8);
@@ -165,11 +198,14 @@ void _test02 () {
 
         if (TRNIF) {
             USBRequest* setup_packet = (USBRequest*)(&BUFFER0[0]);
-
+            UADDR = usb_device_state;
             if (USTAT == DIR_OUT) {
                 unsigned char PID = (unsigned char)((ep0_o.STAT & 0x3C) >> 2); // Pull PID from middle of BD0STAT
 
                 if (PID == SETUP) {
+                    // if (debug == 1) {
+                    //     PORTB++;
+                    // }
                     // Setup stage
                     // Note: Microchip says to turn off the UOWN bit on the IN direction as
                     // soon as possible after detecting that a SETUP has been received.
@@ -180,7 +216,7 @@ void _test02 () {
                     control_stage = SETUP_STAGE;
                     request_handled = 0; // Default is that request hasn't been handled
                     
-                    // dlen = 0; // No unsigned chars transferred
+                    dlen = 0; // No unsigned chars transferred
                     // See if this is a standard (as definded in USB chapter 9) request
                     
                     // debug=setup_packet.bmRequestType;
@@ -196,36 +232,38 @@ void _test02 () {
                             usb_device_state = ADDRESS;
 
                         } else if (request == GET_DESCRIPTOR) {
+                            // PORTB++;
                             get_descriptor();
 
-                        } else if (request == SET_CONFIGURATION) {
-                            
-                            // PORTB++;
+                        } else if (request == SET_DESCRIPTOR) {
+                            PORTB++;
+                        } else if (request == SET_CONFIGURATION) {  
+                            PORTB++;
                             // request_handled = 1;
                             
                         } else if (request == GET_CONFIGURATION) { // Never seen in Windows
-                            // PORTB++;
+                            PORTB++;
                             // request_handled = 1;
 
                         } else if (request == GET_STATUS) {  // Never seen in Windows
-                            // PORTB++;
+                            PORTB++;
                             // request_handled = 1;
 
                         } else if ((request == CLEAR_FEATURE) || (request == SET_FEATURE)) {  // Never seen in Windows
-                            // PORTB++;
+                            PORTB++;
                             // request_handled = 1;
 
                         } else if (request == GET_INTERFACE) { // Never seen in Windows
-                            // PORTB++;
+                            PORTB++;
                             // request_handled = 1;
                             
                         } else if ((request == SET_INTERFACE) || (request == SET_LINE_CODING) || (request == SET_CONTROL_LINE_STATE)) {
                             // No support for alternate interfaces - just ignore.
-                            // PORTB++;
+                            PORTB++;
                             // request_handled = 1;
 
                         } else if (request == GET_LINE_CODING) {
-                            // PORTB++;
+                            PORTB++;
                             // request_handled = 1;
                         }
                         
@@ -233,7 +271,7 @@ void _test02 () {
                     
                     
                     if (!request_handled) {
-                        //  PORTB++;
+                         
                         // PORTB = 7;
                         // If this service wasn't handled then stall endpoint 0
                         ep0_o.CNT = E0SZ;
@@ -241,7 +279,6 @@ void _test02 () {
                         ep0_o.STAT = UOWN | BSTALL;
                         ep0_i.STAT = UOWN | BSTALL;
                     } else if (setup_packet->bmRequestType & 0x80) {
-                        // PORTB = 1;
                         // Device-to-host
                         // if (setup_packet->wLength < dlen)//9.4.3, p.253
                         // 	dlen = setup_packet->wLength;
@@ -256,7 +293,7 @@ void _test02 () {
                         // Give to SIE, DATA1 packet, enable data toggle checks
                         ep0_i.STAT = UOWN | DTS | DTSEN;
                     } else {
-                        
+                        // PORTB = setup_packet->bRequest;
                         // PORTB = 2;
                         // Host-to-device
                         control_stage = DATA_OUT_STAGE;
@@ -265,7 +302,7 @@ void _test02 () {
                         ep0_i.STAT = UOWN | DTS | DTSEN;
                         // Set the out buffer descriptor on endpoint 0 to receive data
                         ep0_o.CNT = E0SZ;
-                        ep0_o.ADDR = (int) &BUFFER1[0];
+                        ep0_o.ADDR = (unsigned int) &BUFFER1[0];
                         // Give to SIE, DATA1 packet, enable data toggle checks
                         ep0_o.STAT = UOWN | DTS | DTSEN;
                     }
@@ -306,7 +343,7 @@ void _test02 () {
                 // Endpoint 0:in
                 
                 // set address
-                UADDR = LOWBYTE(setup_packet->wValue);
+                // UADDR = LOWBYTE(setup_packet->wValue);
                 // PORTB = UADDR;
                 // if ((UADDR == 0) && (usb_device_state == ADDRESS)) {
                 // 	// TBD: ensure that the new address matches the value of

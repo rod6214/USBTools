@@ -13,9 +13,10 @@
 void main(void) {
     
     PORTB = 0;
-    TRISB0 = 0;
-    TRISB1 = 0;
-    TRISB2 = 0;
+    TRISB = 0;
+    // TRISB0 = 0;
+    // TRISB1 = 0;
+    // TRISB2 = 0;
 //    PORTB = 7;
     
 //    PORTBbits.RB0 = 1;

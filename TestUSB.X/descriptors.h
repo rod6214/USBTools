@@ -134,7 +134,7 @@ struct HIDConfigurationDescriptior_t {
     InterfaceDescriptor_t interfaceDesc;
     HIDInterfaceDescriptor_t hidInterfaceDesc;
     HIDClassInterfaceDescriptor_t hidClassinterfaceDesc;
-    EndpointDescriptor_t ep1_i;
+    // EndpointDescriptor_t ep1_i;
     EndpointDescriptor_t ep1_o;
 };
 

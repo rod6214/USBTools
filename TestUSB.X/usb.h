@@ -95,6 +95,8 @@ extern "C" {
 #define SET_INTERFACE     11
 #define SYNCH_FRAME       12
 
+
+
 /* Class-Specific Requests */
 #define SEND_ENCAPSULATED_COMMAND   0x00
 #define GET_ENCAPSULATED_RESPONSE   0x01
@@ -134,6 +136,9 @@ extern volatile BDT ep3_i __at(0x0404+3*8);
 #define INTERFACE_DESCRIPTOR     0x04
 #define ENDPOINT_DESCRIPTOR      0x05
 #define QUALIFIER_DESCRIPTOR     0x06
+#define DESC_HID 0x21
+#define DESC_REPORT 0x22
+#define DESC_PHYSICAL 0x23
 
 #define NUM_DESC 2
 

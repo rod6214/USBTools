@@ -86,31 +86,53 @@ const BYTE stringDescriptor[] = {
 };
 
 const BYTE iProductDesc[] = {
-    12, 0x03, 
-    'H', 0x00,
+    0x2E, 0x03, 
+    'M', 0x00,
+    'o', 0x00,
+    'u', 0x00,
+    's', 0x00,
     'e', 0x00,
+    ' ', 0x00,
+    'I', 0x00,
+    'n', 0x00,
+    ' ', 0x00,
+    'a', 0x00,
+    ' ', 0x00,
+    'C', 0x00,
+    'i', 0x00,
+    'r', 0x00,
+    'c', 0x00,
     'l', 0x00,
-    'l', 0x00,
+    'e', 0x00,
+    ' ', 0x00,
+    'D', 0x00,
+    'e', 0x00,
+    'm', 0x00,
     'o', 0x00,
 };
 
 const BYTE iManufacturerDesc[] = {
-    0x20, 0x03, //
-    'U', 0x00, //
-    'S', 0x00, //
-    'B', 0x00, //
-    ' ', 0x00, //
-    'G', 0x00, //
-    'e', 0x00, //
-    'n', 0x00, //
-    'e', 0x00, //
-    'r', 0x00, //
+    42, 0x03, //
+    'M', 0x00, //
     'i', 0x00, //
     'c', 0x00, //
+    'r', 0x00, //
+    'o', 0x00, //
+    'c', 0x00, //
+    'h', 0x00, //
+    'i', 0x00, //
+    'p', 0x00, //
     ' ', 0x00, //
-    'C', 0x00, //
-    'D', 0x00, //
-    'C', 0x00, //
+    'T', 0x00, //
+    'e', 0x00, //
+    'c', 0x00, //
+    'n', 0x00, //
+    'o', 0x00, //
+    'l', 0x00, //
+    'o', 0x00, //
+    'g', 0x00, //
+    'y', 0x00, //
+    '.', 0x00, //
 };
 // const BYTE iManufacturerDesc[] = {
 //     22, 0x03, 
@@ -136,8 +158,8 @@ const BYTE iManufacturerDesc[] = {
 
 const BYTE* StringDescTable[] = {
     stringDescriptor,
-    iManufacturerDesc,
-    iProductDesc,
+    iManufacturerDesc, // 0
+    iProductDesc, // 1
     // iSerialNumberDesc
 };
 
@@ -150,8 +172,8 @@ const DeviceDescriptor_t deviceDescriptor = {
     0x00, // bDeviceProtocol
     0x40, // bMaxPacketSize0
     0x04D8, // idVendor
-    0x0D, // idProduct 
-    0x01, // bcdDevice
+    0x000D, // idProduct 
+    0x0101, // bcdDevice
     0x01, // iManufacturer
     0x02, // iProduct
     0x00, // iSerialnumber
@@ -161,28 +183,28 @@ const struct HIDConfigurationDescriptior_t configurationDesc = {
    {/*Configuration descriptor*/
        0x09, // Length
        0x02, // bDescriptorType
-       sizeof(configurationDesc), //    0x29, // Total length
+       34, //    0x29, // Total length
        0x01, // NumInterfaces
        0x01, // bConfigurationValue
        0x00, // iConfiguration
-       0xA0, // bmAttributes
-       100 // MaxPower (200mA)
+       0x80, // bmAttributes 0xA0
+       50 // MaxPower (100mA)
    },
    {/*Interface descriptor*/
        0x09, // Length
        0x04, // bDescriptorType
        0x00, // bInterfaceNumber
        0x00, // bAlternateSetting
-       0x02, // bNumEndpoints
+       0x01, // bNumEndpoints
        0x03, // bInterfaceClass (3 = HID)
-       0x01, // bInterfaceSubClass
-       0x02, // bInterfaceProtocol
+       0x00, // bInterfaceSubClass
+       0x00, // bInterfaceProtocol
        0x00 // iInterface
    },
    {/*HID interface descriptor*/
        0x09, // Length
        0x21, // bDescriptorType
-       0x101, // bcdHID
+       0x0111, // bcdHID
        0x00, // bCountryCode
        0x01, // bNumDescriptors
    },
@@ -190,21 +212,21 @@ const struct HIDConfigurationDescriptior_t configurationDesc = {
        0x22, // bDescriptorType
        0x32// wItemLength (HID report size)
    },
-   {/*Enpoint 1 IN descriptor*/
-       0x07, // Length
-       0x05, // bDescriptorType
-       0x81, // bEndpointAddress
-       0x03, // bmAttributes
-       0x40, // MaxPacketSize (LITLE ENDIAN)
-       0x0A, // bInterval
-   },
+//    {/*Enpoint 1 IN descriptor*/
+//        0x07, // Length
+//        0x05, // bDescriptorType
+//        0x81, // bEndpointAddress
+//        0x03, // bmAttributes (Interrupt)
+//        0x40, // MaxPacketSize (LITLE ENDIAN)
+//        0x0A, // bInterval
+//    },
    {/*Endpoint 1 OUT descriptor*/
        0x07, // Length
        0x05, // bDescriptorType
        0x01, // bEndpointAddress
-       0x03, // bmAttributes
+       0x03, // bmAttributes (Interrupt)
        0x40, // MaxPacketSize (LITLE ENDIAN)
-       0x0A, // bInterval
+       1, // bInterval
    },
 };
 
