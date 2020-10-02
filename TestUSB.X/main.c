@@ -66,6 +66,8 @@ char getchar() {
 
 void main(void) {
 	OSCCON = 0x70;
+	PORTB = 0;
+	TRISB = 0;
 
 	usbcdc_init();
 
@@ -76,7 +78,6 @@ void main(void) {
 		;
 
 	// printft("Wellcome!\n");
-
 
 	while (1) {
 		// printft("%02d\n",getchar());

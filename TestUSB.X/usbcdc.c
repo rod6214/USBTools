@@ -53,7 +53,7 @@ typedef struct {
     HIDInterfaceDescriptor_t hidInterfaceDesc;
     HIDClassInterfaceDescriptor_t hidClassinterfaceDesc;
     EndpointDescriptor_t ep1_i;
-    EndpointDescriptor_t ep1_o;
+    // EndpointDescriptor_t ep1_o;
 } config_struct;
 
 // Global variables
@@ -76,20 +76,15 @@ static unsigned char dlen; // Number of unsigned chars of data
 #define STATUS_STAGE   3
 
 const unsigned char device_descriptor[] = { //
-    0x12, // bLength
-    0x01, // bDescriptorType
-    0x200, // bcdUSB
-    0x00, // bDeviceClass
-    0x00, // bDeviceSubClass
-    0x00, // bDeviceProtocol
-    0x40, // bMaxPacketSize0
-    0x04D8, // idVendor
-    0x0D, // idProduct 
-    0x01, // bcdDevice
-    0x01, // iManufacturer
-    0x02, // iProduct
-    0x00, // iSerialnumber
-    0x01 // bNumConfigurations
+    0x12, 0x01, // bLength, bDescriptorType
+    0x00, 0x02, // bcdUSB lsb, bcdUSB msb
+    0x00, 0x00, // bDeviceClass, bDeviceSubClass
+    0x00, E0SZ, // bDeviceProtocl, bMaxPacketSize
+    0xD8, 0x04, // idVendor lsb, idVendor msb
+    0x33, 0x00, // idProduct lsb, idProduct msb
+    0x02, 0x00, // bcdDevice lsb, bcdDevice msb
+    0x01, 0x01, // iManufacturer, iProduct
+    0x00, 0x01 // iSerialNumber (none), bNumConfigurations*/
 };
 const unsigned char device_qualifier_descriptor[] = { //
     0x0A, 0x06, // bLength, bDescriptorType
@@ -112,25 +107,25 @@ config_descriptor = {
        sizeof(config_descriptor), //    0x29, // Total length
        0x01, // NumInterfaces
        0x01, // bConfigurationValue
-       0x00, // iConfiguration
+       0x02, // iConfiguration
        0xA0, // bmAttributes
-       100 // MaxPower (200mA)
+       50 // MaxPower (200mA)
    },
    {/*Interface descriptor*/
        0x09, // Length
        0x04, // bDescriptorType
        0x00, // bInterfaceNumber
        0x00, // bAlternateSetting
-       0x02, // bNumEndpoints
+       0x01, // bNumEndpoints
        0x03, // bInterfaceClass (3 = HID)
-       0x01, // bInterfaceSubClass
-       0x02, // bInterfaceProtocol
+       0x00, // bInterfaceSubClass
+       0x00, // bInterfaceProtocol
        0x00 // iInterface
    },
    {/*HID interface descriptor*/
        0x09, // Length
        0x21, // bDescriptorType
-       0x101, // bcdHID
+       0x0001, // bcdHID
        0x00, // bCountryCode
        0x01, // bNumDescriptors
    },
@@ -143,17 +138,17 @@ config_descriptor = {
        0x05, // bDescriptorType
        0x81, // bEndpointAddress
        0x03, // bmAttributes
-       0x40, // MaxPacketSize (LITLE ENDIAN)
-       0x0A, // bInterval
+       64, // MaxPacketSize (LITLE ENDIAN)
+       0x01, // bInterval
    },
-   {/*Endpoint 1 OUT descriptor*/
-       0x07, // Length
-       0x05, // bDescriptorType
-       0x01, // bEndpointAddress
-       0x03, // bmAttributes
-       0x40, // MaxPacketSize (LITLE ENDIAN)
-       0x0A, // bInterval
-   },
+//    {/*Endpoint 1 OUT descriptor*/
+//        0x07, // Length
+//        0x05, // bDescriptorType
+//        0x01, // bEndpointAddress
+//        0x03, // bmAttributes
+//        E0SZ, // MaxPacketSize (LITLE ENDIAN)
+//        0x0A, // bInterval
+//    },
 };
 // const config_struct
 // config_descriptor = {
@@ -212,15 +207,43 @@ const unsigned char string_descriptor0[] = { // available languages  descriptor
     0x04, STRING_DESCRIPTOR, //
     0x09, 0x04, //
 };
-
+// (Standard system devices)
+// const unsigned char string_descriptor1[] = { //
+//     0x0E, STRING_DESCRIPTOR, // bLength, bDscType
+//     'T', 0x00, //
+//     'e', 0x00, //
+//     's', 0x00, //
+//     't', 0x00, //
+//     'i', 0x00, //
+//     '!', 0x00, //
+// };
 const unsigned char string_descriptor1[] = { //
-    0x0E, STRING_DESCRIPTOR, // bLength, bDscType
-    'T', 0x00, //
-    'e', 0x00, //
-    's', 0x00, //
-    't', 0x00, //
-    'i', 0x00, //
-    '!', 0x00, //
+    52, STRING_DESCRIPTOR, // bLength, bDscType
+	'M','\0',
+	'i','\0', 
+	'c','\0',
+	'r','\0',
+	'o','\0',
+	'c','\0',
+	'h','\0',
+	'i','\0',
+	'p','\0',
+	' ','\0',
+	'T','\0',
+	'e','\0',
+	'c','\0',
+	'h','\0',
+	'n','\0',
+	'o','\0',
+	'l','\0',
+	'o','\0',
+	'g','\0',
+	'y','\0',
+	' ','\0',
+	'I','\0',
+	'n','\0',
+	'c','\0',
+	'.','\0',
 };
 const unsigned char string_descriptor2[] = { //
     0x20, STRING_DESCRIPTOR, //
@@ -320,36 +343,51 @@ char usbcdc_getchar() {
 	return c;
 }
 
+int debug0 = 0;
+
 static void get_descriptor(void) {
+	if (setup_packet.bmrequesttype == 0x81) {
+		PORTB++;
+	}
 	if (setup_packet.bmrequesttype == 0x80) {
 		unsigned char descriptorType = setup_packet.wvalue1;
 		unsigned char descriptorIndex = setup_packet.wvalue0;
+
         
 		if (descriptorType == DEVICE_DESCRIPTOR) {
 			request_handled = 1;
 			code_ptr = (codePtr) device_descriptor;
 			dlen = *code_ptr;//DEVICE_DESCRIPTOR_SIZE;
 		} else if (descriptorType == QUALIFIER_DESCRIPTOR) {
-			request_handled = 1;
-			code_ptr = (codePtr) device_qualifier_descriptor;
-			dlen = sizeof(device_qualifier_descriptor);
+			// debug0++;
+			// request_handled = 1;
+			// code_ptr = (codePtr) device_qualifier_descriptor;
+			// dlen = sizeof(device_qualifier_descriptor);
 		} else if (descriptorType == CONFIGURATION_DESCRIPTOR) {
+			// 
 			request_handled = 1;
             
 			code_ptr = (codePtr) &config_descriptor;
-			dlen = *(code_ptr + 2);
+			// dlen = *(code_ptr + 2);
+			dlen = config_descriptor.configDesc.wTotalLength;
             
 		} else if (descriptorType == STRING_DESCRIPTOR) {
+			
 			request_handled = 1;
 			if (descriptorIndex == 0) {
 				code_ptr = (codePtr) string_descriptor0;
 			} else if (descriptorIndex == 1) {
 				code_ptr = (codePtr) string_descriptor1;
-			} else {
+			} else if (descriptorIndex == 2) {
 				code_ptr = (codePtr) string_descriptor2;
 			}
 			dlen = *code_ptr;
-		}
+			
+
+		} 
+		// else if (descriptorType == 0x21) {
+		// 	PORTB = descriptorType;
+		// }
 	}
 }
 
@@ -434,14 +472,15 @@ void in_data_stage(void) {
 	ep0_i.STAT &= ~(BC8| BC9); // Clear BC8 and BC9
 	//ep0_i.STAT |= (unsigned char) ((bufferSize & 0x0300) >> 8);
 	//ep0_i.CNT = (unsigned char) (bufferSize & 0xFF);
+	// if (debug0) PORTB = bufferSize;
 	ep0_i.CNT = bufferSize;
-	ep0_i.ADDR = (int) control_transfer_buffer;
+	ep0_i.ADDR = (int) &control_transfer_buffer[0];
 	// Update the number of unsigned chars that still need to be sent.  Getting
 	// all the data back to the host can take multiple transactions, so
 	// we need to track how far along we are.
 	dlen = dlen - bufferSize;
 	// Move data to the USB output buffer from wherever it sits now.
-	in_ptr = (dataPtr) control_transfer_buffer;
+	in_ptr = (dataPtr) &control_transfer_buffer[0];
     
 	//	for (idx = 0; idx < bufferSize; idx++)
 	for (idx = bufferSize; idx--;)
@@ -621,7 +660,6 @@ void process_control_transfer(void) {
 				// Give to SIE, DATA1 packet, enable data toggle checks
 				ep0_i.STAT = UOWN | DTS | DTSEN;
 			} else {
-                
 				// Host-to-device
 				control_stage = DATA_OUT_STAGE;
 				// Clear the input buffer descriptor
@@ -629,7 +667,7 @@ void process_control_transfer(void) {
 				ep0_i.STAT = UOWN | DTS | DTSEN;
 				// Set the out buffer descriptor on endpoint 0 to receive data
 				ep0_o.CNT = E0SZ;
-				ep0_o.ADDR = (int) control_transfer_buffer;
+				ep0_o.ADDR = (int) &control_transfer_buffer[0];
 				// Give to SIE, DATA1 packet, enable data toggle checks
 				ep0_o.STAT = UOWN | DTS | DTSEN;
 			}
@@ -641,7 +679,6 @@ void process_control_transfer(void) {
 			// passed from host to device before servicing it.
             
 			{
-                
 				unsigned char bufferSize;
 				//bufferSize = ((0x03 & ep0_o.STAT) << 8) | ep0_o.CNT;
 				bufferSize = ep0_o.CNT;
@@ -778,4 +815,6 @@ void usbcdc_handler(void) {
 		// Turn off interrupt
 		UIRbits.TRNIF = 0;
 	}
+	// PORTB = usbcdc_device_state;
+	// PORTB = UIRbits.STALLIF;
 }
