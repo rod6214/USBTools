@@ -119,6 +119,86 @@ typedef struct _USB_EP_DSC
     unsigned char bmAttributes;  unsigned short wMaxPktSize;   unsigned char bInterval;
 } USB_EP_DSC;
 
+/******************************************************************************
+ * USB Interface Device Descriptor
+ *****************************************************************************/
+typedef struct {
+    unsigned char bLength;
+    unsigned char bDescriptorType;
+    unsigned int bcdUSB;
+    unsigned char bDeviceClass;
+    unsigned char bDeviceSubClass;
+    unsigned char bDeviceProtocol;
+    unsigned char bMaxPacketSize0;
+    unsigned int idVendor;
+    unsigned int idProduct;
+    unsigned int bcdDevice;
+    unsigned char iManufacturer;
+    unsigned char iProduct;
+    unsigned char iSerialnumber;
+    unsigned char bNumConfigurations;
+} DeviceDescriptor_t;
+
+/******************************************************************************
+ * USB Interface Descriptor Structure
+ *****************************************************************************/
+typedef struct {
+    unsigned char bLength;
+    unsigned char bDescriptorType;
+    unsigned char bInterfaceNumber;
+    unsigned char bAlternateSetting;
+    unsigned char bNumEndpoints;
+    unsigned char bInterfaceClass;
+    unsigned char bInterfaceSubClass;
+    unsigned char bInterfaceProtocol;
+    unsigned char iInterface;
+} InterfaceDescriptor_t;
+
+/******************************************************************************
+ * USB HID Interface Descriptor Structure
+ *****************************************************************************/
+typedef struct {
+    unsigned char bLength;
+    unsigned char bDescriptorType;
+    unsigned int bcdHID;
+    unsigned char bCountryCode;
+    unsigned char bNumDescriptors;
+} HIDInterfaceDescriptor_t;
+
+/******************************************************************************
+ * USB HID Class Interface Descriptor Structure
+ *****************************************************************************/
+typedef struct {
+    unsigned char bDescriptorType;
+    unsigned int wItemLength;
+} HIDClassInterfaceDescriptor_t;
+
+/******************************************************************************
+ * USB Endpoint Descriptor Structure
+ *****************************************************************************/
+typedef struct {
+    unsigned char bLength;
+    unsigned char bDescriptorType;
+    unsigned char bEndpointAddress;
+    unsigned char bmAttributes;
+    unsigned char MaxPacketSize;
+    unsigned char bInterval;
+} EndpointDescriptor_t;
+
+/******************************************************************************
+ * USB Configuration Descriptor Structure
+ *****************************************************************************/
+typedef struct {
+    unsigned char bLength;
+    unsigned char bDescriptorType;
+    unsigned int wTotalLength;
+    unsigned char bNumInterfaces;
+    unsigned char bConfigurationValue;
+    unsigned char iConfiguration;
+    unsigned char bmAttributes;
+    unsigned int wMaxPower;
+} ConfigurationDescriptior_t;
+
 //
 // Standard Request Codes USB 2.0 Spec Ref Table 9-4
 //

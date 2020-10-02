@@ -26,7 +26,7 @@ THE SOFTWARE.
  */
 
 
-#include "pic18f4550.h"
+#include "pic18f2550.h"
 #include "usbcdc.h"
 #include "usb_defs.h"
 #include "pic-config.c"
@@ -75,11 +75,11 @@ void main(void) {
 	while (usbcdc_device_state != CONFIGURED)
 		;
 
-	printft("Wellcome!\n");
+	// printft("Wellcome!\n");
 
 
 	while (1) {
-		printft("%02d\n",getchar());
+		// printft("%02d\n",getchar());
 	}
 
 }

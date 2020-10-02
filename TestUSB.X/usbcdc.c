@@ -35,17 +35,25 @@ typedef unsigned char* dataPtr;
 
 // Device and configuration descriptors
 
+// typedef struct {
+// 	USB_CFG_DSC cd01;
+// 	USB_INTF_DSC i01a00;
+// 	USB_CDC_HEADER_FN_DSC cdc_header_fn_i01a00;
+// 	USB_CDC_CALL_MGT_FN_DSC cdc_call_mgt_fn_i01a00;
+// 	USB_CDC_ACM_FN_DSC cdc_acm_fn_i01a00;
+// 	USB_CDC_UNION_FN_DSC cdc_union_fn_i01a00;
+// 	USB_EP_DSC ep02i_i01a00;
+// 	USB_INTF_DSC i02a00;
+// 	USB_EP_DSC ep03o_i02a00;
+// 	USB_EP_DSC ep03i_i02a00;
+// } config_struct;
 typedef struct {
-	USB_CFG_DSC cd01;
-	USB_INTF_DSC i01a00;
-	USB_CDC_HEADER_FN_DSC cdc_header_fn_i01a00;
-	USB_CDC_CALL_MGT_FN_DSC cdc_call_mgt_fn_i01a00;
-	USB_CDC_ACM_FN_DSC cdc_acm_fn_i01a00;
-	USB_CDC_UNION_FN_DSC cdc_union_fn_i01a00;
-	USB_EP_DSC ep02i_i01a00;
-	USB_INTF_DSC i02a00;
-	USB_EP_DSC ep03o_i02a00;
-	USB_EP_DSC ep03i_i02a00;
+	ConfigurationDescriptior_t configDesc;
+    InterfaceDescriptor_t interfaceDesc;
+    HIDInterfaceDescriptor_t hidInterfaceDesc;
+    HIDClassInterfaceDescriptor_t hidClassinterfaceDesc;
+    EndpointDescriptor_t ep1_i;
+    EndpointDescriptor_t ep1_o;
 } config_struct;
 
 // Global variables
@@ -68,16 +76,20 @@ static unsigned char dlen; // Number of unsigned chars of data
 #define STATUS_STAGE   3
 
 const unsigned char device_descriptor[] = { //
-    0x12, 0x01, // bLength, bDescriptorType
-    0x00, 0x02, // bcdUSB lsb, bcdUSB msb
-    0x02, 0x00, // bDeviceClass, bDeviceSubClass
-    0x00, E0SZ, // bDeviceProtocl, bMaxPacketSize
-    0x08, 0x04, // idVendor lsb, idVendor msb
-    0x0A, 0x00, // idProduct lsb, idProduct msb
-    0x00, 0x01, // bcdDevice lsb, bcdDevice msb
-    0x01, 0x00, // iManufacturer, iProduct
-    0x00, 0x01 // iSerialNumber (none), bNumConfigurations*/
-    
+    0x12, // bLength
+    0x01, // bDescriptorType
+    0x200, // bcdUSB
+    0x00, // bDeviceClass
+    0x00, // bDeviceSubClass
+    0x00, // bDeviceProtocol
+    0x40, // bMaxPacketSize0
+    0x04D8, // idVendor
+    0x0D, // idProduct 
+    0x01, // bcdDevice
+    0x01, // iManufacturer
+    0x02, // iProduct
+    0x00, // iSerialnumber
+    0x01 // bNumConfigurations
 };
 const unsigned char device_qualifier_descriptor[] = { //
     0x0A, 0x06, // bLength, bDescriptorType
@@ -94,54 +106,107 @@ static const char const_values_status[] = { (USBCDC_SELF_POWERED<<0), 0 }; // fi
 
 const config_struct
 config_descriptor = {
-    {
-        // Configuration descriptor
-        sizeof(USB_CFG_DSC), DSC_CFG, // bLength, bDescriptorType (Configuration)
-        sizeof(config_struct), // wTotalLength
-        0x02, 0x01, // bNumInterfaces, bConfigurationValue
-        0x00, 0x80 | (USBCDC_SELF_POWERED<<6),//_DEFAULT, // iConfiguration, bmAttributes ()
-        USBCDC_MAXPOWER / 2, // bMaxPower
-    },
-    /* Interface Descriptor */
-    { sizeof(USB_INTF_DSC), // Size of this descriptor in unsigned chars
-        DSC_INTF, // INTERFACE descriptor type
-        0, // Interface Number
-        0, // Alternate Setting Number
-        1, // Number of endpoints in this intf
-        COMM_INTF, // Class __code
-        ABSTRACT_CONTROL_MODEL, // Subclass __code
-        V25TER, // Protocol __code
-        0 // Interface string index
-    },
-    /* CDC Class-Specific Descriptors */
-    { sizeof(USB_CDC_HEADER_FN_DSC), CS_INTERFACE,DSC_FN_HEADER,
-        0x0110 },
-    { sizeof(USB_CDC_CALL_MGT_FN_DSC), CS_INTERFACE,
-        DSC_FN_CALL_MGT, 0x01, CDC_DATA_INTF_ID},
-    { sizeof(USB_CDC_ACM_FN_DSC), CS_INTERFACE,
-        DSC_FN_ACM, 0x02 },
-    { sizeof(USB_CDC_UNION_FN_DSC), CS_INTERFACE,
-        DSC_FN_UNION, CDC_COMM_INTF_ID, CDC_DATA_INTF_ID },
-    /* Endpoint Descriptor */
-    {//notification endpoint
-        sizeof(USB_EP_DSC), DSC_EP,_EP01_IN, _INT,CDC_INT_EP_SIZE, 0x0A, },
-    /* Interface Descriptor */
-    { sizeof(USB_INTF_DSC), // Size of this descriptor in unsigned chars
-        DSC_INTF, // INTERFACE descriptor type
-        1, // Interface Number
-        0, // Alternate Setting Number
-        2, // Number of endpoints in this intf
-        DATA_INTF, // Class __code
-        0, // Subclass __code
-        NO_PROTOCOL, // Protocol __code
-        2, // Interface string index
-    },
-    /* Endpoint Descriptors */
-    { sizeof(USB_EP_DSC), DSC_EP,_EP02_OUT,
-        _BULK,USBCDC_BUFFER_LEN, 0x00, }, //
-    { sizeof(USB_EP_DSC), DSC_EP,_EP02_IN, _BULK,USBCDC_BUFFER_LEN,
-        0x00 }, //
+   {/*Configuration descriptor*/
+       0x09, // Length
+       0x02, // bDescriptorType
+       sizeof(config_descriptor), //    0x29, // Total length
+       0x01, // NumInterfaces
+       0x01, // bConfigurationValue
+       0x00, // iConfiguration
+       0xA0, // bmAttributes
+       100 // MaxPower (200mA)
+   },
+   {/*Interface descriptor*/
+       0x09, // Length
+       0x04, // bDescriptorType
+       0x00, // bInterfaceNumber
+       0x00, // bAlternateSetting
+       0x02, // bNumEndpoints
+       0x03, // bInterfaceClass (3 = HID)
+       0x01, // bInterfaceSubClass
+       0x02, // bInterfaceProtocol
+       0x00 // iInterface
+   },
+   {/*HID interface descriptor*/
+       0x09, // Length
+       0x21, // bDescriptorType
+       0x101, // bcdHID
+       0x00, // bCountryCode
+       0x01, // bNumDescriptors
+   },
+   {/*HID class interface descriptor*/
+       0x22, // bDescriptorType
+       0x32// wItemLength (HID report size)
+   },
+   {/*Enpoint 1 IN descriptor*/
+       0x07, // Length
+       0x05, // bDescriptorType
+       0x81, // bEndpointAddress
+       0x03, // bmAttributes
+       0x40, // MaxPacketSize (LITLE ENDIAN)
+       0x0A, // bInterval
+   },
+   {/*Endpoint 1 OUT descriptor*/
+       0x07, // Length
+       0x05, // bDescriptorType
+       0x01, // bEndpointAddress
+       0x03, // bmAttributes
+       0x40, // MaxPacketSize (LITLE ENDIAN)
+       0x0A, // bInterval
+   },
 };
+// const config_struct
+// config_descriptor = {
+//     {
+//        0x09, // Length
+//        0x02, // bDescriptorType
+//        sizeof(config_descriptor), //    0x29, // Total length
+//        0x01, // NumInterfaces
+//        0x01, // bConfigurationValue
+//        0x00, // iConfiguration
+//        0xA0, // bmAttributes
+//        100 // MaxPower (200mA)
+//     },
+//     /* Interface Descriptor */
+//     { sizeof(USB_INTF_DSC), // Size of this descriptor in unsigned chars
+//         DSC_INTF, // INTERFACE descriptor type
+//         0, // Interface Number
+//         0, // Alternate Setting Number
+//         1, // Number of endpoints in this intf
+//         COMM_INTF, // Class __code
+//         ABSTRACT_CONTROL_MODEL, // Subclass __code
+//         V25TER, // Protocol __code
+//         0 // Interface string index
+//     },
+//     /* CDC Class-Specific Descriptors */
+//     { sizeof(USB_CDC_HEADER_FN_DSC), CS_INTERFACE,DSC_FN_HEADER,
+//         0x0110 },
+//     { sizeof(USB_CDC_CALL_MGT_FN_DSC), CS_INTERFACE,
+//         DSC_FN_CALL_MGT, 0x01, CDC_DATA_INTF_ID},
+//     { sizeof(USB_CDC_ACM_FN_DSC), CS_INTERFACE,
+//         DSC_FN_ACM, 0x02 },
+//     { sizeof(USB_CDC_UNION_FN_DSC), CS_INTERFACE,
+//         DSC_FN_UNION, CDC_COMM_INTF_ID, CDC_DATA_INTF_ID },
+//     /* Endpoint Descriptor */
+//     {//notification endpoint
+//         sizeof(USB_EP_DSC), DSC_EP,_EP01_IN, _INT,CDC_INT_EP_SIZE, 0x0A, },
+//     /* Interface Descriptor */
+//     { sizeof(USB_INTF_DSC), // Size of this descriptor in unsigned chars
+//         DSC_INTF, // INTERFACE descriptor type
+//         1, // Interface Number
+//         0, // Alternate Setting Number
+//         2, // Number of endpoints in this intf
+//         DATA_INTF, // Class __code
+//         0, // Subclass __code
+//         NO_PROTOCOL, // Protocol __code
+//         2, // Interface string index
+//     },
+//     /* Endpoint Descriptors */
+//     { sizeof(USB_EP_DSC), DSC_EP,_EP02_OUT,
+//         _BULK,USBCDC_BUFFER_LEN, 0x00, }, //
+//     { sizeof(USB_EP_DSC), DSC_EP,_EP02_IN, _BULK,USBCDC_BUFFER_LEN,
+//         0x00 }, //
+// };
 
 const unsigned char string_descriptor0[] = { // available languages  descriptor
     0x04, STRING_DESCRIPTOR, //
