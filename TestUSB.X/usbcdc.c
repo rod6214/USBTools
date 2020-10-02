@@ -24,7 +24,7 @@
  */
 
 
-#include "pic18f4550.h"
+#include "pic18f2550.h"
 #include "usbcdc.h"
 #include "usbpic_defs.h"
 #include "usbcdc_defs.h"
@@ -49,11 +49,16 @@ typedef unsigned char* dataPtr;
 // } config_struct;
 typedef struct {
 	ConfigurationDescriptior_t configDesc;
+
     InterfaceDescriptor_t interfaceDesc;
-    HIDInterfaceDescriptor_t hidInterfaceDesc;
-    // HIDClassInterfaceDescriptor_t hidClassinterfaceDesc;
+    HIDInterfaceDescriptor_t hidInterfaceDesc1;
     EndpointDescriptor_t ep1_i;
-    // EndpointDescriptor_t ep1_o;
+    EndpointDescriptor_t ep1_o;
+
+	InterfaceDescriptor_t interfaceDesc2;
+	HIDInterfaceDescriptor_t hidInterfaceDesc2;
+    EndpointDescriptor_t ep2_i;
+    EndpointDescriptor_t ep2_o;
 } config_struct;
 
 // Global variables
@@ -76,15 +81,20 @@ static unsigned char dlen; // Number of unsigned chars of data
 #define STATUS_STAGE   3
 
 const unsigned char device_descriptor[] = { //
-    0x12, 0x01, // bLength, bDescriptorType
+    0x12, // bLength
+	0x01, // bDescriptorType
     0x00, 0x02, // bcdUSB lsb, bcdUSB msb
-    0x00, 0x00, // bDeviceClass, bDeviceSubClass
-    0x00, E0SZ, // bDeviceProtocl, bMaxPacketSize
-    0xD8, 0x04, // idVendor lsb, idVendor msb
-    0x33, 0x00, // idProduct lsb, idProduct msb
-    0x01, 0x00, // bcdDevice lsb, bcdDevice msb
-    0x01, 0x02, // iManufacturer, iProduct
-    0x00, 0x01 // iSerialNumber (none), bNumConfigurations*/
+    0x00, // bDeviceClass
+	0x00, // bDeviceSubClass
+    0x00, // bDeviceProtocl
+	E0SZ, // bMaxPacketSize
+    0x61, 0x04, // idVendor lsb, idVendor msb
+    0x55, 0x00, // idProduct lsb, idProduct msb
+    0x02, 0x00, // bcdDevice lsb, bcdDevice msb
+    0x01, // iManufacturer
+	0x02, // iProduct
+    0x00, // iSerialNumber (none) 
+	0x01  // bNumConfigurations*/
 };
 const unsigned char device_qualifier_descriptor[] = { //
     0x0A, 0x06, // bLength, bDescriptorType
@@ -153,7 +163,7 @@ config_descriptor = {
        0x01, // NumInterfaces
        0x01, // bConfigurationValue
        0x00, // iConfiguration
-       0xA0, // bmAttributes
+       (1 << 7) | (1 << 6), // bmAttributes
        50, // MaxPower (200mA)
    },
    {/*Interface descriptor*/
@@ -161,16 +171,16 @@ config_descriptor = {
        0x04, // bDescriptorType
        0x00, // bInterfaceNumber
        0x00, // bAlternateSetting
-       0x01, // bNumEndpoints
+       0x02, // bNumEndpoints
        0x03, // bInterfaceClass (3 = HID)
        0x01, // bInterfaceSubClass
-       0x02, // bInterfaceProtocol
+       0x01, // bInterfaceProtocol
        0x00, // iInterface
   },
    {/*HID interface descriptor*/
        sizeof(HIDInterfaceDescriptor_t), // Length
        0x21, // bDescriptorType
-       0x0101, // bcdHID
+       0x0111, // bcdHID
        0x00, // bCountryCode
        0x01, // bNumDescriptors
 	   /*HID class interface descriptor*/
@@ -180,10 +190,56 @@ config_descriptor = {
    {/*Enpoint 1 IN descriptor*/
        sizeof(EndpointDescriptor_t), // Length
        0x05, // bDescriptorType
+       0x81, // bEndpointAddress
+       0x03, // bmAttributes
+       4, // MaxPacketSize (LITLE ENDIAN)
+       10, // bInterval
+   },
+   {/*Enpoint 1 OUT descriptor*/
+       sizeof(EndpointDescriptor_t), // Length
+       0x05, // bDescriptorType
+       0x01, // bEndpointAddress
+       0x03, // bmAttributes
+       4, // MaxPacketSize (LITLE ENDIAN)
+       10, // bInterval
+   },
+//    Interface 2
+{/*Interface descriptor*/
+       sizeof(InterfaceDescriptor_t), // Length
+       0x04, // bDescriptorType
+       0x00, // bInterfaceNumber
+       0x00, // bAlternateSetting
+       0x02, // bNumEndpoints
+       0x03, // bInterfaceClass (3 = HID)
+       0x00, // bInterfaceSubClass
+       0x00, // bInterfaceProtocol
+       0x00, // iInterface
+  },
+   {/*HID interface descriptor*/
+       sizeof(HIDInterfaceDescriptor_t), // Length
+       0x21, // bDescriptorType
+       0x0111, // bcdHID
+       0x00, // bCountryCode
+       0x01, // bNumDescriptors
+	   /*HID class interface descriptor*/
+       0x22, // bDescriptorType
+       0x32,// wItemLength (HID report size)
+   },
+   {/*Enpoint 1 IN descriptor*/
+       sizeof(EndpointDescriptor_t), // Length
+       0x05, // bDescriptorType
+       0x82, // bEndpointAddress
+       0x03, // bmAttributes
+       4, // MaxPacketSize (LITLE ENDIAN)
+       10, // bInterval
+   },
+   {/*Enpoint 1 OUT descriptor*/
+       sizeof(EndpointDescriptor_t), // Length
+       0x05, // bDescriptorType
        0x02, // bEndpointAddress
        0x03, // bmAttributes
-       64, // MaxPacketSize (LITLE ENDIAN)
-       0x0A, // bInterval
+       4, // MaxPacketSize (LITLE ENDIAN)
+       10, // bInterval
    },
 //    {/*Endpoint 1 OUT descriptor*/
 //        sizeof(EndpointDescriptor_t), // Length
@@ -401,7 +457,6 @@ static void get_descriptor(void) {
 	if (setup_packet.bmrequesttype == 0x80) {
 		unsigned char descriptorType = setup_packet.wvalue1;
 		unsigned char descriptorIndex = setup_packet.wvalue0;
-		// PORTB++;
         
 		if (descriptorType == DEVICE_DESCRIPTOR) {
 			
@@ -437,7 +492,7 @@ static void get_descriptor(void) {
 			dlen = *code_ptr;
 			
 
-		} 
+		}
 		// if (debug0) {
 		// 	PORTB = descriptorType;
 		// }
@@ -559,7 +614,7 @@ void process_control_transfer(void) {
 		// 13 times
 		
 		if (PID == 0x0D) {
-			
+			// 7 times
 			// Setup stage
 			// Note: Microchip says to turn off the UOWN bit on the IN direction as
 			// soon as possible after detecting that a SETUP has been received.
@@ -648,6 +703,9 @@ void process_control_transfer(void) {
 					code_ptr = (codePtr) (cdc_line_coding);
 					dlen = sizeof(cdc_line_coding);
 					request_handled = 1;
+				}
+				else {
+					
 				}
                 
                 
@@ -756,6 +814,7 @@ void process_control_transfer(void) {
 			else
 				ep0_o.STAT = UOWN | DTS | DTSEN;
 		} else {
+			// 6 times
 			// Prepare for the Setup stage of a control transfer
 			prepare_for_setup_stage();
 		}
@@ -879,6 +938,12 @@ void usbcdc_handler(void) {
 		// Turn off interrupt
 		UIRbits.TRNIF = 0;
 	}
+
+	unsigned char descriptorType = setup_packet.wvalue1;
+
+	// if (descriptorType == DEVICE_DESCRIPTOR) {
+	// 		PORTB++;
+	// 	} 
 	// PORTB = usbcdc_device_state;
 	// PORTB = UIRbits.STALLIF;
 }
