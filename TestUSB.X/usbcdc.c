@@ -566,51 +566,7 @@ void process_control_transfer(void) {
 					
 				}
                 
-                
-                ////////////////////
-                /*
-                 // If request recipient is not an interface then return
-                 if((SetupPacket.bmRequestType & 0x1f)!= 0x01) return;
-                 
-                 // If request type is not class-specific then return
-                 if((SetupPacket.bmRequestType & 0x60)!= 0x20) return;
-                 
-                 
-                 // Interface ID must match interface numbers associated with
-                 // CDC class, else return
-                 
-                 if((SetupPacket.wIndex0 != 0x00)&&
-                 (SetupPacket.wIndex0 != 0x01)) return;
-                 
-                 switch(SetupPacket.bRequest)
-                 {
-                 case SEND_ENCAPSULATED_COMMAND:
-                 requestHandled = 1;
-                 outPtr = dummy_encapsulated_cmd_response;
-                 wCount = DUMMY_LENGTH;
-                 break;
-                 case GET_ENCAPSULATED_RESPONSE:
-                 requestHandled = 1;
-                 // Populate dummy_encapsulated_cmd_response first.
-                 inPtr = dummy_encapsulated_cmd_response;
-                 break;
-                 case SET_LINE_CODING:
-                 requestHandled = 1;
-                 inPtr = (byte*)&line_coding;    // Set destination
-                 break;
-                 case GET_LINE_CODING:
-                 requestHandled = 1;
-                 outPtr = (byte*) &line_coding;    // Set source
-                 wCount = sizeof(LINE_CODING);   // Set data count
-                 break;
-                 */
-                ////////////////////
-                
-                
-                
-                
-                
-			} //----------
+			}
             
             
 			if (!request_handled) {
