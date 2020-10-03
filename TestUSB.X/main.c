@@ -65,7 +65,7 @@ char getchar() {
 }
 
 void main(void) {
-	OSCCON = 0x70;
+	// OSCCON = 0x70;
 	PORTB = 0;
 	TRISB = 0;
 
