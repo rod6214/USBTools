@@ -34,31 +34,14 @@ typedef const unsigned char* codePtr;
 typedef unsigned char* dataPtr;
 
 // Device and configuration descriptors
-
-// typedef struct {
-// 	USB_CFG_DSC cd01;
-// 	USB_INTF_DSC i01a00;
-// 	USB_CDC_HEADER_FN_DSC cdc_header_fn_i01a00;
-// 	USB_CDC_CALL_MGT_FN_DSC cdc_call_mgt_fn_i01a00;
-// 	USB_CDC_ACM_FN_DSC cdc_acm_fn_i01a00;
-// 	USB_CDC_UNION_FN_DSC cdc_union_fn_i01a00;
-// 	USB_EP_DSC ep02i_i01a00;
-// 	USB_INTF_DSC i02a00;
-// 	USB_EP_DSC ep03o_i02a00;
-// 	USB_EP_DSC ep03i_i02a00;
-// } config_struct;
 typedef struct {
 	ConfigurationDescriptior_t configDesc;
-
+	// Interface 1
     InterfaceDescriptor_t interfaceDesc;
     HIDInterfaceDescriptor_t hidInterfaceDesc1;
     EndpointDescriptor_t ep1_i;
     EndpointDescriptor_t ep1_o;
-
-	// InterfaceDescriptor_t interfaceDesc2;
-	// HIDInterfaceDescriptor_t hidInterfaceDesc2;
-    // EndpointDescriptor_t ep2_i;
-    // EndpointDescriptor_t ep2_o;
+	// TODO: Set more interfaces here
 } config_struct;
 
 // Global variables
@@ -159,48 +142,10 @@ config_descriptor = {
        E0SZ, // MaxPacketSize (LITLE ENDIAN)
        1, // bInterval
    },
-//    Interface 2
-// {/*Interface descriptor*/
-//        sizeof(InterfaceDescriptor_t), // Length
-//        0x04, // bDescriptorType
-//        0x01, // bInterfaceNumber
-//        0x00, // bAlternateSetting
-//        0x02, // bNumEndpoints
-//        0x03, // bInterfaceClass (3 = HID)
-//        0x00, // bInterfaceSubClass
-//        0x00, // bInterfaceProtocol
-//        0x00, // iInterface
-//   },
-//    {/*HID interface descriptor*/
-//        sizeof(HIDInterfaceDescriptor_t), // Length
-//        0x21, // bDescriptorType
-//        0x0111, // bcdHID
-//        0x00, // bCountryCode
-//        0x01, // bNumDescriptors
-// 	   /*HID class interface descriptor*/
-//        0x22, // bDescriptorType
-//        0x1C,// wItemLength (HID report size)
-//    },
-//    {/*Enpoint 2 IN descriptor*/
-//        sizeof(EndpointDescriptor_t), // Length
-//        0x05, // bDescriptorType
-//        0x82, // bEndpointAddress
-//        0x03, // bmAttributes
-//        64, // MaxPacketSize (LITLE ENDIAN)
-//        1, // bInterval
-//    },
-//    {/*Enpoint 2 OUT descriptor*/
-//        sizeof(EndpointDescriptor_t), // Length
-//        0x05, // bDescriptorType
-//        0x02, // bEndpointAddress
-//        0x03, // bmAttributes
-//        64, // MaxPacketSize (LITLE ENDIAN)
-//        1, // bInterval
-//    },
 };
 
 // Class specific descriptor - HID 
-const struct{BYTE report[HID_RPT01_SIZE];}hid_rpt01={
+const struct {BYTE report[HID_RPT01_SIZE];}hid_rpt01={
 {
     0x06, 0x00, 0xFF,       // Usage Page = 0xFF00 (Vendor Defined Page 1)
     0x09, 0x01,             // Usage (Vendor Usage 1)
@@ -366,8 +311,6 @@ char usbcdc_getchar() {
 	return c;
 }
 
-int debug0 = 0;
-
 static void get_descriptor(void) {
 
 	unsigned char descriptorType = setup_packet.wvalue1;
@@ -380,7 +323,6 @@ static void get_descriptor(void) {
 			code_ptr = (codePtr) device_descriptor;
 			dlen = *code_ptr;//DEVICE_DESCRIPTOR_SIZE;
 		} else if (descriptorType == QUALIFIER_DESCRIPTOR) {
-			// debug0++;
 			// request_handled = 1;
 			// code_ptr = (codePtr) device_qualifier_descriptor;
 			// dlen = sizeof(device_qualifier_descriptor);
@@ -406,15 +348,17 @@ static void get_descriptor(void) {
 				
 			}
 			dlen = *code_ptr;
-			debug0++;
-
 		}
 
 	} else if (setup_packet.bmrequesttype == 0x81) {
 		if (descriptorType == HID_DESCRIPTOR) {
 			PORTB = 1;
 		} else if (descriptorType == REPORT_DESCRIPTOR) {
-			PORTB = 2;
+
+			request_handled = 1;
+			code_ptr = (codePtr) &hid_rpt01;
+			dlen = HID_RPT01_SIZE;
+
 		} else if (descriptorType == PHYSICAL_DESCRIPTOR) {
 			PORTB = 3;
 		}
@@ -502,7 +446,6 @@ void in_data_stage(void) {
 	ep0_i.STAT &= ~(BC8| BC9); // Clear BC8 and BC9
 	//ep0_i.STAT |= (unsigned char) ((bufferSize & 0x0300) >> 8);
 	//ep0_i.CNT = (unsigned char) (bufferSize & 0xFF);
-	// if (debug0) PORTB = bufferSize;
 	ep0_i.CNT = bufferSize;
 	ep0_i.ADDR = (int) &control_transfer_buffer[0];
 	// Update the number of unsigned chars that still need to be sent.  Getting
@@ -527,8 +470,6 @@ void prepare_for_setup_stage(void) {
 	UCONbits.PKTDIS = 0;
 }
 
-// char debug=0;
-
 void process_control_transfer(void) {
 
 	if (USTAT == USTAT_OUT) {
@@ -549,12 +490,8 @@ void process_control_transfer(void) {
             
 			dlen = 0; // No unsigned chars transferred
 			// See if this is a standard (as definded in USB chapter 9) request
-            
-//			debug=setup_packet.bmrequesttype;
 			if (1 /* (setup_packet.bmrequesttype & 0x60) == 0x00*/) {// ----------
 				unsigned char request = setup_packet.brequest;
-//				debug = request;
-                
                 
 				if (request == SET_ADDRESS) {
 					// Set the address of the device.  All future requests
@@ -566,7 +503,6 @@ void process_control_transfer(void) {
 					usbcdc_device_state = ADDRESS;
 					device_address = setup_packet.wvalue0;
 				} else if (request == GET_DESCRIPTOR) {
-					PORTB++;
 					get_descriptor();
 				} else if (request == SET_CONFIGURATION) {
 					
@@ -802,7 +738,6 @@ void usbcdc_init() {
 	PIE2bits.USBIE = 1;
 }
 
-int debug = 0;
 // Main entry point for USB tasks.  Checks interrupts, then checks for transactions.
 void usbcdc_handler(void) {
 	if ((UCFGbits.UTEYE == 1) || //eye test
