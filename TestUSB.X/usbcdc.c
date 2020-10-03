@@ -55,10 +55,10 @@ typedef struct {
     EndpointDescriptor_t ep1_i;
     EndpointDescriptor_t ep1_o;
 
-	InterfaceDescriptor_t interfaceDesc2;
-	HIDInterfaceDescriptor_t hidInterfaceDesc2;
-    EndpointDescriptor_t ep2_i;
-    EndpointDescriptor_t ep2_o;
+	// InterfaceDescriptor_t interfaceDesc2;
+	// HIDInterfaceDescriptor_t hidInterfaceDesc2;
+    // EndpointDescriptor_t ep2_i;
+    // EndpointDescriptor_t ep2_o;
 } config_struct;
 
 // Global variables
@@ -115,7 +115,7 @@ config_descriptor = {
        sizeof(ConfigurationDescriptior_t), // Length
        0x02, // bDescriptorType
        sizeof(config_struct), // Total length
-       0x02, // NumInterfaces
+       0x01, // NumInterfaces
        0x01, // bConfigurationValue
        0x00, // iConfiguration
        0xC0, // bmAttributes
@@ -141,7 +141,7 @@ config_descriptor = {
        0x01, // bNumDescriptors
 	   /*HID class interface descriptor*/
        0x22, // bDescriptorType
-       0x32,// wItemLength (HID report size)
+       HID_RPT01_SIZE,// wItemLength (HID report size)
    },
    {/*Enpoint 1 IN descriptor*/
        sizeof(EndpointDescriptor_t), // Length
@@ -160,44 +160,63 @@ config_descriptor = {
        1, // bInterval
    },
 //    Interface 2
-{/*Interface descriptor*/
-       sizeof(InterfaceDescriptor_t), // Length
-       0x04, // bDescriptorType
-       0x01, // bInterfaceNumber
-       0x00, // bAlternateSetting
-       0x02, // bNumEndpoints
-       0x03, // bInterfaceClass (3 = HID)
-       0x00, // bInterfaceSubClass
-       0x00, // bInterfaceProtocol
-       0x00, // iInterface
-  },
-   {/*HID interface descriptor*/
-       sizeof(HIDInterfaceDescriptor_t), // Length
-       0x21, // bDescriptorType
-       0x0111, // bcdHID
-       0x00, // bCountryCode
-       0x01, // bNumDescriptors
-	   /*HID class interface descriptor*/
-       0x22, // bDescriptorType
-       0x1C,// wItemLength (HID report size)
-   },
-   {/*Enpoint 2 IN descriptor*/
-       sizeof(EndpointDescriptor_t), // Length
-       0x05, // bDescriptorType
-       0x82, // bEndpointAddress
-       0x03, // bmAttributes
-       64, // MaxPacketSize (LITLE ENDIAN)
-       1, // bInterval
-   },
-   {/*Enpoint 2 OUT descriptor*/
-       sizeof(EndpointDescriptor_t), // Length
-       0x05, // bDescriptorType
-       0x02, // bEndpointAddress
-       0x03, // bmAttributes
-       64, // MaxPacketSize (LITLE ENDIAN)
-       1, // bInterval
-   },
+// {/*Interface descriptor*/
+//        sizeof(InterfaceDescriptor_t), // Length
+//        0x04, // bDescriptorType
+//        0x01, // bInterfaceNumber
+//        0x00, // bAlternateSetting
+//        0x02, // bNumEndpoints
+//        0x03, // bInterfaceClass (3 = HID)
+//        0x00, // bInterfaceSubClass
+//        0x00, // bInterfaceProtocol
+//        0x00, // iInterface
+//   },
+//    {/*HID interface descriptor*/
+//        sizeof(HIDInterfaceDescriptor_t), // Length
+//        0x21, // bDescriptorType
+//        0x0111, // bcdHID
+//        0x00, // bCountryCode
+//        0x01, // bNumDescriptors
+// 	   /*HID class interface descriptor*/
+//        0x22, // bDescriptorType
+//        0x1C,// wItemLength (HID report size)
+//    },
+//    {/*Enpoint 2 IN descriptor*/
+//        sizeof(EndpointDescriptor_t), // Length
+//        0x05, // bDescriptorType
+//        0x82, // bEndpointAddress
+//        0x03, // bmAttributes
+//        64, // MaxPacketSize (LITLE ENDIAN)
+//        1, // bInterval
+//    },
+//    {/*Enpoint 2 OUT descriptor*/
+//        sizeof(EndpointDescriptor_t), // Length
+//        0x05, // bDescriptorType
+//        0x02, // bEndpointAddress
+//        0x03, // bmAttributes
+//        64, // MaxPacketSize (LITLE ENDIAN)
+//        1, // bInterval
+//    },
 };
+
+// Class specific descriptor - HID 
+const struct{BYTE report[HID_RPT01_SIZE];}hid_rpt01={
+{
+    0x06, 0x00, 0xFF,       // Usage Page = 0xFF00 (Vendor Defined Page 1)
+    0x09, 0x01,             // Usage (Vendor Usage 1)
+    0xA1, 0x01,             // Collection (Application)
+    0x19, 0x01,             //      Usage Minimum 
+    0x29, 0x40,             //      Usage Maximum 	//64 input usages total (0x01 to 0x40)
+    0x15, 0x01,             //      Logical Minimum (data bytes in the report may have minimum value = 0x00)
+    0x25, 0x40,      	  	//      Logical Maximum (data bytes in the report may have maximum value = 0x00FF = unsigned 255)
+    0x75, 0x08,             //      Report Size: 8-bit field size
+    0x95, 0x40,             //      Report Count: Make sixty-four 8-bit fields (the next time the parser hits an "Input", "Output", or "Feature" item)
+    0x81, 0x00,             //      Input (Data, Array, Abs): Instantiates input packet fields based on the above report size, count, logical min/max, and usage.
+    0x19, 0x01,             //      Usage Minimum 
+    0x29, 0x40,             //      Usage Maximum 	//64 output usages total (0x01 to 0x40)
+    0x91, 0x00,             //      Output (Data, Array, Abs): Instantiates output packet fields.  Uses same report size and count as "Input" fields, since nothing new/different was specified to the parser since the "Input" item.
+    0xC0}                   // End Collection
+};   
 
 
 const unsigned char string_descriptor0[] = { // available languages  descriptor
@@ -351,10 +370,10 @@ int debug0 = 0;
 
 static void get_descriptor(void) {
 
+	unsigned char descriptorType = setup_packet.wvalue1;
+	unsigned char descriptorIndex = setup_packet.wvalue0;
+
 	if (setup_packet.bmrequesttype == 0x80) {
-		unsigned char descriptorType = setup_packet.wvalue1;
-		unsigned char descriptorIndex = setup_packet.wvalue0;
-        
 		if (descriptorType == DEVICE_DESCRIPTOR) {
 			
 			request_handled = 1;
@@ -389,12 +408,16 @@ static void get_descriptor(void) {
 			dlen = *code_ptr;
 			debug0++;
 
-		} else if (descriptorType == 0x22) {
-			PORTB++;
 		}
-		// if (debug0) {
-		// 	PORTB = descriptorType;
-		// }
+
+	} else if (setup_packet.bmrequesttype == 0x81) {
+		if (descriptorType == HID_DESCRIPTOR) {
+			PORTB = 1;
+		} else if (descriptorType == REPORT_DESCRIPTOR) {
+			PORTB = 2;
+		} else if (descriptorType == PHYSICAL_DESCRIPTOR) {
+			PORTB = 3;
+		}
 	}
 }
 
@@ -543,7 +566,7 @@ void process_control_transfer(void) {
 					usbcdc_device_state = ADDRESS;
 					device_address = setup_packet.wvalue0;
 				} else if (request == GET_DESCRIPTOR) {
-					
+					PORTB++;
 					get_descriptor();
 				} else if (request == SET_CONFIGURATION) {
 					

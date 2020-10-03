@@ -58,6 +58,7 @@ char usbcdc_getchar() ;
 #define CDC_TX_REG (CONTROL_TRANSFER_REG + E0SZ)
 #define CDC_RX_REG (CDC_TX_REG + USBCDC_BUFFER_LEN)
 #define CDC_INT_REG (CDC_RX_REG + USBCDC_BUFFER_LEN)
+#define HID_RPT01_SIZE 28
 
 volatile setup_packet_struct setup_packet __at(SETUP_PACKET_REG);
 extern unsigned char control_transfer_buffer[E0SZ] __at(CONTROL_TRANSFER_REG);

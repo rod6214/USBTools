@@ -227,9 +227,9 @@ typedef struct {
 #define INTERFACE_DESCRIPTOR     0x04
 #define ENDPOINT_DESCRIPTOR      0x05
 #define QUALIFIER_DESCRIPTOR     0x06
-#define DESC_HID 0x21
-#define	DESC_REPORT 0x22
-#define	DESC_PHYSICAL 0x23
+#define HID_DESCRIPTOR           0x21
+#define	REPORT_DESCRIPTOR        0x22
+#define	PHYSICAL_DESCRIPTOR      0x23
 
 // Device states (Chap 9.1.1)
 #define DETACHED     0

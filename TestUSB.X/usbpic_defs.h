@@ -13,6 +13,9 @@
 #define BC9    0x02 // Byte count bit 9
 #define BC8    0x01 // Byte count bit 8
 
+
+typedef unsigned char BYTE;
+
 typedef struct _BDT
 {
     unsigned char STAT;
