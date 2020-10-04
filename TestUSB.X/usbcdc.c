@@ -460,14 +460,19 @@ void in_data_stage(void) {
 		*in_ptr++ = *code_ptr++;
     
 }
+#define EPINEN (1 << 1)
+#define EPOUTEN (1 << 2)
+#define EPHSHK (1 << 4)
 
 void prepare_for_setup_stage(void) {
+	// UEP0 = EPINEN | EPOUTEN | EPHSHK;
 	control_stage = SETUP_STAGE;
 	ep0_o.CNT = E0SZ;
 	ep0_o.ADDR = (int) &setup_packet;
 	ep0_o.STAT = UOWN | DTSEN;
 	ep0_i.STAT = 0x00;
 	UCONbits.PKTDIS = 0;
+    // PORTB = 3;
 }
 
 void process_control_transfer(void) {
@@ -679,6 +684,7 @@ void usbcdc_init() {
 	if (UCONbits.USBEN == 0) {//enable usb controller
 		UCON = 0;
 		UIE = 0;
+        
 		UCONbits.USBEN = 1;
 		usbcdc_device_state = ATTACHED;
         
@@ -699,12 +705,15 @@ void usbcdc_handler(void) {
 	if ((UCFGbits.UTEYE == 1) || //eye test
         (usbcdc_device_state == DETACHED) || //not connected
         (UCONbits.SUSPND == 1))//suspended
-		return;
+    {
+        // PORTB = 2;
+        return;
+    }
 
 	// Process a bus reset
 	if (UIRbits.URSTIF && UIEbits.URSTIE) {
 		{ // bus_reset
-            
+            // PORTB = 1;
 			UEIR = 0x00;
 			UIR = 0x00;
 			UEIE = 0x9f;
@@ -732,11 +741,13 @@ void usbcdc_handler(void) {
 	}
 	//nothing is done to start of frame
 	if (UIRbits.SOFIF && UIEbits.SOFIE) {
+		// PORTB = 3;
 		UIRbits.SOFIF = 0;
 	}
     
 	// stall processing
 	if (UIRbits.STALLIF && UIEbits.STALLIE) {
+		// PORTB = 4;
 		if (UEP0bits.EPSTALL == 1) {
 			// Prepare for the Setup stage of a control transfer
 			prepare_for_setup_stage();
@@ -745,17 +756,21 @@ void usbcdc_handler(void) {
 		UIRbits.STALLIF = 0;
 	}
 	if (UIRbits.UERRIF && UIEbits.UERRIE) {
+		// PORTB = 5;
 		// Clear errors
 		UIRbits.UERRIF = 0;
 	}
-
+    
 	// A transaction has finished.  Try default processing on endpoint 0.
 	if (UIRbits.TRNIF && UIEbits.TRNIE) {
-		process_control_transfer();
+		PORTB = 2;
+		// PORTB = 2;
+//        PORTB++;
+//		process_control_transfer();
 		// Turn off interrupt
 		// UIRbits.TRNIF = 0;
-		while (UIRbits.TRNIF == 1) {
-			UIRbits.TRNIF = 0;
-		}
+//		while (UIRbits.TRNIF == 1) {
+//			UIRbits.TRNIF = 0;
+//		}
 	}
 }
