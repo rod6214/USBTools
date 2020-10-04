@@ -1,0 +1,12 @@
+C:\Develop\USBTools\C#App\USBTool\USBTool\bin\Debug\netcoreapp3.1\USBTool.exe
+C:\Develop\USBTools\C#App\USBTool\USBTool\bin\Debug\netcoreapp3.1\USBTool.deps.json
+C:\Develop\USBTools\C#App\USBTool\USBTool\bin\Debug\netcoreapp3.1\USBTool.runtimeconfig.json
+C:\Develop\USBTools\C#App\USBTool\USBTool\bin\Debug\netcoreapp3.1\USBTool.runtimeconfig.dev.json
+C:\Develop\USBTools\C#App\USBTool\USBTool\bin\Debug\netcoreapp3.1\USBTool.dll
+C:\Develop\USBTools\C#App\USBTool\USBTool\bin\Debug\netcoreapp3.1\USBTool.pdb
+C:\Develop\USBTools\C#App\USBTool\USBTool\obj\Debug\netcoreapp3.1\USBTool.AssemblyInfoInputs.cache
+C:\Develop\USBTools\C#App\USBTool\USBTool\obj\Debug\netcoreapp3.1\USBTool.AssemblyInfo.cs
+C:\Develop\USBTools\C#App\USBTool\USBTool\obj\Debug\netcoreapp3.1\USBTool.csproj.CoreCompileInputs.cache
+C:\Develop\USBTools\C#App\USBTool\USBTool\obj\Debug\netcoreapp3.1\USBTool.dll
+C:\Develop\USBTools\C#App\USBTool\USBTool\obj\Debug\netcoreapp3.1\USBTool.pdb
+C:\Develop\USBTools\C#App\USBTool\USBTool\obj\Debug\netcoreapp3.1\USBTool.genruntimeconfig.cache
