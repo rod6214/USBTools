@@ -674,8 +674,8 @@ void process_control_transfer(void) {
 }
 
 void usbcdc_init() {
-//	UCFG = 0x14; // Enable pullup resistors; full speed mode
-    UCFG = UPUEN; // Important: for HID must be low speed
+	UCFG = 0x14; // Enable pullup resistors; full speed mode
+//    UCFG = UPUEN; // Important: for HID must be low speed
 	usbcdc_device_state = DETACHED;
 	//	remote_wakeup = 0x00;
 	current_configuration = 0x00;            
@@ -763,14 +763,14 @@ void usbcdc_handler(void) {
     
 	// A transaction has finished.  Try default processing on endpoint 0.
 	if (UIRbits.TRNIF && UIEbits.TRNIE) {
-		PORTB = 2;
+//		PORTB = 2;
 		// PORTB = 2;
 //        PORTB++;
-//		process_control_transfer();
+		process_control_transfer();
 		// Turn off interrupt
 		// UIRbits.TRNIF = 0;
-//		while (UIRbits.TRNIF == 1) {
-//			UIRbits.TRNIF = 0;
-//		}
+		while (UIRbits.TRNIF == 1) {
+			UIRbits.TRNIF = 0;
+		}
 	}
 }

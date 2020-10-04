@@ -67,7 +67,7 @@ char getchar() {
 
 void main(void) {
 //	 OSCCON = 0x70;
-    UCFG = UPUEN;
+//    UCFG = UPUEN;
 	PORTB = 0;
 	TRISB = 0;
 
