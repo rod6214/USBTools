@@ -112,8 +112,8 @@ config_descriptor = {
        0x00, // bAlternateSetting
        0x02, // bNumEndpoints
        0x03, // bInterfaceClass (3 = HID)
-       0x01, // bInterfaceSubClass
-       0x01, // bInterfaceProtocol
+       0x00, // bInterfaceSubClass
+       0x00, // bInterfaceProtocol (1) Keyboard, (2) Mouse
        0x00, // iInterface
   },
    {/*HID interface descriptor*/
@@ -151,14 +151,14 @@ const struct {BYTE report[HID_RPT01_SIZE];}hid_rpt01={
     0x09, 0x01,             // Usage (Vendor Usage 1)
     0xA1, 0x01,             // Collection (Application)
     0x19, 0x01,             //      Usage Minimum 
-    0x29, 0x40,             //      Usage Maximum 	//64 input usages total (0x01 to 0x40)
+    0x29, 0x02,             //      Usage Maximum 	//64 input usages total (0x01 to 0x40)
     0x15, 0x01,             //      Logical Minimum (data bytes in the report may have minimum value = 0x00)
-    0x25, 0x40,      	  	//      Logical Maximum (data bytes in the report may have maximum value = 0x00FF = unsigned 255)
+    0x25, 0x02,      	  	//      Logical Maximum (data bytes in the report may have maximum value = 0x00FF = unsigned 255)
     0x75, 0x08,             //      Report Size: 8-bit field size
-    0x95, 0x40,             //      Report Count: Make sixty-four 8-bit fields (the next time the parser hits an "Input", "Output", or "Feature" item)
+    0x95, 0x02,             //      Report Count: Make sixty-four 8-bit fields (the next time the parser hits an "Input", "Output", or "Feature" item)
     0x81, 0x00,             //      Input (Data, Array, Abs): Instantiates input packet fields based on the above report size, count, logical min/max, and usage.
     0x19, 0x01,             //      Usage Minimum 
-    0x29, 0x40,             //      Usage Maximum 	//64 output usages total (0x01 to 0x40)
+    0x29, 0x02,             //      Usage Maximum 	//64 output usages total (0x01 to 0x40)
     0x91, 0x00,             //      Output (Data, Array, Abs): Instantiates output packet fields.  Uses same report size and count as "Input" fields, since nothing new/different was specified to the parser since the "Input" item.
     0xC0}                   // End Collection
 };   
@@ -249,6 +249,24 @@ static unsigned char rx_idx = 0;
 //static volatile unsigned char cdcint_buffer[USBCDC_BUFFER_LEN];
 static const char cdc_line_coding[7] = {9600&0xFF,9600>>8,0,0,0,0,8};
 //static __code char cdc_line_coding[7] = {9600&0xFF,9600>>8,0,0,1,2,8};
+void configure_tx_rx_ep() {
+	// Initialize the endpoints for all interfaces
+	{ // Turn on both in and out for this endpoint
+		// UEP1 = 0x1E;
+		
+		// ep1_i.ADDR = (int) cdcint_buffer;
+		// ep1_i.STAT = DTS;
+		
+		UEP1 = 0x1E;
+		
+		ep1_o.CNT = sizeof(cdc_rx_buffer);
+		ep1_o.ADDR = (int) cdc_rx_buffer;
+		ep1_o.STAT = UOWN | DTSEN; //set up to receive stuff as soon as we get something
+		
+		ep1_i.ADDR = (int) cdc_tx_buffer;
+		ep1_i.STAT = DTS;
+	}
+}
 
 void usbcdc_putchar(char c)
 {
@@ -311,12 +329,15 @@ char usbcdc_getchar() {
 	return c;
 }
 
+int configured_ep = 0;
+
 static void get_descriptor(void) {
 
 	unsigned char descriptorType = setup_packet.wvalue1;
 	unsigned char descriptorIndex = setup_packet.wvalue0;
 
 	if (setup_packet.bmrequesttype == 0x80) {
+		
 		if (descriptorType == DEVICE_DESCRIPTOR) {
 			
 			request_handled = 1;
@@ -351,16 +372,32 @@ static void get_descriptor(void) {
 		}
 
 	} else if (setup_packet.bmrequesttype == 0x81) {
+
+		        //  if (usbcdc_device_state == CONFIGURED) {
+				// 		PORTB++;
+				// 	}
+
 		if (descriptorType == HID_DESCRIPTOR) {
-			PORTB = 1;
+			// PORTB = 1;
+			// if (usbcdc_device_state == CONFIGURED) {
+			// 			PORTB++;
+			// 		}
 		} else if (descriptorType == REPORT_DESCRIPTOR) {
+
+			if (!configured_ep && usbcdc_device_state == CONFIGURED) {
+				configure_tx_rx_ep();
+				configured_ep++;
+			}
+			        //          if (usbcdc_device_state == CONFIGURED) {
+					// 	PORTB++;
+					// }
 
 			request_handled = 1;
 			code_ptr = (codePtr) &hid_rpt01;
 			dlen = HID_RPT01_SIZE;
 
 		} else if (descriptorType == PHYSICAL_DESCRIPTOR) {
-			PORTB = 3;
+			// PORTB = 3;
 		}
 	}
 }
@@ -472,16 +509,19 @@ void prepare_for_setup_stage(void) {
 	ep0_o.STAT = UOWN | DTSEN;
 	ep0_i.STAT = 0x00;
 	UCONbits.PKTDIS = 0;
-    // PORTB = 3;
 }
 
 void process_control_transfer(void) {
-
+if (usbcdc_device_state == CONFIGURED) {
+						PORTB++;
+					}
 	if (USTAT == USTAT_OUT) {
+
 		unsigned char PID = (ep0_o.STAT & 0x3C) >> 2; // Pull PID from middle of BD0STAT
 		// 13 times
 		
 		if (PID == 0x0D) {
+
 			// 7 times
 			// Setup stage
 			// Note: Microchip says to turn off the UOWN bit on the IN direction as
@@ -497,7 +537,7 @@ void process_control_transfer(void) {
 			// See if this is a standard (as definded in USB chapter 9) request
 			if (1 /* (setup_packet.bmrequesttype & 0x60) == 0x00*/) {// ----------
 				unsigned char request = setup_packet.brequest;
-                
+
 				if (request == SET_ADDRESS) {
 					// Set the address of the device.  All future requests
 					// will come to that address.  Can't actually set UADDR
@@ -508,10 +548,10 @@ void process_control_transfer(void) {
 					usbcdc_device_state = ADDRESS;
 					device_address = setup_packet.wvalue0;
 				} else if (request == GET_DESCRIPTOR) {
+
 					get_descriptor();
 				} else if (request == SET_CONFIGURATION) {
 					
-                    
 					request_handled = 1;
 					current_configuration = setup_packet.wvalue0;
 					// TBD: ensure the new configuration value is one that
@@ -542,6 +582,7 @@ void process_control_transfer(void) {
 						}
 					}
 				} else if (request == GET_CONFIGURATION) { // Never seen in Windows
+				                   
 					request_handled = 1;
 					code_ptr = (codePtr) &const_values_0x00_0x01[current_configuration];
 					dlen = 1;
@@ -705,15 +746,12 @@ void usbcdc_handler(void) {
 	if ((UCFGbits.UTEYE == 1) || //eye test
         (usbcdc_device_state == DETACHED) || //not connected
         (UCONbits.SUSPND == 1))//suspended
-    {
-        // PORTB = 2;
         return;
-    }
 
 	// Process a bus reset
 	if (UIRbits.URSTIF && UIEbits.URSTIE) {
 		{ // bus_reset
-            // PORTB = 1;
+
 			UEIR = 0x00;
 			UIR = 0x00;
 			UEIE = 0x9f;
@@ -741,13 +779,11 @@ void usbcdc_handler(void) {
 	}
 	//nothing is done to start of frame
 	if (UIRbits.SOFIF && UIEbits.SOFIE) {
-		// PORTB = 3;
 		UIRbits.SOFIF = 0;
 	}
     
 	// stall processing
 	if (UIRbits.STALLIF && UIEbits.STALLIE) {
-		// PORTB = 4;
 		if (UEP0bits.EPSTALL == 1) {
 			// Prepare for the Setup stage of a control transfer
 			prepare_for_setup_stage();
@@ -756,16 +792,13 @@ void usbcdc_handler(void) {
 		UIRbits.STALLIF = 0;
 	}
 	if (UIRbits.UERRIF && UIEbits.UERRIE) {
-		// PORTB = 5;
 		// Clear errors
 		UIRbits.UERRIF = 0;
 	}
     
 	// A transaction has finished.  Try default processing on endpoint 0.
 	if (UIRbits.TRNIF && UIEbits.TRNIE) {
-//		PORTB = 2;
-		// PORTB = 2;
-//        PORTB++;
+
 		process_control_transfer();
 		// Turn off interrupt
 		// UIRbits.TRNIF = 0;

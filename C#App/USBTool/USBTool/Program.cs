@@ -14,13 +14,22 @@
 
             if (USB.Find_This_Device(0x048d, 0x003f, 0, ref readHandler, ref writeHandler))
             {
-                byte[] data = Encoding.UTF8.GetBytes("H\0  ");
+                byte[] data = Encoding.UTF8.GetBytes("\0ello\0  ");
+                byte[] buffer = new byte[2048];
 
                 int written = 0;
+                int read = 0;
 
-                USB.WriteFile(writeHandler, data, 1, ref written, 0);
-                
-                //Console.WriteLine("Hello World!");
+                //if (USB.ReadFile(readHandler, buffer, 2, ref read, 0))
+                //{
+
+                //    Console.WriteLine("Data read");
+                //}
+
+                if (USB.WriteFile(writeHandler, data, 3, ref written, 0)) {
+
+                    Console.WriteLine("Data written");
+                }
             }
         }
     }
