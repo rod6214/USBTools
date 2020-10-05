@@ -14,7 +14,8 @@
 
             if (USB.Find_This_Device(0x048d, 0x003f, 0, ref readHandler, ref writeHandler))
             {
-                byte[] data = Encoding.UTF8.GetBytes("\0ello\0  ");
+                //byte[] data = Encoding.UTF8.GetBytes("\02\0  ");
+                byte[] data = new byte[6] { 0, 9, 5, 3, 0, 0 };
                 byte[] buffer = new byte[2048];
 
                 int written = 0;

@@ -512,8 +512,10 @@ void prepare_for_setup_stage(void) {
 }
 
 void process_control_transfer(void) {
-if (usbcdc_device_state == CONFIGURED) {
-						PORTB++;
+	unsigned char _ep = (((15 << 3) & USTAT) >> 3);
+if (usbcdc_device_state == CONFIGURED && _ep == 1) {
+			usbcdc_read();
+						PORTB = cdc_rx_buffer[1];
 					}
 	if (USTAT == USTAT_OUT) {
 
