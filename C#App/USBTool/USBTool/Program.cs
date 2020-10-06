@@ -15,11 +15,16 @@
             if (USB.Find_This_Device(0x048d, 0x003f, 0, ref readHandler, ref writeHandler))
             {
                 //byte[] data = Encoding.UTF8.GetBytes("\02\0  ");
-                byte[] data = new byte[6] { 0, 9, 5, 3, 0, 0 };
-                byte[] buffer = new byte[2048];
+                //byte[] data = new byte[6] { 0, 9, 5, 3, 0, 0 };
+                byte[] buffer = new byte[30];
+                Console.WriteLine("Data read");
+                //int written = 0;
+                //int read = 0;
 
-                int written = 0;
-                int read = 0;
+                //if (USB.HidD_SetFeature(readHandler, buffer, 28))
+                //{
+                //    Console.WriteLine("Data written");
+                //}
 
                 //if (USB.ReadFile(readHandler, buffer, 2, ref read, 0))
                 //{
@@ -27,10 +32,10 @@
                 //    Console.WriteLine("Data read");
                 //}
 
-                if (USB.WriteFile(writeHandler, data, 3, ref written, 0)) {
+                //if (USB.WriteFile(writeHandler, data, 3, ref written, 0)) {
 
-                    Console.WriteLine("Data written");
-                }
+                //    Console.WriteLine("Data written");
+                //}
             }
         }
     }

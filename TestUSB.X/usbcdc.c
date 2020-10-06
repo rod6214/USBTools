@@ -373,31 +373,20 @@ static void get_descriptor(void) {
 
 	} else if (setup_packet.bmrequesttype == 0x81) {
 
-		        //  if (usbcdc_device_state == CONFIGURED) {
-				// 		PORTB++;
-				// 	}
-
 		if (descriptorType == HID_DESCRIPTOR) {
-			// PORTB = 1;
-			// if (usbcdc_device_state == CONFIGURED) {
-			// 			PORTB++;
-			// 		}
+
 		} else if (descriptorType == REPORT_DESCRIPTOR) {
 
 			if (!configured_ep && usbcdc_device_state == CONFIGURED) {
 				configure_tx_rx_ep();
 				configured_ep++;
 			}
-			        //          if (usbcdc_device_state == CONFIGURED) {
-					// 	PORTB++;
-					// }
 
 			request_handled = 1;
 			code_ptr = (codePtr) &hid_rpt01;
 			dlen = HID_RPT01_SIZE;
 
 		} else if (descriptorType == PHYSICAL_DESCRIPTOR) {
-			// PORTB = 3;
 		}
 	}
 }
@@ -512,11 +501,12 @@ void prepare_for_setup_stage(void) {
 }
 
 void process_control_transfer(void) {
-	unsigned char _ep = (((15 << 3) & USTAT) >> 3);
-if (usbcdc_device_state == CONFIGURED && _ep == 1) {
-			usbcdc_read();
-						PORTB = cdc_rx_buffer[1];
-					}
+	// This comment works fine receiving data from host with interrupt transaction
+// 	unsigned char _ep = (((15 << 3) & USTAT) >> 3);
+// if (usbcdc_device_state == CONFIGURED && _ep == 1) {
+// 			usbcdc_read();
+// 						PORTB = cdc_rx_buffer[1];
+// 					}
 	if (USTAT == USTAT_OUT) {
 
 		unsigned char PID = (ep0_o.STAT & 0x3C) >> 2; // Pull PID from middle of BD0STAT
@@ -592,7 +582,8 @@ if (usbcdc_device_state == CONFIGURED && _ep == 1) {
 					get_status();
 				} else if ((request == CLEAR_FEATURE) || (request
                                                           == SET_FEATURE)) {  // Never seen in Windows
-					set_feature();
+					PORTB++;
+					// set_feature();
 				} else if (request == GET_INTERFACE) { // Never seen in Windows
 					// No support for alternate interfaces.  Send
 					// zero back to the host.

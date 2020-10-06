@@ -20,13 +20,15 @@ namespace USBTool
         private const short DIGCF_PRESENT = 0x00000002;
         private const short DIGCF_DEVICEINTERFACE = 0x00000010;
         //
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct SP_DEVICE_INTERFACE_DATA
         {
             public int cbSize;
             public System.Guid InterfaceClassGuid;
             public int Flags;
-            public int Reserved;
+            public IntPtr Reserved;
+            //public int Reserved;
+            //public int Reserved2;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -176,7 +178,8 @@ namespace USBTool
             MyDeviceInterfaceData.cbSize = 0;
             MyDeviceInterfaceData.Flags = 0;
             MyDeviceInterfaceData.InterfaceClassGuid = Guid.Empty;
-            MyDeviceInterfaceData.Reserved = 0;
+            MyDeviceInterfaceData.Reserved = IntPtr.Zero;
+            //MyDeviceInterfaceData.Reserved2 = 0;
             //
             MyDeviceInterfaceDetailData.cbSize = 0;
             MyDeviceInterfaceDetailData.DevicePath = "";
