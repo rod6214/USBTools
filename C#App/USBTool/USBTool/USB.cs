@@ -223,7 +223,9 @@ namespace USBTool
                     // This time, pass a pointer to DetailDataBuffer and the returned required buffer size.
                     SetupDiGetDeviceInterfaceDetail(DeviceInfoSet, ref MyDeviceInterfaceData, DetailDataBuffer, BufferSize, ref BufferSize, IntPtr.Zero);
                     // Skip over cbsize (4 bytes) to get the address of the devicePathName.
-                    IntPtr pdevicePathName = new IntPtr(DetailDataBuffer.ToInt32() + 4);
+                    
+                    IntPtr pdevicePathName = IntPtr.Add(DetailDataBuffer, 4);
+
                     // Get the String containing the devicePathName.
                     SingledevicePathName = Marshal.PtrToStringAuto(pdevicePathName);
                     l_temp_handle = CreateFile(
