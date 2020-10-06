@@ -31,7 +31,7 @@ namespace USBTool
             //public int Reserved2;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 1)]
         public struct SP_DEVICE_INTERFACE_DETAIL_DATA
         {
             public int cbSize;
@@ -56,10 +56,11 @@ namespace USBTool
             public ushort VersionNumber;
         }
         //
+        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
         public struct SECURITY_ATTRIBUTES
         {
             public int nLength;
-            public int lpSecurityDescriptor;
+            public IntPtr lpSecurityDescriptor;
             public int bInheritHandle;
         }
         //
@@ -102,7 +103,7 @@ namespace USBTool
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         static public extern IntPtr CreateFile(string lpFileName, uint dwDesiredAccess, uint dwShareMode, ref SECURITY_ATTRIBUTES lpSecurityAttributes, int dwCreationDisposition, uint dwFlagsAndAttributes, int hTemplateFile);
-
+        
         [DllImport("hid.dll")]
         static public extern int HidD_GetAttributes(IntPtr HidDeviceObject, ref HIDD_ATTRIBUTES Attributes);
 
@@ -153,7 +154,7 @@ namespace USBTool
             IntPtr DeviceInfoSet = IntPtr.Zero;
             IntPtr PreparsedDataPointer = IntPtr.Zero;
             HIDP_CAPS Capabilities = new HIDP_CAPS();
-            System.Guid HidGuid;
+            Guid HidGuid;
             int Result;
             bool l_found_device;
             ushort l_num_found_devices = 0;
@@ -169,8 +170,8 @@ namespace USBTool
             //
             // initialize all
             //
-            Security.lpSecurityDescriptor = 0;
-            Security.bInheritHandle = System.Convert.ToInt32(true);
+            Security.lpSecurityDescriptor = IntPtr.Zero;
+            Security.bInheritHandle = Convert.ToInt32(true);
             Security.nLength = Marshal.SizeOf(Security);
             //
             HidGuid = Guid.Empty;
@@ -179,7 +180,6 @@ namespace USBTool
             MyDeviceInterfaceData.Flags = 0;
             MyDeviceInterfaceData.InterfaceClassGuid = Guid.Empty;
             MyDeviceInterfaceData.Reserved = IntPtr.Zero;
-            //MyDeviceInterfaceData.Reserved2 = 0;
             //
             MyDeviceInterfaceDetailData.cbSize = 0;
             MyDeviceInterfaceDetailData.DevicePath = "";
@@ -190,8 +190,8 @@ namespace USBTool
             DeviceAttributes.VersionNumber = 0;
             //
             l_found_device = false;
-            Security.lpSecurityDescriptor = 0;
-            Security.bInheritHandle = System.Convert.ToInt32(true);
+            Security.lpSecurityDescriptor = IntPtr.Zero;
+            Security.bInheritHandle = Convert.ToInt32(false);
             Security.nLength = Marshal.SizeOf(Security);
 
             HidD_GetHidGuid(ref HidGuid);
@@ -217,17 +217,34 @@ namespace USBTool
                     MyDeviceInterfaceDetailData.cbSize = Marshal.SizeOf(MyDeviceInterfaceDetailData);
                     // Allocate memory for the MyDeviceInterfaceDetailData Structure using the returned buffer size.
                     IntPtr DetailDataBuffer = Marshal.AllocHGlobal(BufferSize);
+                    
+                    int structSize;
+
+                    if (IntPtr.Size == 4)
+                    {
+                        structSize = IntPtr.Size + Marshal.SystemDefaultCharSize;
+                        // For any reason in 64bits it can't be inherited handle
+                        Security.bInheritHandle = Convert.ToInt32(true);
+                    }
+                    else if (IntPtr.Size == 8)
+                    {
+                        structSize = IntPtr.Size;
+                    }
+                    else 
+                    {
+                        throw new Exception("Bad alignment on pointer");
+                    }
                     // Store cbSize in the first 4 bytes of the array
-                    Marshal.WriteInt32(DetailDataBuffer, 4 + Marshal.SystemDefaultCharSize);
+                    Marshal.WriteInt32(DetailDataBuffer, structSize);
                     //Call SetupDiGetDeviceInterfaceDetail again.  
                     // This time, pass a pointer to DetailDataBuffer and the returned required buffer size.
                     SetupDiGetDeviceInterfaceDetail(DeviceInfoSet, ref MyDeviceInterfaceData, DetailDataBuffer, BufferSize, ref BufferSize, IntPtr.Zero);
+
                     // Skip over cbsize (4 bytes) to get the address of the devicePathName.
-                    
                     IntPtr pdevicePathName = IntPtr.Add(DetailDataBuffer, 4);
 
                     // Get the String containing the devicePathName.
-                    SingledevicePathName = Marshal.PtrToStringAuto(pdevicePathName);
+                    SingledevicePathName = Marshal.PtrToStringUni(pdevicePathName);
                     l_temp_handle = CreateFile(
                                         SingledevicePathName,
                                         GENERIC_READ | GENERIC_WRITE,
@@ -236,6 +253,7 @@ namespace USBTool
                                         OPEN_EXISTING,
                                         0,
                                         0);
+
                     if (l_temp_handle != InvalidHandle)
                     {
                         // tried to use System.Threading.WaitHandle.InvalidHandle, but had access problems since it's protected
