@@ -69,7 +69,9 @@ void main(void) {
 //	 OSCCON = 0x70;
 //    UCFG = UPUEN;
 	PORTB = 0;
+	PORTC = 0;
 	TRISB = 0;
+	TRISC = 1;
 
 //	    di();
 //    IPR2bits.USBIP = 1;
@@ -97,7 +99,16 @@ void main(void) {
 
 	while (usbcdc_device_state != CONFIGURED)
 		;
-	// PORTB++;
+	while (PORTC == 0);
+	PORTB++;
+
+	BYTE tmp[4];
+
+	tmp[0] = 'P';
+	tmp[1] = 'O';
+	tmp[2] = 'I';
+
+	usb_write(tmp, 2);
 	// printft("Wellcome!\n");
 
 	while (1) {

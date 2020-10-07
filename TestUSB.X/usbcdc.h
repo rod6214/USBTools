@@ -68,7 +68,7 @@ extern volatile unsigned char cdcint_buffer[USBCDC_BUFFER_LEN] __at(CDC_INT_REG)
 
 char usbcdc_wr_busy();
 void usbcdc_write(unsigned char len);
-
+extern void usb_write(BYTE* data, int length);
 unsigned char usbcdc_rd_ready();
 void usbcdc_read();
 #define usbcdc_rd_len() (ep2_o.CNT)

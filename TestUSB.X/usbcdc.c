@@ -24,6 +24,7 @@
  */
 #define _XTAL_FREQ 4000000
 #include <xc.h>
+#include <string.h>
 #include "pic18f2550.h"
 #include "usbcdc.h"
 #include "usbpic_defs.h"
@@ -294,12 +295,19 @@ unsigned char usbcdc_rd_ready() {
 void usbcdc_write(unsigned char len)
 {
 	if (len> 0) {
-		ep2_i.CNT = len;
-		if (ep2_i.STAT & DTS)
-            ep2_i.STAT = UOWN | DTSEN;
+		ep1_i.CNT = len;
+		if (ep1_i.STAT & DTS)
+			ep1_i.STAT = UOWN | DTSEN;
 		else
-            ep2_i.STAT = UOWN | DTS | DTSEN;
+			ep1_i.STAT = UOWN | DTS | DTSEN;
 	}
+	// if (len> 0) {
+	// 	ep2_i.CNT = len;
+	// 	if (ep2_i.STAT & DTS)
+    //         ep2_i.STAT = UOWN | DTSEN;
+	// 	else
+    //         ep2_i.STAT = UOWN | DTS | DTSEN;
+	// }
 }
 
 void usbcdc_flush() {
@@ -317,6 +325,11 @@ void usbcdc_read() {
 		ep2_o.STAT = UOWN | DTS | DTSEN;
 }
 
+void usb_write(BYTE* data, int length) 
+{
+	memcpy(cdc_tx_buffer, data, length);
+	usbcdc_write(length);
+}
 
 char usbcdc_getchar() {
 	char c;
@@ -582,7 +595,6 @@ void process_control_transfer(void) {
 					get_status();
 				} else if ((request == CLEAR_FEATURE) || (request
                                                           == SET_FEATURE)) {  // Never seen in Windows
-					PORTB++;
 					// set_feature();
 				} else if (request == GET_INTERFACE) { // Never seen in Windows
 					// No support for alternate interfaces.  Send
