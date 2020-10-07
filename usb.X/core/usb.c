@@ -9,7 +9,8 @@
 #include <xc.h>
 #include <string.h>
 #include <pic18f2550.h>
-#include "usb.h"
+#include "../definitions/usb.h"
+
 
 static void get_descriptor() {}
 
