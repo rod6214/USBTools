@@ -65,6 +65,20 @@ char getchar() {
 	return usbcdc_getchar();
 }
 
+const char params[] = {
+3,4,5
+};
+
+typedef void (*my)(const char* params);
+
+void test(my call) {
+    call(params);
+}
+
+void testCallback(const char* params) {
+    PORTB = params[1];
+}
+
 void main(void) {
 //	 OSCCON = 0x70;
 //    UCFG = UPUEN;
@@ -73,6 +87,7 @@ void main(void) {
 	TRISB = 0;
 	TRISC = 1;
 
+    test(params);
 //	    di();
 //    IPR2bits.USBIP = 1;
 //    INTCONbits.PEIE = 0;
@@ -91,24 +106,24 @@ void main(void) {
     // SUSPND = 0;
 //    INTCONbits.GIEH = 1;
 
-	usbcdc_init();
-
-	INTCONbits.PEIE = 1;
-	INTCONbits.GIE = 1;
-	// INTCONbits.GIEH = 1;
-
-	while (usbcdc_device_state != CONFIGURED)
-		;
-	while (PORTC == 0);
-	PORTB++;
-
-	BYTE tmp[4];
-
-	tmp[0] = 'P';
-	tmp[1] = 'O';
-	tmp[2] = 'I';
-
-	usb_write(tmp, 2);
+//	usbcdc_init();
+//
+//	INTCONbits.PEIE = 1;
+//	INTCONbits.GIE = 1;
+//	// INTCONbits.GIEH = 1;
+//
+//	while (usbcdc_device_state != CONFIGURED)
+//		;
+//	while (PORTC == 0);
+//	PORTB++;
+//
+//	BYTE tmp[4];
+//
+//	tmp[0] = 'P';
+//	tmp[1] = 'O';
+//	tmp[2] = 'I';
+//
+//	usb_write(tmp, 2);
 	// printft("Wellcome!\n");
 
 	while (1) {

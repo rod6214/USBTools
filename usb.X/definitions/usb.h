@@ -12,6 +12,7 @@
 extern "C" {
 #endif
 #include <stdint.h>
+#include <pic18f2550.h>
 
 /** D E F I N I T I O N S ****************************************************/
 #define EP0 0
@@ -113,6 +114,12 @@ extern "C" {
 #define ADDRESS      4
 #define CONFIGURED   5
 
+// See USB spec chapter 5
+#define SETUP_STAGE    0
+#define DATA_OUT_STAGE 1
+#define DATA_IN_STAGE  2
+#define STATUS_STAGE   3
+
 /******************************************************************************
  * USB Endpoint Definitions
  * USB Standard EP Address Format: DIR:X:X:X:EP3:EP2:EP1:EP0
@@ -173,8 +180,45 @@ extern "C" {
 #define _DE         0x00<<4         //Data endpoint
 #define _FE         0x01<<4         //Feedback endpoint
 #define _IE         0x02<<4         //Implicit feedback Data endpoint
-    
-typedef unsigned char BYTE;
+
+#define IS_SETUP(epx) (((epx.STAT & 0x3C) >> 2) == SETUP)
+
+#define IS_IN_EPx(x) ((USTAT) & (x << 3) & (1 << 2)) == ((x << 3) & (1 << 2))
+#define IS_OUT_EPx(x) ((USTAT) & (x << 3)) == (x << 3)
+
+#define IS_IN_EP0 ((USTAT) & (1 << 2)) == (1 << 2)
+#define IS_OUT_EP0 (USTAT == 0)
+#define IS_IN_EP1 IS_IN_EPx(1)
+#define IS_OUT_EP1 IS_OUT_EPx(1)
+#define IS_IN_EP2 IS_IN_EPx(2)
+#define IS_OUT_EP2 IS_OUT_EPx(2)
+#define IS_IN_EP3 IS_IN_EPx(3)
+#define IS_OUT_EP3 IS_OUT_EPx(3)
+#define IS_IN_EP4 IS_IN_EPx(4)
+#define IS_OUT_EP4 IS_OUT_EPx(4)
+#define IS_IN_EP5 IS_IN_EPx(5)
+#define IS_OUT_EP5 IS_OUT_EPx(5)
+#define IS_IN_EP6 IS_IN_EPx(6)
+#define IS_OUT_EP6 IS_OUT_EPx(6)
+#define IS_IN_EP7 IS_IN_EPx(7)
+#define IS_OUT_EP7 IS_OUT_EPx(7)
+#define IS_IN_EP8 IS_IN_EPx(8)
+#define IS_OUT_EP8 IS_OUT_EPx(8)
+#define IS_IN_EP9 IS_IN_EPx(9)
+#define IS_OUT_EP9 IS_OUT_EPx(9)
+#define IS_IN_EP10 IS_IN_EPx(10)
+#define IS_OUT_EP10 IS_OUT_EPx(10)
+#define IS_IN_EP11 IS_IN_EPx(11)
+#define IS_OUT_EP11 IS_OUT_EPx(11)
+#define IS_IN_EP12 IS_IN_EPx(12)
+#define IS_OUT_EP12 IS_OUT_EPx(12)
+#define IS_IN_EP13 IS_IN_EPx(13)
+#define IS_OUT_EP13 IS_OUT_EPx(13)
+#define IS_IN_EP14 IS_IN_EPx(14)
+#define IS_OUT_EP14 IS_OUT_EPx(14)
+#define IS_IN_EP15 IS_IN_EPx(15)
+#define IS_OUT_EP15 IS_OUT_EPx(15)
+
 
 #ifdef	__cplusplus
 }

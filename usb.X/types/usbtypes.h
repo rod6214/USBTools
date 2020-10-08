@@ -14,6 +14,8 @@ extern "C" {
 
 typedef unsigned char BYTE;
 typedef unsigned int UINT;
+typedef const unsigned char* codePtr;
+typedef unsigned char* dataPtr;
 
 /******************************************************************************
  * USB Interface Device Descriptor
@@ -96,6 +98,43 @@ typedef struct {
     BYTE bmAttributes;
     BYTE bMaxPower;
 } ConfigurationDescriptior_t;
+
+/******************************************************************************
+ * USB Device and configuration descriptors
+ *****************************************************************************/
+typedef struct {
+	ConfigurationDescriptior_t configDesc;
+	// Interface 1
+    InterfaceDescriptor_t interfaceDesc;
+    HIDInterfaceDescriptor_t hidInterfaceDesc1;
+    EndpointDescriptor_t ep1_i;
+    EndpointDescriptor_t ep1_o;
+	// TODO: Set more interfaces here
+} config_struct;
+
+/******************************************************************************
+ * USB Descriptor base
+ *****************************************************************************/
+typedef struct {} Desc_t;
+
+typedef struct {
+    // dataPtr ep_control_bd;
+    dataPtr buffer_rx;
+    dataPtr buffer_tx;
+    // codePtr pDescriptor;
+    BYTE usb_device_state;
+    BYTE device_address;
+    BYTE current_configuration; // 0 or 1
+    // static unsigned char idx; // loop counter for data transfers loops
+    BYTE control_stage; // Holds the current stage in a control transfer
+    BYTE request_handled; // Set to 1 if request was understood and processed.
+    // dataPtr data_ptr; // Data to host from RAM
+    codePtr pDescriptor; // Data to host from FLASH
+    // dataPtr in_ptr; // Data from the host
+    BYTE dlen; // Number of unsigned chars of data
+    BYTE max_buffer_size;
+    BYTE setup_packet;
+} USB;
 
 #ifdef	__cplusplus
 }
