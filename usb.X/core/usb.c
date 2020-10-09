@@ -22,14 +22,32 @@ static unsigned char request_handled; // Set to 1 if request was understood and 
 static unsigned char device_address;
 static unsigned char dlen; // Number of unsigned chars of data
 static codePtr code_ptr; // Data to host from FLASH
+static USB *_pusb;
 
 void usb_init(USB* pUsb);
+void process_interrupt();
 
 static void get_descriptor() {}
 
 static void prepare_for_setup_stage() {}
 
 static void in_data_stage() {}
+
+static void process_interrupt() {
+		// This comment works fine receiving data from host with interrupt transaction
+// 	unsigned char _ep = (((15 << 3) & USTAT) >> 3);
+// if (usbcdc_device_state == CONFIGURED && _ep == 1) {
+// 			usbcdc_read();
+// 						PORTB = cdc_rx_buffer[1];
+// 					}
+	if (_pusb->usb_device_state == CONFIGURED) {
+		if (IS_IN_EP1) {
+
+		} else if (IS_OUT_EP1) {
+
+		}
+	}
+}
 
 static void process_control_transfer() {
 
@@ -163,7 +181,9 @@ static void process_control_transfer() {
 }
 
 USB* create_usb(Desc_t* desc) {
-	usb_init(0);
+	static USB _usb;
+	// TODO: set descriptors here
+	return &_usb;
 }
 
 void usb_init(USB* pUsb) {
@@ -172,7 +192,8 @@ void usb_init(USB* pUsb) {
 	//    UCFG = UPUEN; // Important: for HID must be low speed
 		// usbcdc_device_state = DETACHED;
 		//	remote_wakeup = 0x00;
-		current_configuration = 0x00;            
+		// current_configuration = 0x00;
+		pUsb->current_configuration = 0;         
 		
 		// attach
 		if (UCONbits.USBEN == 0) {//enable usb controller

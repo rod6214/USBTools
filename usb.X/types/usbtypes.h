@@ -118,19 +118,14 @@ typedef struct {
 typedef struct {} Desc_t;
 
 typedef struct {
-    // dataPtr ep_control_bd;
     dataPtr buffer_rx;
     dataPtr buffer_tx;
-    // codePtr pDescriptor;
     BYTE usb_device_state;
     BYTE device_address;
     BYTE current_configuration; // 0 or 1
-    // static unsigned char idx; // loop counter for data transfers loops
     BYTE control_stage; // Holds the current stage in a control transfer
     BYTE request_handled; // Set to 1 if request was understood and processed.
-    // dataPtr data_ptr; // Data to host from RAM
     codePtr pDescriptor; // Data to host from FLASH
-    // dataPtr in_ptr; // Data from the host
     BYTE dlen; // Number of unsigned chars of data
     BYTE max_buffer_size;
     BYTE setup_packet;

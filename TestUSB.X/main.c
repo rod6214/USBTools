@@ -76,8 +76,10 @@ void test(my call) {
 }
 
 void testCallback(const char* params) {
-    PORTB = params[1];
+    PORTB = 3;
 }
+
+
 
 void main(void) {
 //	 OSCCON = 0x70;
@@ -86,8 +88,10 @@ void main(void) {
 	PORTC = 0;
 	TRISB = 0;
 	TRISC = 1;
-
-    test(params);
+    my pepe = testCallback;
+    
+    pepe(params);
+//    test(params);
 //	    di();
 //    IPR2bits.USBIP = 1;
 //    INTCONbits.PEIE = 0;
