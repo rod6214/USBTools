@@ -18,13 +18,14 @@ BYTE request_handled; // Set to 1 if request was understood and processed.
 BYTE device_address;
 BYTE dlen; // Number of unsigned chars of data
 codePtr code_ptr; // Data to host from FLASH
-USB *_pusb;
+// USB *_pusb;
 codePtr _devDesc; 
 codePtr _configDesc; 
 codePtr *_stringDescs;
 codePtr _hid_rpt01;
 int configured_ep = 0;
 
+static const char const_values_0x00_0x00[] = { 0, 0 };
 volatile setup_packet_struct setup_packet __at(USB_TX0_REG);
 volatile BYTE ep0_in_buffer[USB_BUFFER_CONTROL_SIZE] __at(USB_RX0_REG);
 volatile BYTE ep1_tx_buffer[USB_EP_BUFFER_LEN] __at(USB_TX1_REG);
@@ -40,9 +41,6 @@ volatile BDT ep2_i __at (0x0404+2*8);
 volatile BDT ep3_o __at (0x0400+3*8);
 volatile BDT ep3_i __at (0x0404+3*8);
 
-extern void usb_interrupt_handler();
-extern void usb_init();
-
 static void usb_read_buffer();
 static void in_data_stage();
 static void process_interrupt();
@@ -55,7 +53,7 @@ static void get_descriptor() {
 	unsigned char descriptorIndex = setup_packet.wvalue0;
 
 	if (setup_packet.bmrequesttype == 0x80) {
-		
+
 		if (descriptorType == DEVICE_DESCRIPTOR) {
 			
 			request_handled = 1;
@@ -69,7 +67,7 @@ static void get_descriptor() {
 			dlen = (((Desc_t*)_configDesc)->configDesc).wTotalLength;
             
 		} else if (descriptorType == STRING_DESCRIPTOR) {
-			
+
 			request_handled = 1;
 			code_ptr = (codePtr)_stringDescs[descriptorIndex];
 			dlen = *code_ptr;
@@ -99,12 +97,11 @@ static void configure_tx_rx_ep() {
 	// Initialize the endpoints for all interfaces
 	{ // Turn on both in and out for this endpoint	
 		UEP1 = 0x1E;
-		
 		ep1_o.CNT = USB_EP_BUFFER_LEN;
-		ep1_o.ADDR = (int) ep1_tx_buffer;
+		ep1_o.ADDR = (int) ep1_rx_buffer;
 		ep1_o.STAT = UOWN | DTSEN; //set up to receive stuff as soon as we get something
 		
-		ep1_i.ADDR = (int) ep1_rx_buffer;
+		ep1_i.ADDR = (int) ep1_tx_buffer;
 		ep1_i.STAT = DTS;
 	}
 }
@@ -144,14 +141,21 @@ static void in_data_stage() {
 	// all the data back to the host can take multiple transactions, so
 	// we need to track how far along we are.
 	dlen = dlen - bufferSize;
-	memcpy((UINT*)ep0_i.ADDR, code_ptr, bufferSize);
+	// memcpy((UINT*)ep0_i.ADDR, code_ptr, bufferSize);
+	dataPtr in_ptr = (dataPtr) &ep0_in_buffer[0];
+    
+	//	for (idx = 0; idx < bufferSize; idx++)
+	for (int idx = bufferSize; idx--;)
+		*in_ptr++ = *code_ptr++;
 }
 
 static void process_interrupt() {
+	
 	// This comment works fine receiving data from host with interrupt transaction
-	if (_pusb->usb_device_state == CONFIGURED) {
+	if (usb_device_state == CONFIGURED) {
+		
+			
 		if (IS_IN_EP1) {
-
 			usb_read_buffer();
 			PORTB = ep1_rx_buffer[1];
 
@@ -191,7 +195,33 @@ static void process_control_transfer() {
 					device_address = setup_packet.wvalue0;
 				} else if (request == GET_DESCRIPTOR) {
 					get_descriptor();
-				}
+				} else if (request == SET_CONFIGURATION) {
+					
+					request_handled = 1;
+					current_configuration = setup_packet.wvalue0;
+					// TBD: ensure the new configuration value is one that
+					// exists in the descriptor.
+					if (current_configuration == 0) {
+						// If configuration value is zero, device is put in
+						// address state (USB 2.0 - 9.4.7)
+						usb_device_state = ADDRESS;
+					} else {
+						// Set the configuration.
+						usb_device_state = CONFIGURED;
+						// Initialize the endpoints for all interfaces
+						{ // Turn on both in and out for this endpoint
+							UEP1 = 0x1E;
+							ep1_i.ADDR = (int) ep1_rx_buffer;
+							ep1_i.STAT = DTS;
+						}
+					}
+				} else if (request == GET_INTERFACE) {
+					// No support for alternate interfaces.  Send
+					// zero back to the host.
+					request_handled = 1;
+					code_ptr = (codePtr) (const_values_0x00_0x00);
+					dlen = 1;
+                }
 			}
             
 			if (!request_handled) {
@@ -288,9 +318,35 @@ void set_descriptors(codePtr devDesc, codePtr configDesc, codePtr hid_rpt01, cod
 }
 
 void usb_init() {
+// 	UCFG = 0x14; // Enable pullup resistors; full speed mode
+// //    UCFG = UPUEN; // Important: for HID must be low speed
+// 	usb_device_state = DETACHED;
+// 	//	remote_wakeup = 0x00;
+// 	current_configuration = 0x00;            
+    
+// 	// attach
+// 	if (UCONbits.USBEN == 0) {//enable usb controller
+// 		UCON = 0;
+// 		UIE = 0;
+        
+// 		UCONbits.USBEN = 1;
+// 		usb_device_state = ATTACHED;
+        
+// 	}
+    
+// 	{//Wait for bus reset
+// 		UIR = 0;
+// 		UIE = 0;
+// 		UIEbits.URSTIE = 1;
+// 		usb_device_state = POWERED;
+// 	}
+    
+	// PIE2bits.USBIE = 1;
 	if (usb_device_state == DETACHED) {
 		UCFG = 0x14; // Enable pullup resistors; full speed mode      
 		
+		current_configuration = 0; 
+
 		// attach
 		if (UCONbits.USBEN == 0) {//enable usb controller
 			UCON = 0;
@@ -312,6 +368,7 @@ void usb_init() {
 }
 
 void usb_interrupt_handler() {
+	 
     if ((UCFGbits.UTEYE == 1) || //eye test
     (usb_device_state == DETACHED) || //not connected
     (UCONbits.SUSPND == 1))//suspended
@@ -366,8 +423,10 @@ void usb_interrupt_handler() {
 	}
     
 	// A transaction has finished.  Try default processing on endpoint 0.
-	if (UIRbits.TRNIF && UIEbits.TRNIE) {
 
+	if (UIRbits.TRNIF && UIEbits.TRNIE) {
+		// PORTB++;
+		// PORTA++;
 		process_control_transfer();
 		process_interrupt();
 		// Turn off interrupt

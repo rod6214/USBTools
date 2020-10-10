@@ -2,19 +2,7 @@
 // #include <string.h>
 // #include <pic18f2550.h>
 #include "usbtypes.h"
-
-/******************************************************************************
- * USB Device and configuration descriptors
- *****************************************************************************/
-typedef struct {
-	ConfigurationDescriptior_t configDesc;
-	// Interface 1
-    InterfaceDescriptor_t interfaceDesc;
-    HIDInterfaceDescriptor_t hidInterfaceDesc1;
-    EndpointDescriptor_t ep1_i;
-    EndpointDescriptor_t ep1_o;
-	// TODO: Set more interfaces here
-} config_struct;
+#include "descriptor.h"
 
 const DeviceDescriptor_t 
 device_descriptor = { //
@@ -87,7 +75,7 @@ config_descriptor = {
 };
 
 // Class specific descriptor - HID 
-const struct {BYTE report[HID_RPT01_SIZE];}hid_rpt01={
+const struct _hid_report {BYTE report[HID_RPT01_SIZE];}hid_rpt01={
 {
     0x06, 0x00, 0xFF,       // Usage Page = 0xFF00 (Vendor Defined Page 1)
     0x09, 0x01,             // Usage (Vendor Usage 1)
@@ -103,4 +91,69 @@ const struct {BYTE report[HID_RPT01_SIZE];}hid_rpt01={
     0x29, 0x02,             //      Usage Maximum 	//64 output usages total (0x01 to 0x40)
     0x91, 0x00,             //      Output (Data, Array, Abs): Instantiates output packet fields.  Uses same report size and count as "Input" fields, since nothing new/different was specified to the parser since the "Input" item.
     0xC0}                   // End Collection
-}; 
+};
+
+const BYTE string_descriptor0[] = { // available languages  descriptor
+    0x04, STRING_DESCRIPTOR, //
+    0x09, 0x04, //
+};
+
+const BYTE string_descriptor1[] = { //
+    52, STRING_DESCRIPTOR, // bLength, bDscType
+	'M','\0',
+	'i','\0', 
+	'c','\0',
+	'r','\0',
+	'o','\0',
+	'c','\0',
+	'h','\0',
+	'i','\0',
+	'p','\0',
+	' ','\0',
+	'T','\0',
+	'e','\0',
+	'c','\0',
+	'h','\0',
+	'n','\0',
+	'o','\0',
+	'l','\0',
+	'o','\0',
+	'g','\0',
+	'y','\0',
+	' ','\0',
+	'I','\0',
+	'n','\0',
+	'c','\0',
+	'.','\0',
+};
+const BYTE string_descriptor2[] = { //
+    0x2E, STRING_DESCRIPTOR, //
+    'S', 0x00, //
+    'i', 0x00, //
+    'm', 0x00, //
+    'p', 0x00, //
+    'l', 0x00, //
+    'e', 0x00, //
+    ' ', 0x00, //
+    'H', 0x00, //
+    'I', 0x00, //
+    'D', 0x00, //
+    ' ', 0x00, //
+    'D', 0x00, //
+    'e', 0x00, //
+    'v', 0x00, //
+    'i', 0x00, //
+    'c', 0x00, //
+    'e', 0x00, //
+    ' ', 0x00, //
+    'D', 0x00, //
+    'e', 0x00, //
+    'm', 0x00, //
+    'o', 0x00, //
+};
+
+const BYTE *string_descriptors[] = {
+    string_descriptor0,
+    string_descriptor1,
+    string_descriptor2
+};

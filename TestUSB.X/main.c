@@ -88,9 +88,9 @@ void main(void) {
 	PORTC = 0;
 	TRISB = 0;
 	TRISC = 1;
-    my pepe = testCallback;
+    // my pepe = testCallback;
     
-    pepe(params);
+    // pepe(params);
 //    test(params);
 //	    di();
 //    IPR2bits.USBIP = 1;
@@ -110,16 +110,16 @@ void main(void) {
     // SUSPND = 0;
 //    INTCONbits.GIEH = 1;
 
-//	usbcdc_init();
+	usbcdc_init();
 //
-//	INTCONbits.PEIE = 1;
-//	INTCONbits.GIE = 1;
+	INTCONbits.PEIE = 1;
+	INTCONbits.GIE = 1;
 //	// INTCONbits.GIEH = 1;
 //
-//	while (usbcdc_device_state != CONFIGURED)
-//		;
+	while (usbcdc_device_state != CONFIGURED)
+		;
 //	while (PORTC == 0);
-//	PORTB++;
+	// PORTB++;
 //
 //	BYTE tmp[4];
 //
