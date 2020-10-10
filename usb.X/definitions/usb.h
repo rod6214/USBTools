@@ -231,6 +231,9 @@ extern "C" {
 
 #define HID_RPT01_SIZE 28
 
+extern void usb_interrupt_handler();
+extern void usb_init();
+
 #ifdef	__cplusplus
 }
 #endif

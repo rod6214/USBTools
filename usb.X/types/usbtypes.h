@@ -12,8 +12,11 @@
 extern "C" {
 #endif
 
+#include "usb.h"
+
 typedef unsigned char BYTE;
 typedef unsigned int UINT;
+typedef unsigned short USHORT;
 typedef const unsigned char* codePtr;
 typedef unsigned char* dataPtr;
 
@@ -112,10 +115,35 @@ typedef struct {
 	// TODO: Set more interfaces here
 } config_struct;
 
+// Every device request starts with an 8 unsigned char setup packet (USB 2.0, chap 9.3)
+// with a standard layout.  The meaning of wValue and wIndex will
+// vary depending on the request type and specific request.
+typedef struct _setup_packet_struct
+{
+    BYTE bmrequesttype; // D7: Direction, D6..5: Type, D4..0: Recipient
+    BYTE brequest;      // Specific request
+    BYTE wvalue0;       // LSB of wValue
+    BYTE wvalue1;       // MSB of wValue
+    BYTE windex0;       // LSB of wIndex
+    BYTE windex1;       // MSB of wIndex
+    USHORT wlength;       // Number of unsigned chars to transfer if there's a data stage
+    BYTE extra[56];     // Fill out to same size as Endpoint 0 max buffer
+} setup_packet_struct;
+
+typedef struct _BDT
+{
+    BYTE STAT;
+    BYTE CNT;
+    UINT ADDR;
+} BDT; //Buffer Descriptor Table
+
 /******************************************************************************
  * USB Descriptor base
  *****************************************************************************/
-typedef struct {} Desc_t;
+typedef struct {
+    ConfigurationDescriptior_t configDesc;
+    InterfaceDescriptor_t interfaceDesc;
+} Desc_t;
 
 typedef struct {
     dataPtr buffer_rx;
