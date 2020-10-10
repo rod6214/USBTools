@@ -102,19 +102,6 @@ typedef struct {
     BYTE bMaxPower;
 } ConfigurationDescriptior_t;
 
-/******************************************************************************
- * USB Device and configuration descriptors
- *****************************************************************************/
-typedef struct {
-	ConfigurationDescriptior_t configDesc;
-	// Interface 1
-    InterfaceDescriptor_t interfaceDesc;
-    HIDInterfaceDescriptor_t hidInterfaceDesc1;
-    EndpointDescriptor_t ep1_i;
-    EndpointDescriptor_t ep1_o;
-	// TODO: Set more interfaces here
-} config_struct;
-
 // Every device request starts with an 8 unsigned char setup packet (USB 2.0, chap 9.3)
 // with a standard layout.  The meaning of wValue and wIndex will
 // vary depending on the request type and specific request.

@@ -14,7 +14,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>loaders.c</itemPath>
       <itemPath>descriptors.c</itemPath>
       <itemPath>core/usb.c</itemPath>
       <itemPath>main.c</itemPath>

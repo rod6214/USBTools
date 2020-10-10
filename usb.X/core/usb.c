@@ -5,13 +5,10 @@
  * Created on July 20, 2020, 8:37 PM
  */
 
-
 #include <xc.h>
 #include <string.h>
 #include <pic18f2550.h>
 #include "usbtypes.h"
-
-
 
 // Global variables
 BYTE usb_device_state;
@@ -30,8 +27,8 @@ int configured_ep = 0;
 
 volatile setup_packet_struct setup_packet __at(USB_TX0_REG);
 volatile BYTE ep0_in_buffer[USB_BUFFER_CONTROL_SIZE] __at(USB_RX0_REG);
-volatile BYTE ep1_tx_buffer[USB_BUFFER_INTERRUPT_LEN] __at(USB_TX1_REG);
-volatile BYTE ep1_rx_buffer[USB_BUFFER_INTERRUPT_LEN] __at(USB_RX1_REG);
+volatile BYTE ep1_tx_buffer[USB_EP_BUFFER_LEN] __at(USB_TX1_REG);
+volatile BYTE ep1_rx_buffer[USB_EP_BUFFER_LEN] __at(USB_RX1_REG);
 
 //endpoints
 volatile BDT ep0_o __at (0x0400+0*8);
@@ -46,6 +43,7 @@ volatile BDT ep3_i __at (0x0404+3*8);
 extern void usb_interrupt_handler();
 extern void usb_init();
 
+static void usb_read_buffer();
 static void in_data_stage();
 static void process_interrupt();
 static void prepare_for_setup_stage();
@@ -102,13 +100,21 @@ static void configure_tx_rx_ep() {
 	{ // Turn on both in and out for this endpoint	
 		UEP1 = 0x1E;
 		
-		ep1_o.CNT = USB_BUFFER_INTERRUPT_LEN;
+		ep1_o.CNT = USB_EP_BUFFER_LEN;
 		ep1_o.ADDR = (int) ep1_tx_buffer;
 		ep1_o.STAT = UOWN | DTSEN; //set up to receive stuff as soon as we get something
 		
 		ep1_i.ADDR = (int) ep1_rx_buffer;
 		ep1_i.STAT = DTS;
 	}
+}
+
+static void usb_read_buffer() {
+	ep1_o.CNT = USB_EP_BUFFER_LEN;
+	if (ep1_o.STAT & DTS)
+		ep1_o.STAT = UOWN | DTSEN;
+	else
+		ep1_o.STAT = UOWN | DTS | DTSEN;
 }
 
 static void prepare_for_setup_stage() {
@@ -142,14 +148,12 @@ static void in_data_stage() {
 }
 
 static void process_interrupt() {
-		// This comment works fine receiving data from host with interrupt transaction
-// 	unsigned char _ep = (((15 << 3) & USTAT) >> 3);
-// if (usbcdc_device_state == CONFIGURED && _ep == 1) {
-// 			usbcdc_read();
-// 						PORTB = cdc_rx_buffer[1];
-// 					}
+	// This comment works fine receiving data from host with interrupt transaction
 	if (_pusb->usb_device_state == CONFIGURED) {
 		if (IS_IN_EP1) {
+
+			usb_read_buffer();
+			PORTB = ep1_rx_buffer[1];
 
 		} else if (IS_OUT_EP1) {
 
@@ -365,6 +369,7 @@ void usb_interrupt_handler() {
 	if (UIRbits.TRNIF && UIEbits.TRNIE) {
 
 		process_control_transfer();
+		process_interrupt();
 		// Turn off interrupt
 		UIRbits.TRNIF = 0;
 	}
