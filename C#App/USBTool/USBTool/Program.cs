@@ -43,7 +43,7 @@
                 byte[] data = new byte[66];
 
                 data[1] = 9;
-                data[64] = 11;
+                data[64] = 7;
 
                 int written = 0;
 

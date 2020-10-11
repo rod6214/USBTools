@@ -18,7 +18,6 @@ BYTE request_handled; // Set to 1 if request was understood and processed.
 BYTE device_address;
 BYTE dlen; // Number of unsigned chars of data
 codePtr code_ptr; // Data to host from FLASH
-// USB *_pusb;
 codePtr _devDesc; 
 codePtr _configDesc; 
 codePtr *_stringDescs;
