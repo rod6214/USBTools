@@ -99,7 +99,7 @@ const BYTE string_descriptor0[] = { // available languages  descriptor
 };
 
 const BYTE string_descriptor1[] = { //
-    52, STRING_DESCRIPTOR, // bLength, bDscType
+    54, STRING_DESCRIPTOR, // bLength, bDscType
 	'M','\0',
 	'i','\0', 
 	'c','\0',
@@ -125,9 +125,10 @@ const BYTE string_descriptor1[] = { //
 	'n','\0',
 	'c','\0',
 	'.','\0',
+	'\0','\0',
 };
 const BYTE string_descriptor2[] = { //
-    0x2E, STRING_DESCRIPTOR, //
+    0x30, STRING_DESCRIPTOR, //
     'S', 0x00, //
     'i', 0x00, //
     'm', 0x00, //
@@ -150,6 +151,7 @@ const BYTE string_descriptor2[] = { //
     'e', 0x00, //
     'm', 0x00, //
     'o', 0x00, //
+    '\0','\0',
 };
 
 const BYTE *string_descriptors[] = {
