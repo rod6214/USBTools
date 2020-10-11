@@ -15,7 +15,7 @@ extern "C" {
 #include <pic18f2550.h>
 
 #define USB_BUFFER_CONTROL_SIZE 8
-#define USB_EP_BUFFER_LEN 32
+#define USB_EP_BUFFER_LEN 64
 /** D E F I N I T I O N S ****************************************************/
 #define EP0 0
 #define EP1 1

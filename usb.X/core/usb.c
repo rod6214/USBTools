@@ -153,14 +153,10 @@ static void process_interrupt() {
 	
 	// This comment works fine receiving data from host with interrupt transaction
 	if (usb_device_state == CONFIGURED) {
-		
 			
 		if (IS_IN_EP1) {
 			usb_read_buffer();
-			PORTB = ep1_rx_buffer[1];
-
-		} else if (IS_OUT_EP1) {
-
+			PORTB = ep1_rx_buffer[63];
 		}
 	}
 }
@@ -318,30 +314,7 @@ void set_descriptors(codePtr devDesc, codePtr configDesc, codePtr hid_rpt01, cod
 }
 
 void usb_init() {
-// 	UCFG = 0x14; // Enable pullup resistors; full speed mode
-// //    UCFG = UPUEN; // Important: for HID must be low speed
-// 	usb_device_state = DETACHED;
-// 	//	remote_wakeup = 0x00;
-// 	current_configuration = 0x00;            
     
-// 	// attach
-// 	if (UCONbits.USBEN == 0) {//enable usb controller
-// 		UCON = 0;
-// 		UIE = 0;
-        
-// 		UCONbits.USBEN = 1;
-// 		usb_device_state = ATTACHED;
-        
-// 	}
-    
-// 	{//Wait for bus reset
-// 		UIR = 0;
-// 		UIE = 0;
-// 		UIEbits.URSTIE = 1;
-// 		usb_device_state = POWERED;
-// 	}
-    
-	// PIE2bits.USBIE = 1;
 	if (usb_device_state == DETACHED) {
 		UCFG = 0x14; // Enable pullup resistors; full speed mode      
 		
