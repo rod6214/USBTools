@@ -167,10 +167,10 @@ extern "C" {
 #define _RWU        0x01<<5         //Remote Wakeup (Supports if set)
 
 /* Endpoint Transfer Type */
-#define _CTRL       0x00            //Control Transfer
-#define _ISO        0x01            //Isochronous Transfer
-#define _BULK       0x02            //Bulk Transfer
-#define _INT        0x03            //Interrupt Transfer
+#define ATTRIBUTE_MODE_CTRL       0x00            //Control Transfer
+#define ATTRIBUTE_MODE_ISO        0x01            //Isochronous Transfer
+#define ATTRIBUTE_MODE_BULK       0x02            //Bulk Transfer
+#define ATTRIBUTE_MODE_INT        0x03            //Interrupt Transfer
 
 /* Isochronous Endpoint Synchronization Type */
 #define _NS         0x00<<2         //No Synchronization

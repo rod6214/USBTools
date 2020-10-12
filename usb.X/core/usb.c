@@ -149,13 +149,18 @@ static void in_data_stage() {
 }
 
 static void process_interrupt() {
-	
+	if (!configured_ep && usb_device_state == CONFIGURED) {
+				configure_tx_rx_ep();
+				configured_ep++;
+			}
 	// This comment works fine receiving data from host with interrupt transaction
 	if (usb_device_state == CONFIGURED) {
 			
 		if (IS_IN_EP1) {
+
+			PORTB++;
 			usb_read_buffer();
-			PORTB = ep1_rx_buffer[63];
+			// PORTB = ep1_rx_buffer[63];
 		}
 	}
 }
@@ -165,6 +170,7 @@ static void process_control_transfer() {
     if (IS_OUT_EP0) {
 
 		if (IS_SETUP(ep0_o)) {
+			
 			// Setup stage
 			// Note: Microchip says to turn off the UOWN bit on the IN direction as
 			// soon as possible after detecting that a SETUP has been received.

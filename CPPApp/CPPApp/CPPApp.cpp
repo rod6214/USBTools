@@ -2,14 +2,29 @@
 //
 
 #include <iostream>
+#include "usb.h"
 #include <Windows.h>
 #include <winusb.h>
 
 int main()
 {
-    size_t tt = sizeof(unsigned short);
+    void *pDeviceHandle;
+    WINUSB_INTERFACE_HANDLE interfaceHandle;
 
-    std::cout << "Hello World!\n";
+    if (USB::Find_Device(0x04d8, 0x0053, &pDeviceHandle)) {
+        if (WinUsb_Initialize(pDeviceHandle, &interfaceHandle)) {
+
+            unsigned char buffer[66] = {0};
+            unsigned long written = 0;
+
+            buffer[0] = 7;
+            buffer[1] = 7;
+            buffer[63] = 6;
+
+            bool dd = WinUsb_WritePipe(interfaceHandle, 1, buffer, 64, &written, NULL);
+            std::cout << "Hello World!\n";
+        }
+    }
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

@@ -10,8 +10,7 @@ extern "C" {
 		public:
 			static bool Find_Device(unsigned short p_VendorID,
 									unsigned short p_PoductID,
-									void* pReadHandle, 
-									void* pWriteHandle);
+									void** pDeviceHandle);
 	};
 #ifdef __cplusplus
 }

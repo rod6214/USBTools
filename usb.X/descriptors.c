@@ -13,8 +13,8 @@ device_descriptor = { //
 	0x00, // bDeviceSubClass
     0x00, // bDeviceProtocl
 	USB_BUFFER_CONTROL_SIZE, // bMaxPacketSize
-    0x048D, // idVendor lsb, idVendor msb
-    0x003F, // idProduct lsb, idProduct msb
+    0x04D8, // idVendor lsb, idVendor msb
+    0x0053, // idProduct lsb, idProduct msb
     0x0002, // bcdDevice lsb, bcdDevice msb
     0x01, // iManufacturer
 	0x02, // iProduct
@@ -41,26 +41,16 @@ config_descriptor = {
        0x00, // bInterfaceNumber
        0x00, // bAlternateSetting
        0x02, // bNumEndpoints
-       0x03, // bInterfaceClass (3 = HID)
-       0x00, // bInterfaceSubClass
-       0x00, // bInterfaceProtocol (1) Keyboard, (2) Mouse
+       0xFF, // bInterfaceClass (Defined by the vendor)
+       0xFF, // bInterfaceSubClass (Defined by the vendor)
+       0xFF, // bInterfaceProtocol (Defined by the vendor)
        0x00, // iInterface
   },
-   {/*HID interface descriptor*/
-       sizeof(HIDInterfaceDescriptor_t), // Length
-       0x21, // bDescriptorType
-       0x0111, // bcdHID
-       0x00, // bCountryCode
-       0x01, // bNumDescriptors
-	   /*HID class interface descriptor*/
-       0x22, // bDescriptorType
-       HID_RPT01_SIZE,// wItemLength (HID report size)
-   },
    {/*Enpoint 1 IN descriptor*/
        sizeof(EndpointDescriptor_t), // Length
        0x05, // bDescriptorType
        0x81, // bEndpointAddress
-       0x03, // bmAttributes
+       ATTRIBUTE_MODE_BULK, // bmAttributes
        USB_EP_BUFFER_LEN, // MaxPacketSize (LITLE ENDIAN)
        1, // bInterval
    },
@@ -68,7 +58,7 @@ config_descriptor = {
        sizeof(EndpointDescriptor_t), // Length
        0x05, // bDescriptorType
        0x01, // bEndpointAddress
-       0x03, // bmAttributes
+       ATTRIBUTE_MODE_BULK, // bmAttributes
        USB_EP_BUFFER_LEN, // MaxPacketSize (LITLE ENDIAN)
        1, // bInterval
    },
