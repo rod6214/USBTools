@@ -157,10 +157,8 @@ static void process_interrupt() {
 	if (usb_device_state == CONFIGURED) {
 			
 		if (IS_IN_EP1) {
-
-			PORTB++;
 			usb_read_buffer();
-			// PORTB = ep1_rx_buffer[63];
+			PORTB = ep1_rx_buffer[63];
 		}
 	}
 }
