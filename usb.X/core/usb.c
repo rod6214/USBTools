@@ -25,7 +25,7 @@ codePtr _hid_rpt01;
 int configured_ep = 0;
 
 static const char const_values_0x00_0x00[] = { 0, 0 };
-volatile setup_packet_struct setup_packet __at(USB_TX0_REG);
+volatile USBControlPacket setup_packet __at(USB_TX0_REG);
 volatile BYTE ep0_in_buffer[USB_BUFFER_CONTROL_SIZE] __at(USB_RX0_REG);
 volatile BYTE ep1_tx_buffer[USB_EP_BUFFER_LEN] __at(USB_TX1_REG);
 volatile BYTE ep1_rx_buffer[USB_EP_BUFFER_LEN] __at(USB_RX1_REG);
@@ -48,10 +48,12 @@ static void get_descriptor();
 static void configure_tx_rx_ep();
 
 static void get_descriptor() {
-	unsigned char descriptorType = setup_packet.wvalue1;
-	unsigned char descriptorIndex = setup_packet.wvalue0;
+//	unsigned char descriptorType = setup_packet.wvalue1;
+//	unsigned char descriptorIndex = setup_packet.wvalue0;
+    BYTE descriptorType = HBYTE(setup_packet.wValue);
+    BYTE descriptorIndex = LBYTE(setup_packet.wValue);
 
-	if (setup_packet.bmrequesttype == 0x80) {
+	if (setup_packet.bmRequestType == 0x80) {
 
 		if (descriptorType == DEVICE_DESCRIPTOR) {
 			
@@ -72,7 +74,7 @@ static void get_descriptor() {
 			dlen = *code_ptr;
 		}
 
-	} else if (setup_packet.bmrequesttype == 0x81) {
+	} else if (setup_packet.bmRequestType == 0x81) {
 
 		if (descriptorType == HID_DESCRIPTOR) {
 
@@ -152,7 +154,7 @@ static void process_interrupt() {
 	if (!configured_ep && usb_device_state == CONFIGURED) {
 				configure_tx_rx_ep();
 				configured_ep++;
-			}
+	}
 	// This comment works fine receiving data from host with interrupt transaction
 	if (usb_device_state == CONFIGURED) {
 			
@@ -182,7 +184,7 @@ static void process_control_transfer() {
 			dlen = 0; // No unsigned chars transferred
 			// See if this is a standard (as definded in USB chapter 9) request
 			{// ----------
-				unsigned char request = setup_packet.brequest;
+				BYTE request = setup_packet.bRequest;
 
 				if (request == SET_ADDRESS) {
 					// Set the address of the device.  All future requests
@@ -191,13 +193,13 @@ static void process_control_transfer() {
 					// transaction uses address 0.     
 					request_handled = 1;
 					usb_device_state = ADDRESS;
-					device_address = setup_packet.wvalue0;
+					device_address = LBYTE(setup_packet.wValue);
 				} else if (request == GET_DESCRIPTOR) {
 					get_descriptor();
 				} else if (request == SET_CONFIGURATION) {
 					
 					request_handled = 1;
-					current_configuration = setup_packet.wvalue0;
+					current_configuration = LBYTE(setup_packet.wValue);
 					// TBD: ensure the new configuration value is one that
 					// exists in the descriptor.
 					if (current_configuration == 0) {
@@ -229,10 +231,10 @@ static void process_control_transfer() {
 				ep0_o.ADDR = (int) &setup_packet;
 				ep0_o.STAT = UOWN | BSTALL;
 				ep0_i.STAT = UOWN | BSTALL;
-			} else if (setup_packet.bmrequesttype & 0x80) {
+			} else if (setup_packet.bmRequestType & 0x80) {
 				// Device-to-host
-				if (setup_packet.wlength < dlen)//9.4.3, p.253
-					dlen = setup_packet.wlength;
+				if (setup_packet.wLength < dlen)//9.4.3, p.253
+					dlen = setup_packet.wLength;
                 
 				in_data_stage();
 				control_stage = DATA_IN_STAGE;
@@ -286,7 +288,7 @@ static void process_control_transfer() {
 		if ((UADDR == 0) && (usb_device_state == ADDRESS)) {
 			// TBD: ensure that the new address matches the value of
 			// "device_address" (which came in through a SET_ADDRESS).
-			UADDR = setup_packet.wvalue0;
+			UADDR = LBYTE(setup_packet.wValue);
 			if (UADDR == 0) {
 				// If we get a reset after a SET_ADDRESS, then we need
 				// to drop back to the Default state.

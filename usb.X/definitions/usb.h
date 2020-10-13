@@ -16,6 +16,8 @@ extern "C" {
 
 #define USB_BUFFER_CONTROL_SIZE 8
 #define USB_EP_BUFFER_LEN 64
+#define HBYTE(x) (x >> 8)
+#define LBYTE(x) (x & 255)
 /** D E F I N I T I O N S ****************************************************/
 #define EP0 0
 #define EP1 1
