@@ -19,6 +19,7 @@ int main()
 
             buffer[0] = 7;
             buffer[1] = 7;
+            buffer[62] = 6;
             buffer[63] = 6;
 
             bool dd = WinUsb_WritePipe(interfaceHandle, 1, buffer, 64, &written, NULL);

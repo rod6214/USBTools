@@ -29,6 +29,8 @@ volatile USBControlPacket setup_packet __at(USB_TX0_REG);
 volatile BYTE ep0_in_buffer[USB_BUFFER_CONTROL_SIZE] __at(USB_RX0_REG);
 volatile BYTE ep1_tx_buffer[USB_EP_BUFFER_LEN] __at(USB_TX1_REG);
 volatile BYTE ep1_rx_buffer[USB_EP_BUFFER_LEN] __at(USB_RX1_REG);
+int usb_sp = 0; // Stack Pointer
+BYTE usb_stack[2*RECEPTOR_LENGTH] __at(RECEPTOR_0_REG);
 
 //endpoints
 volatile BDT ep0_o __at (0x0400+0*8);
@@ -46,10 +48,10 @@ static void process_interrupt();
 static void prepare_for_setup_stage();
 static void get_descriptor();
 static void configure_tx_rx_ep();
+static BYTE usb_read_ep1_buffer() ;
 
 static void get_descriptor() {
-//	unsigned char descriptorType = setup_packet.wvalue1;
-//	unsigned char descriptorIndex = setup_packet.wvalue0;
+
     BYTE descriptorType = HBYTE(setup_packet.wValue);
     BYTE descriptorIndex = LBYTE(setup_packet.wValue);
 
@@ -115,6 +117,15 @@ static void usb_read_buffer() {
 		ep1_o.STAT = UOWN | DTS | DTSEN;
 }
 
+static BYTE usb_read_ep1_buffer() {
+	ep1_o.CNT = USB_EP_BUFFER_LEN;
+	if (ep1_o.STAT & DTS)
+		ep1_o.STAT = UOWN | DTSEN;
+	else
+		ep1_o.STAT = UOWN | DTS | DTSEN;
+	return USB_EP_BUFFER_LEN;
+}
+
 static void prepare_for_setup_stage() {
 	control_stage = SETUP_STAGE;
 	ep0_o.CNT = USB_BUFFER_CONTROL_SIZE;
@@ -150,17 +161,30 @@ static void in_data_stage() {
 		*in_ptr++ = *code_ptr++;
 }
 
+BYTE testing __at(0x800);
+
+int prepare_ready_ep1 = 0;
+
 static void process_interrupt() {
 	if (!configured_ep && usb_device_state == CONFIGURED) {
-				configure_tx_rx_ep();
-				configured_ep++;
+		configure_tx_rx_ep();
+		configured_ep++;
 	}
 	// This comment works fine receiving data from host with interrupt transaction
 	if (usb_device_state == CONFIGURED) {
-			
-		if (IS_IN_EP1) {
-			usb_read_buffer();
-			PORTB = ep1_rx_buffer[63];
+		if (usb_sp >= 0 && usb_sp < 512) {
+			if (IS_IN_EP1) {
+				BYTE bytes = usb_read_ep1_buffer();
+				if (prepare_ready_ep1 == 2) {
+
+					memcpy((void*)&usb_stack[usb_sp], (void*)&ep1_rx_buffer[0], bytes);
+
+					usb_sp += bytes;
+				}
+				else {
+					prepare_ready_ep1++;
+				}
+			}
 		}
 	}
 }
