@@ -10,12 +10,24 @@
 
 #ifdef	__cplusplus
 extern "C" {
+typedef bool BOOL;
+#define TRUE true
+#define FALSE false
 #endif
+
+#ifndef __cplusplus
+typedef int BOOL;
+#define TRUE 1
+#define FALSE 0
+#endif
+
 #include <stdint.h>
 #include <pic18f2550.h>
 
 #define USB_BUFFER_CONTROL_SIZE 8
 #define USB_EP_BUFFER_LEN 64
+
+// #define USB_SP_MAX 256
 #define HBYTE(x) (x >> 8)
 #define LBYTE(x) (x & 255)
 /** D E F I N I T I O N S ****************************************************/

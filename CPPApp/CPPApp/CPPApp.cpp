@@ -19,6 +19,16 @@ int main()
 
             buffer[0] = 7;
             buffer[1] = 7;
+            buffer[2] = 7;
+            buffer[3] = 7;
+            buffer[4] = 7;
+            buffer[5] = 7;
+            buffer[6] = 7;
+            buffer[7] = 7;
+            buffer[8] = 7;
+            buffer[9] = 7;
+            buffer[10] = 7;
+            buffer[11] = 7;
             buffer[62] = 6;
             buffer[63] = 6;
 
