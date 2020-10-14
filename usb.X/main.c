@@ -35,17 +35,28 @@ void main () {
 	INTCONbits.GIE = 1;
 
     while(get_device_state() != CONFIGURED);
-
+    
     while (1)
     {
         int pressed = 0;
 
-        while((PORTA & 1) == 1) {
+        while ((PORTA & 1) == 1) {
             if (pressed == 0) {
-                usb_read(usb_buffer);
-                PORTB++;
+                usb_write(usb_buffer);
+                // PORTB++;
                 pressed++;
             }
         }
+//        while(usb_read(usb_buffer) == 0);
+//        
+//        PORTB = usb_buffer[0];
+//        
+//        usb_buffer[0]++;
+//        
+//        __delay_ms(500);
+//        
+//        usb_write(usb_buffer);
+//
+//        PORTB++;
     }
 }

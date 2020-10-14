@@ -17,7 +17,7 @@ int main()
             unsigned char buffer[66] = {0};
             unsigned long written = 0;
 
-            buffer[0] = 7;
+            buffer[0] = 1;
             buffer[1] = 7;
             buffer[2] = 7;
             buffer[3] = 7;
@@ -32,8 +32,16 @@ int main()
             buffer[62] = 6;
             buffer[63] = 6;
 
-            bool dd = WinUsb_WritePipe(interfaceHandle, 1, buffer, 64, &written, NULL);
-            std::cout << "Hello World!\n";
+            while (true) {
+                if (WinUsb_ReadPipe(interfaceHandle, 1, buffer, 64, &written, NULL)) {
+                    if (buffer[0] == 7) {
+                        buffer[0] = 0;
+                    }
+                }
+                /*if (WinUsb_WritePipe(interfaceHandle, 1, buffer, 64, &written, NULL)) {
+                    
+                }*/
+            }
         }
     }
 }

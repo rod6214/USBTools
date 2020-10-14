@@ -49,9 +49,13 @@ static void prepare_for_setup_stage();
 static void get_descriptor();
 static void configure_tx_rx_ep();
 static BYTE usb_read_ep1_buffer();
+static BYTE usb_write_ep1_buffer(BYTE len);
+
+void wait() {
+while ((ep1_o.STAT & UOWN)!=0);
+}
 
 int usb_read(BYTE* buffer) {
-	static int offset = 0;
 	if (usb_sp > 0) {
        for (int idx = 0;idx < USB_EP_BUFFER_LEN; idx++) {
            buffer[USB_EP_BUFFER_LEN - idx - 1] = usb_stack[usb_sp - idx - 1];
@@ -61,6 +65,14 @@ int usb_read(BYTE* buffer) {
        return USB_EP_BUFFER_LEN;
 	}
 	return 0;
+}
+
+int usb_write(BYTE* buffer) {
+    // for (int idx = 0; idx < USB_EP_BUFFER_LEN; idx++) {
+    //     ep1_tx_buffer[idx] = buffer[idx];
+    // }
+	usb_write_ep1_buffer(USB_EP_BUFFER_LEN);
+    return USB_EP_BUFFER_LEN;
 }
 
 BYTE get_device_state() {
@@ -143,6 +155,19 @@ static BYTE usb_read_ep1_buffer() {
 	return USB_EP_BUFFER_LEN;
 }
 
+static BYTE usb_write_ep1_buffer(BYTE len) {
+	ep1_i.CNT = USB_EP_BUFFER_LEN;
+    // ep1_i.STAT = UOWN | DTS | DTSEN;
+	while ((ep1_i.STAT & UOWN)!=0);
+	PORTB++;
+	if (ep1_i.STAT & DTS)
+		ep1_i.STAT = UOWN | DTSEN;
+	else
+		ep1_i.STAT = UOWN | DTS | DTSEN;
+	UCONbits.PKTDIS = 0;
+	return USB_EP_BUFFER_LEN;
+}
+
 static void prepare_for_setup_stage() {
 	control_stage = SETUP_STAGE;
 	ep0_o.CNT = USB_BUFFER_CONTROL_SIZE;
@@ -189,9 +214,10 @@ static void process_interrupt() {
 	}
 	// This comment works fine receiving data from host with interrupt transaction
 	if (usb_device_state == CONFIGURED) {
+		// usb_write_ep1_buffer(USB_EP_BUFFER_LEN);
 		if (usb_sp >= 0 && usb_sp < RECEPTOR_LENGTH) {
 			if (IS_IN_EP1) {
-				BYTE bytes = usb_read_ep1_buffer();
+				 BYTE bytes = usb_read_ep1_buffer();
 				if (prepare_ready_ep1 == 2) {
 
 					memcpy((void*)&usb_stack[usb_sp], (void*)&ep1_rx_buffer[0], bytes);
@@ -201,6 +227,8 @@ static void process_interrupt() {
 				else {
 					prepare_ready_ep1++;
 				}
+			} else if (IS_OUT_EP1) {
+				
 			}
 		}
 	}
@@ -387,7 +415,7 @@ void usb_init() {
 }
 
 void usb_interrupt_handler() {
-	 
+	//  PORTB++;
     if ((UCFGbits.UTEYE == 1) || //eye test
     (usb_device_state == DETACHED) || //not connected
     (UCONbits.SUSPND == 1))//suspended

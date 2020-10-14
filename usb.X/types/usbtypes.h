@@ -147,6 +147,8 @@ extern void usb_init();
 extern void set_descriptors(codePtr devDesc, codePtr configDesc, codePtr hid_rpt01, codePtr *stringDescs);
 extern int usb_read(BYTE* buffer);
 extern BYTE get_device_state();
+extern int usb_write(BYTE* buffer);
+extern void wait();
 
 #ifdef	__cplusplus
 }
