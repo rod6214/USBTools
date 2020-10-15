@@ -26,7 +26,7 @@ void main () {
     ADCON1 = 15;
 
     set_descriptors((codePtr) &device_descriptor, 
-    (codePtr) &config_descriptor, (codePtr) &hid_rpt01, (codePtr*) string_descriptors);
+    (codePtr) &config_descriptor, NULL, (codePtr*) string_descriptors);
 
     usb_init();
 
@@ -43,7 +43,7 @@ void main () {
         while ((PORTA & 1) == 1) {
             if (pressed == 0) {
                 usb_write(usb_buffer);
-                // PORTB++;
+                //  PORTB++;
                 pressed++;
             }
         }

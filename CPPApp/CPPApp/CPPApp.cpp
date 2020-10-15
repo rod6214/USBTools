@@ -38,9 +38,9 @@ int main()
                         buffer[0] = 0;
                     }
                 }
-                /*if (WinUsb_WritePipe(interfaceHandle, 1, buffer, 64, &written, NULL)) {
-                    
-                }*/
+                if (WinUsb_WritePipe(interfaceHandle, 1, buffer, 64, &written, NULL)) {
+                    std::cout << "dd" << std::endl;
+                }
             }
         }
     }

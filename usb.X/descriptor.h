@@ -78,6 +78,7 @@ typedef struct {
     // HIDInterfaceDescriptor_t hidInterfaceDesc1;
     EndpointDescriptor_t ep1_i;
     EndpointDescriptor_t ep1_o;
+    EndpointDescriptor_t ep2_o;
 	// TODO: Set more interfaces here
 } config_struct;
 
@@ -85,7 +86,7 @@ typedef struct {
     // linkage so the functions can be used by the c code. 
 extern const DeviceDescriptor_t device_descriptor;
 extern const config_struct config_descriptor;
-extern const struct _hid_report hid_rpt01;
+//extern const struct _hid_report hid_rpt01;
 extern const BYTE *string_descriptors[];
 
 #ifdef	__cplusplus

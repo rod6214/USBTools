@@ -134,7 +134,7 @@ static void configure_tx_rx_ep() {
 		ep1_o.STAT = UOWN | DTSEN; //set up to receive stuff as soon as we get something
 		
 		ep1_i.ADDR = (int) ep1_tx_buffer;
-		ep1_i.STAT = DTS;
+		ep1_i.STAT = 0;
 	}
 }
 // This method will be removed in the future

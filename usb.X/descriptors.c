@@ -62,26 +62,42 @@ config_descriptor = {
        USB_EP_BUFFER_LEN, // MaxPacketSize (LITLE ENDIAN)
        1, // bInterval
    },
+//    {/*Enpoint 2 IN descriptor*/
+//        sizeof(EndpointDescriptor_t), // Length
+//        0x05, // bDescriptorType
+//        0x81, // bEndpointAddress
+//        ATTRIBUTE_MODE_BULK, // bmAttributes
+//        USB_EP_BUFFER_LEN, // MaxPacketSize (LITLE ENDIAN)
+//        1, // bInterval
+//    },
+   {/*Enpoint 2 OUT descriptor*/
+       sizeof(EndpointDescriptor_t), // Length
+       0x05, // bDescriptorType
+       0x02, // bEndpointAddress
+       ATTRIBUTE_MODE_BULK, // bmAttributes
+       USB_EP_BUFFER_LEN, // MaxPacketSize (LITLE ENDIAN)
+       1, // bInterval
+   },
 };
 
-// Class specific descriptor - HID 
-const struct _hid_report {BYTE report[HID_RPT01_SIZE];}hid_rpt01={
-{
-    0x06, 0x00, 0xFF,       // Usage Page = 0xFF00 (Vendor Defined Page 1)
-    0x09, 0x01,             // Usage (Vendor Usage 1)
-    0xA1, 0x01,             // Collection (Application)
-    0x19, 0x00,             //      Usage Minimum 
-    0x29, 0x40,             //      Usage Maximum 	//64 input usages total (0x01 to 0x40)
-    0x15, 0x00,             //      Logical Minimum (data bytes in the report may have minimum value = 0x00)
-    0x25, 0x40,      	  	//      Logical Maximum (data bytes in the report may have maximum value = 0x00FF = unsigned 255)
-    0x75, 0x08,             //      Report Size: 8-bit field size
-    0x95, 0x40,             //      Report Count: Make sixty-four 8-bit fields (the next time the parser hits an "Input", "Output", or "Feature" item)
-    0x81, 0x00,             //      Input (Data, Array, Abs): Instantiates input packet fields based on the above report size, count, logical min/max, and usage.
-    0x19, 0x00,             //      Usage Minimum 
-    0x29, 0x40,             //      Usage Maximum 	//64 output usages total (0x01 to 0x40)
-    0x91, 0x00,             //      Output (Data, Array, Abs): Instantiates output packet fields.  Uses same report size and count as "Input" fields, since nothing new/different was specified to the parser since the "Input" item.
-    0xC0}                   // End Collection
-};
+// // Class specific descriptor - HID 
+// const struct _hid_report {BYTE report[HID_RPT01_SIZE];}hid_rpt01={
+// {
+//     0x06, 0x00, 0xFF,       // Usage Page = 0xFF00 (Vendor Defined Page 1)
+//     0x09, 0x01,             // Usage (Vendor Usage 1)
+//     0xA1, 0x01,             // Collection (Application)
+//     0x19, 0x00,             //      Usage Minimum 
+//     0x29, 0x40,             //      Usage Maximum 	//64 input usages total (0x01 to 0x40)
+//     0x15, 0x00,             //      Logical Minimum (data bytes in the report may have minimum value = 0x00)
+//     0x25, 0x40,      	  	//      Logical Maximum (data bytes in the report may have maximum value = 0x00FF = unsigned 255)
+//     0x75, 0x08,             //      Report Size: 8-bit field size
+//     0x95, 0x40,             //      Report Count: Make sixty-four 8-bit fields (the next time the parser hits an "Input", "Output", or "Feature" item)
+//     0x81, 0x00,             //      Input (Data, Array, Abs): Instantiates input packet fields based on the above report size, count, logical min/max, and usage.
+//     0x19, 0x00,             //      Usage Minimum 
+//     0x29, 0x40,             //      Usage Maximum 	//64 output usages total (0x01 to 0x40)
+//     0x91, 0x00,             //      Output (Data, Array, Abs): Instantiates output packet fields.  Uses same report size and count as "Input" fields, since nothing new/different was specified to the parser since the "Input" item.
+//     0xC0}                   // End Collection
+// };
 
 const BYTE string_descriptor0[] = { // available languages  descriptor
     0x04, STRING_DESCRIPTOR, //
