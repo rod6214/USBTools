@@ -31,7 +31,17 @@ volatile BYTE ep1_tx_buffer[USB_EP_BUFFER_LEN] __at(USB_TX1_REG);
 volatile BYTE ep1_rx_buffer[USB_EP_BUFFER_LEN] __at(USB_RX1_REG);
 int usb_sp = 0; // Stack Pointer
 BYTE usb_stack[RECEPTOR_LENGTH] __at(RECEPTOR_1_REG);
+
+// *************** Definitions *************** //
 #define USBCDC_SELF_POWERED 1
+#define flush_data(epx_bd) do {\
+if (epx_bd.STAT & DTS)\
+		epx_bd.STAT = UOWN | DTSEN;\
+	else\
+		epx_bd.STAT = UOWN | DTS | DTSEN;\
+} while(0)
+// *************** Definitions *************** //
+
 static const char const_values_status[] = { 0, 0 };
 
 //endpoints
@@ -58,25 +68,33 @@ void wait() {
 while ((ep1_o.STAT & UOWN)!=0);
 }
 
-int usb_read(BYTE* buffer) {
-	if (usb_sp > 0) {
-       for (int idx = 0;idx < USB_EP_BUFFER_LEN; idx++) {
-           buffer[USB_EP_BUFFER_LEN - idx - 1] = usb_stack[usb_sp - idx - 1];
-       }
-	   usb_sp -= USB_EP_BUFFER_LEN;
+// int usb_read(BYTE* buffer) {
+// 	if (usb_sp > 0) {
+//        for (int idx = 0;idx < USB_EP_BUFFER_LEN; idx++) {
+//            buffer[USB_EP_BUFFER_LEN - idx - 1] = usb_stack[usb_sp - idx - 1];
+//        }
+// 	   usb_sp -= USB_EP_BUFFER_LEN;
 	   
-       return USB_EP_BUFFER_LEN;
-	}
+//        return USB_EP_BUFFER_LEN;
+// 	}
+// 	return 0;
+// }
+
+int usb_read(int epid, BYTE* buffer, int bytes) {
 	return 0;
 }
 
-int usb_write(BYTE* buffer) {
-    for (int idx = 0; idx < USB_EP_BUFFER_LEN; idx++) {
-        ep1_tx_buffer[idx] = buffer[idx];
-    }
-	usb_write_ep1_buffer(USB_EP_BUFFER_LEN);
-    return USB_EP_BUFFER_LEN;
+int usb_write(int epid, BYTE* buffer, int bytes) {
+	return 0;
 }
+
+// int usb_write(BYTE* buffer) {
+//     for (int idx = 0; idx < USB_EP_BUFFER_LEN; idx++) {
+//         ep1_tx_buffer[idx] = buffer[idx];
+//     }
+// 	usb_write_ep1_buffer(USB_EP_BUFFER_LEN);
+//     return USB_EP_BUFFER_LEN;
+// }
 
 BYTE get_device_state() {
 	return usb_device_state;
@@ -189,14 +207,8 @@ static void configure_tx_rx_ep() {
 		// ep1_i.STAT = 0;
 	}
 }
-// This method will be removed in the future
-//static void usb_read_buffer() {
-//	ep1_o.CNT = USB_EP_BUFFER_LEN;
-//	if (ep1_o.STAT & DTS)
-//		ep1_o.STAT = UOWN | DTSEN;
-//	else
-//		ep1_o.STAT = UOWN | DTS | DTSEN;
-//}
+
+
 
 static BYTE usb_read_ep1_buffer() {
 	ep1_o.CNT = 2;
