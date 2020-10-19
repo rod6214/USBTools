@@ -27,6 +27,9 @@ typedef int BOOL;
 #define USB_BUFFER_CONTROL_SIZE 8
 #define USB_EP_BUFFER_LEN 64
 
+#define RX 0
+#define TX 1
+
 // #define USB_SP_MAX 256
 #define HBYTE(x) (x >> 8)
 #define LBYTE(x) (x & 255)

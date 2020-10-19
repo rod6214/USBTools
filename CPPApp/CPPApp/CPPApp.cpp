@@ -87,15 +87,15 @@ int main()
             int ss = 0;
 
             while (true) {
-                //if (WinUsb_ReadPipe(interfaceHandle, 129, buffer, 64, &written, NULL)) {
-                //    if (buffer[0] == 7) {
-                //        buffer[0] = 0;
-                //    }
-                //}
-                //ss = GetLastError();
-                if (WinUsb_WritePipe(interfaceHandle, 1, buffer, 3, &written, NULL)) {
-                    std::cout << "dd" << std::endl;
+                if (WinUsb_ReadPipe(interfaceHandle, 129, buffer, 3, &written, NULL)) {
+                    if (buffer[0] == 7) {
+                        buffer[0] = 0;
+                    }
                 }
+                ss = GetLastError();
+                //if (WinUsb_WritePipe(interfaceHandle, 1, buffer, 3, &written, NULL)) {
+                //    std::cout << "dd" << std::endl;
+                //}
             }
         }
     }

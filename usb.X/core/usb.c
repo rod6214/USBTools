@@ -46,6 +46,7 @@ if (epx_bd.STAT & DTS)\
 	else\
 		epx_bd.STAT = UOWN | DTS | DTSEN;\
 } while(0)
+// #define __wait(epx) while ((epx.STAT & UOWN)!=0) 
 // *************** Definitions *************** //
 
 static const char const_values_status[] = { 0, 0 };
@@ -69,27 +70,52 @@ static BYTE usb_read_ep1_buffer();
 static BYTE usb_write_ep1_buffer(BYTE len);
 static void get_status(void);
 
-void wait() {
-while ((ep1_o.STAT & UOWN)!=0);
-}
 
-BYTE* __get_epx_buffer(int epid) {
+
+void __wait(int epid, int dir) {
+	
 	switch (epid)
 	{
 		case EP1:
+		{
+			if (dir) {
+				while ((ep1_i.STAT & UOWN)!=0);
+				return;
+			}
+			while ((ep1_o.STAT & UOWN)!=0);
+		}
+		break;
+	}
+}
+
+BYTE* __get_epx_buffer(int epid, int dir) {
+	switch (epid)
+	{
+		case EP1:
+		{
+			if (dir) {
+				return (BYTE*)ep1_tx_buffer;
+			}
 			return (BYTE*)ep1_rx_buffer;
-		
+		}
 		default:
 			return 0;
 	}
 }
 
-void __flush_ep(int epid) {
+void __flush_ep(int epid, int dir, int bytes) {
 	switch (epid)
 	{
 		case EP1:
-			flush_data(ep1_o);
-			break;
+		{
+			if (dir) {
+				ep1_i.CNT = bytes;
+				flush_data(ep1_i);
+			} else {
+				flush_data(ep1_o);
+			}
+		}
+		break;
 	}
 }
 
@@ -97,9 +123,9 @@ int usb_read(int epid, BYTE* buffer, int bytes) {
 	if (ep_pending_data[epid] > 0) {
 		int idx = 0;
 		for (; idx < bytes; idx++) {
-			buffer[idx] = __get_epx_buffer(epid)[idx];
+			buffer[idx] = __get_epx_buffer(epid, RX)[idx];
 		}
-		__flush_ep(epid);
+		__flush_ep(epid, RX, 0);
 		ep_pending_data[epid]--;
 		return idx++;
 	}
@@ -107,16 +133,15 @@ int usb_read(int epid, BYTE* buffer, int bytes) {
 }
 
 int usb_write(int epid, BYTE* buffer, int bytes) {
-	return 0;
+	int idx = 0;
+	__wait(epid, TX);
+	for (; idx < bytes; idx++) {
+		BYTE *tmp = &(__get_epx_buffer(epid, TX)[idx]);
+		*tmp = buffer[idx];
+	}
+	__flush_ep(epid, TX, bytes);
+	return idx++;
 }
-
-// int usb_write(BYTE* buffer) {
-//     for (int idx = 0; idx < USB_EP_BUFFER_LEN; idx++) {
-//         ep1_tx_buffer[idx] = buffer[idx];
-//     }
-// 	usb_write_ep1_buffer(USB_EP_BUFFER_LEN);
-//     return USB_EP_BUFFER_LEN;
-// }
 
 BYTE get_device_state() {
 	return usb_device_state;
@@ -343,6 +368,7 @@ static void process_control_transfer() {
 							
 							ep1_i.ADDR = (int) ep1_tx_buffer;
 							ep1_i.STAT = DTS;
+							// ep1_i.STAT = 0;
 							// UEP1 = 0x1E;
 							// ep1_i.ADDR = (int) ep1_rx_buffer;
 							// ep1_i.STAT = DTS;
@@ -473,6 +499,7 @@ void usb_init() {
 		}
 		
 		{//Wait for bus reset
+			UIEbits.SOFIE = 1;
 			UIR = 0;
 			UIE = 0;
 			UIEbits.URSTIE = 1;
@@ -542,6 +569,7 @@ void usb_interrupt_handler() {
 
 	if (UIRbits.TRNIF && UIEbits.TRNIE) {
 		process_control_transfer();
+		
 		// Turn off interrupt
 		UIRbits.TRNIF = 0;
 	}
