@@ -17,18 +17,24 @@ BYTE control_stage; // Holds the current stage in a control transfer
 BYTE request_handled; // Set to 1 if request was understood and processed.
 BYTE device_address;
 BYTE dlen; // Number of unsigned chars of data
+// BYTE pending_data;
+BYTE ep_pending_data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 codePtr code_ptr; // Data to host from FLASH
 codePtr _devDesc; 
 codePtr _configDesc; 
 codePtr *_stringDescs;
 codePtr _hid_rpt01;
-int configured_ep = 0;
+
 
 static const char const_values_0x00_0x00[] = { 0, 0 };
 volatile USBControlPacket setup_packet __at(USB_TX0_REG);
 volatile BYTE ep0_in_buffer[USB_BUFFER_CONTROL_SIZE] __at(USB_RX0_REG);
 volatile BYTE ep1_tx_buffer[USB_EP_BUFFER_LEN] __at(USB_TX1_REG);
 volatile BYTE ep1_rx_buffer[USB_EP_BUFFER_LEN] __at(USB_RX1_REG);
+// volatile BYTE *epx_rx_buffer[] = {
+// 	ep0_in_buffer,
+// 	ep1_rx_buffer
+// };
 int usb_sp = 0; // Stack Pointer
 BYTE usb_stack[RECEPTOR_LENGTH] __at(RECEPTOR_1_REG);
 
@@ -56,7 +62,6 @@ volatile BDT ep3_i __at (0x0404+3*8);
 
 static void usb_read_buffer();
 static void in_data_stage();
-static void process_interrupt();
 static void prepare_for_setup_stage();
 static void get_descriptor();
 static void configure_tx_rx_ep();
@@ -68,19 +73,36 @@ void wait() {
 while ((ep1_o.STAT & UOWN)!=0);
 }
 
-// int usb_read(BYTE* buffer) {
-// 	if (usb_sp > 0) {
-//        for (int idx = 0;idx < USB_EP_BUFFER_LEN; idx++) {
-//            buffer[USB_EP_BUFFER_LEN - idx - 1] = usb_stack[usb_sp - idx - 1];
-//        }
-// 	   usb_sp -= USB_EP_BUFFER_LEN;
-	   
-//        return USB_EP_BUFFER_LEN;
-// 	}
-// 	return 0;
-// }
+BYTE* __get_epx_buffer(int epid) {
+	switch (epid)
+	{
+		case EP1:
+			return (BYTE*)ep1_rx_buffer;
+		
+		default:
+			return 0;
+	}
+}
+
+void __flush_ep(int epid) {
+	switch (epid)
+	{
+		case EP1:
+			flush_data(ep1_o);
+			break;
+	}
+}
 
 int usb_read(int epid, BYTE* buffer, int bytes) {
+	if (ep_pending_data[epid] > 0) {
+		int idx = 0;
+		for (; idx < bytes; idx++) {
+			buffer[idx] = __get_epx_buffer(epid)[idx];
+		}
+		__flush_ep(epid);
+		ep_pending_data[epid]--;
+		return idx++;
+	}
 	return 0;
 }
 
@@ -111,10 +133,8 @@ static void get_status(void) {
 
 	} else if (recipient == 0x01) {
 		// Interface
-		// PORTB++;
 		
 	} else if (recipient == 0x02) {
-		// PORTB++;
 	}
 	if (request_handled) {
 		dlen = 2;
@@ -220,11 +240,8 @@ static BYTE usb_read_ep1_buffer() {
 }
 
 static BYTE usb_write_ep1_buffer(BYTE len) {
-    // ep1_i.STAT = UOWN | DTS | DTSEN;
-	// while ((ep1_i.STAT & UOWN)!=0);
-	// PORTB = UADDR;
 	while ((ep1_i.STAT & UOWN) == UOWN);
-	PORTB++;
+	// PORTB++;
 	ep1_i.STAT &= 0x48;
 	ep1_i.CNT = 2;
 	if (ep1_i.STAT & DTS)
@@ -268,37 +285,6 @@ static void in_data_stage() {
 	//	for (idx = 0; idx < bufferSize; idx++)
 	for (int idx = bufferSize; idx--;)
 		*in_ptr++ = *code_ptr++;
-}
-
-// BYTE testing __at(0x800);
-
-int prepare_ready_ep1 = 0;
-
-static void process_interrupt() {
-	if (!configured_ep && usb_device_state == CONFIGURED) {
-		configure_tx_rx_ep();
-		configured_ep++;
-	}
-	// This comment works fine receiving data from host with interrupt transaction
-	if (usb_device_state == CONFIGURED) {
-		// usb_write_ep1_buffer(USB_EP_BUFFER_LEN);
-		if (usb_sp >= 0 && usb_sp < RECEPTOR_LENGTH) {
-			if (IS_IN_EP1) {
-				 BYTE bytes = usb_read_ep1_buffer();
-				if (prepare_ready_ep1 == 2) {
-
-					memcpy((void*)&usb_stack[usb_sp], (void*)&ep1_rx_buffer[0], bytes);
-
-					usb_sp += bytes;
-				}
-				else {
-					prepare_ready_ep1++;
-				}
-			} else if (IS_OUT_EP1) {
-				
-			}
-		}
-	}
 }
 
 static void process_control_transfer() {
@@ -369,9 +355,7 @@ static void process_control_transfer() {
 					code_ptr = (codePtr) (const_values_0x00_0x00);
 					dlen = 1;
                 } else if (request == SET_INTERFACE) {
-					PORTB++;
 				} else if (request == SET_FEATURE) {
-					PORTB++;
 				}
 			}
             
@@ -458,6 +442,10 @@ static void process_control_transfer() {
 			// Prepare for the Setup stage of a control transfer
 			prepare_for_setup_stage();
 		}
+	} else if (IS_IN_EP1) {
+		if (ep_pending_data[EP1] == 0) {
+			ep_pending_data[EP1]++;
+		}
 	}
 }
 
@@ -496,7 +484,7 @@ void usb_init() {
 }
 
 void usb_interrupt_handler() {
-	//  PORTB++;
+
     if ((UCFGbits.UTEYE == 1) || //eye test
     (usb_device_state == DETACHED) || //not connected
     (UCONbits.SUSPND == 1))//suspended
@@ -554,7 +542,6 @@ void usb_interrupt_handler() {
 
 	if (UIRbits.TRNIF && UIEbits.TRNIE) {
 		process_control_transfer();
-		process_interrupt();
 		// Turn off interrupt
 		UIRbits.TRNIF = 0;
 	}

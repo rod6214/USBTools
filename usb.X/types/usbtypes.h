@@ -145,9 +145,9 @@ typedef struct {
 extern void usb_interrupt_handler();
 extern void usb_init();
 extern void set_descriptors(codePtr devDesc, codePtr configDesc, codePtr hid_rpt01, codePtr *stringDescs);
-extern int usb_read(BYTE* buffer);
+int usb_read(int epid, BYTE* buffer, int bytes);
+int usb_write(int epid, BYTE* buffer, int bytes);
 extern BYTE get_device_state();
-extern int usb_write(BYTE* buffer);
 extern void wait();
 
 #ifdef	__cplusplus

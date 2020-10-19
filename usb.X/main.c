@@ -42,7 +42,8 @@ void main () {
 
         while ((PORTA & 1) == 1) {
             if (pressed == 0) {
-                usb_write(usb_buffer);
+                usb_read(EP1, usb_buffer, 3);
+                // usb_write(usb_buffer);
                 //  PORTB++;
                 pressed++;
             }
