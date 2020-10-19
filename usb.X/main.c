@@ -1,6 +1,6 @@
 #include <xc.h>
 #include <pic18f2550.h>
-#include "descriptor.h"
+#include "descriptors.h"
 #include "usb.h"
 #include "usbtypes.h"
 
@@ -45,6 +45,10 @@ void main () {
                 usb_buffer[0] = 10;
                 usb_buffer[1] = 10;
                 usb_buffer[2] = 10;
+                usb_write(EP1, usb_buffer, 3);
+                usb_buffer[0] = 1;
+                usb_buffer[1] = 2;
+                usb_buffer[2] = 3;
                 usb_write(EP1, usb_buffer, 3);
                 // usb_read(EP1, usb_buffer, 3);
                 // usb_write(usb_buffer);

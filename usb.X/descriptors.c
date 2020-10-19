@@ -2,7 +2,7 @@
 // #include <string.h>
 // #include <pic18f2550.h>
 #include "usbtypes.h"
-#include "descriptor.h"
+#include "descriptors.h"
 
 const DeviceDescriptor_t 
 device_descriptor = { //
@@ -31,8 +31,7 @@ config_descriptor = {
        0x01, // NumInterfaces
        0x01, // bConfigurationValue
        0x00, // iConfiguration
-    //    0xC0, // bmAttributes
-       0x80, // bmAttributes
+       _DEFAULT | _SELF | _RWU, // bmAttributes
        50, // MaxPower (200mA)
    },
 //    Interface 1
