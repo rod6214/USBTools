@@ -56,6 +56,13 @@ bool USB::Find_Device(unsigned short p_VendorID,
 												OPEN_EXISTING,
 												FILE_FLAG_OVERLAPPED,
 												0);
+						/**pDeviceHandle = CreateFile(devicePath.data(),
+							GENERIC_READ | GENERIC_WRITE,
+							FILE_SHARE_READ | FILE_SHARE_WRITE,
+							NULL,
+							OPEN_EXISTING,
+							0,
+							0);*/
 
 						bool validDeviceHandle = INVALID_HANDLE_VALUE != *pDeviceHandle;
 

@@ -12,7 +12,59 @@ int main()
     WINUSB_INTERFACE_HANDLE interfaceHandle;
 
     if (USB::Find_Device(0x04d8, 0x0053, &pDeviceHandle)) {
+
+        //GetDeviceHandle
+
+        //if (pDeviceHandle == INVALID_HANDLE_VALUE)
+        //{
+        //    return FALSE;
+        //}
+
+        //BOOL bResult = TRUE;
+
+        //USB_INTERFACE_DESCRIPTOR InterfaceDescriptor;
+        //ZeroMemory(&InterfaceDescriptor, sizeof(USB_INTERFACE_DESCRIPTOR));
+
+        //WINUSB_PIPE_INFORMATION  Pipe;
+        //ZeroMemory(&Pipe, sizeof(WINUSB_PIPE_INFORMATION));
+
+
+        //bResult = WinUsb_QueryInterfaceSettings(pDeviceHandle, 0, &InterfaceDescriptor);
+        //WINUSB_PIPE_INFORMATION  Pipe;
+
+        //USB_INTERFACE_DESCRIPTOR InterfaceDescriptor;
+        //ZeroMemory(&InterfaceDescriptor, sizeof(USB_INTERFACE_DESCRIPTOR));
+
+        //ZeroMemory(&Pipe, sizeof(WINUSB_PIPE_INFORMATION));
+
+        //bool result = false;
+
+        //result = WinUsb_QueryInterfaceSettings(pDeviceHandle, 0, &InterfaceDescriptor);
+
+        //result = WinUsb_QueryPipe(pDeviceHandle, 0, 1, &Pipe);
+
         if (WinUsb_Initialize(pDeviceHandle, &interfaceHandle)) {
+
+            USB_INTERFACE_DESCRIPTOR InterfaceDescriptor;
+            ZeroMemory(&InterfaceDescriptor, sizeof(USB_INTERFACE_DESCRIPTOR));
+
+            //WINUSB_PIPE_INFORMATION  Pipe;
+            //ZeroMemory(&Pipe, sizeof(WINUSB_PIPE_INFORMATION));
+
+
+            //bResult = WinUsb_QueryInterfaceSettings(pDeviceHandle, 0, &InterfaceDescriptor);
+            WINUSB_PIPE_INFORMATION  Pipe;
+
+            /*USB_INTERFACE_DESCRIPTOR InterfaceDescriptor;
+            ZeroMemory(&InterfaceDescriptor, sizeof(USB_INTERFACE_DESCRIPTOR));*/
+
+            ZeroMemory(&Pipe, sizeof(WINUSB_PIPE_INFORMATION));
+
+            bool result = false;
+
+            result = WinUsb_QueryInterfaceSettings(interfaceHandle, 0, &InterfaceDescriptor);
+
+            result = WinUsb_QueryPipe(interfaceHandle, 0, 2, &Pipe);
 
             unsigned char buffer[66] = {0};
             unsigned long written = 0;
@@ -32,15 +84,18 @@ int main()
             buffer[62] = 6;
             buffer[63] = 6;
 
+            int ss = 0;
+
             while (true) {
-                if (WinUsb_ReadPipe(interfaceHandle, 1, buffer, 64, &written, NULL)) {
+                if (WinUsb_ReadPipe(interfaceHandle, 129, buffer, 64, &written, NULL)) {
                     if (buffer[0] == 7) {
                         buffer[0] = 0;
                     }
                 }
-                if (WinUsb_WritePipe(interfaceHandle, 1, buffer, 64, &written, NULL)) {
-                    std::cout << "dd" << std::endl;
-                }
+                ss = GetLastError();
+                //if (WinUsb_WritePipe(interfaceHandle, 1, buffer, 64, &written, NULL)) {
+                //    std::cout << "dd" << std::endl;
+                //}
             }
         }
     }

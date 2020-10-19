@@ -31,6 +31,8 @@ volatile BYTE ep1_tx_buffer[USB_EP_BUFFER_LEN] __at(USB_TX1_REG);
 volatile BYTE ep1_rx_buffer[USB_EP_BUFFER_LEN] __at(USB_RX1_REG);
 int usb_sp = 0; // Stack Pointer
 BYTE usb_stack[RECEPTOR_LENGTH] __at(RECEPTOR_1_REG);
+#define USBCDC_SELF_POWERED 1
+static const char const_values_status[] = { 0, 0 };
 
 //endpoints
 volatile BDT ep0_o __at (0x0400+0*8);
@@ -50,6 +52,7 @@ static void get_descriptor();
 static void configure_tx_rx_ep();
 static BYTE usb_read_ep1_buffer();
 static BYTE usb_write_ep1_buffer(BYTE len);
+static void get_status(void);
 
 void wait() {
 while ((ep1_o.STAT & UOWN)!=0);
@@ -68,15 +71,63 @@ int usb_read(BYTE* buffer) {
 }
 
 int usb_write(BYTE* buffer) {
-    // for (int idx = 0; idx < USB_EP_BUFFER_LEN; idx++) {
-    //     ep1_tx_buffer[idx] = buffer[idx];
-    // }
+    for (int idx = 0; idx < USB_EP_BUFFER_LEN; idx++) {
+        ep1_tx_buffer[idx] = buffer[idx];
+    }
 	usb_write_ep1_buffer(USB_EP_BUFFER_LEN);
     return USB_EP_BUFFER_LEN;
 }
 
 BYTE get_device_state() {
 	return usb_device_state;
+}
+
+static void get_status(void) {
+	// Mask off the Recipient bits
+	unsigned char recipient = (unsigned char)(setup_packet.bmRequestType & 0x1F);
+		// See where the request goes
+	if (recipient == 0x00) {
+		// Device
+        request_handled = 1;
+		code_ptr = (codePtr) const_values_status; // hard __code device status
+
+	} else if (recipient == 0x01) {
+		// Interface
+		// PORTB++;
+		
+	} else if (recipient == 0x02) {
+		// PORTB++;
+	}
+	if (request_handled) {
+		dlen = 2;
+	}
+    
+	// // See where the request goes
+	// if (recipient == 0x00) {
+	// 	// Device
+	// 	request_handled = 1;
+	// 	code_ptr = (codePtr) const_values_status; // hard __code device status
+        
+	// } else if (recipient == 0x01) {
+	// 	// Interface
+	// 	code_ptr = (codePtr) const_values_0x00_0x00;
+	// 	request_handled = 1;
+	// } else if (recipient == 0x02) {
+	// 	// Endpoint
+	// 	unsigned char endpointNum = (unsigned char)(setup_packet.windex0 & 0x0F);
+	// 	unsigned char endpointDir = (unsigned char)(setup_packet.windex0 & 0x80);
+	// 	request_handled = 1;
+	// 	// Endpoint descriptors are 8 unsigned chars long, with each in and out taking 4 unsigned chars
+	// 	// within the endpoint. (See PIC datasheet.)
+	// 	in_ptr = (dataPtr) &ep0_o + (endpointNum * 8);
+	// 	if (endpointDir)
+	// 		in_ptr += 4;
+	// 	if (*in_ptr & BSTALL)
+	// 		code_ptr = (codePtr) const_values_0x01_0x00;
+	// }
+	// if (request_handled) {
+	// 	dlen = 2;
+	// }
 }
 
 static void get_descriptor() {
@@ -105,36 +156,37 @@ static void get_descriptor() {
 			dlen = *code_ptr;
 		}
 
-	} else if (setup_packet.bmRequestType == 0x81) {
+	} 
+	// else if (setup_packet.bmRequestType == 0x81) {
 
-		if (descriptorType == HID_DESCRIPTOR) {
+	// 	if (descriptorType == HID_DESCRIPTOR) {
 
-		} else if (descriptorType == REPORT_DESCRIPTOR) {
+	// 	} else if (descriptorType == REPORT_DESCRIPTOR) {
 
-			if (!configured_ep && usb_device_state == CONFIGURED) {
-				configure_tx_rx_ep();
-				configured_ep++;
-			}
+	// 		if (!configured_ep && usb_device_state == CONFIGURED) {
+	// 			configure_tx_rx_ep();
+	// 			configured_ep++;
+	// 		}
 
-			request_handled = 1;
-			code_ptr = (codePtr) _hid_rpt01;
-			dlen = HID_RPT01_SIZE;
+	// 		request_handled = 1;
+	// 		code_ptr = (codePtr) _hid_rpt01;
+	// 		dlen = HID_RPT01_SIZE;
 
-		} else if (descriptorType == PHYSICAL_DESCRIPTOR) {
-		}
-	}
+	// 	} else if (descriptorType == PHYSICAL_DESCRIPTOR) {
+	// 	}
+	// }
 }
 
 static void configure_tx_rx_ep() {
 	// Initialize the endpoints for all interfaces
 	{ // Turn on both in and out for this endpoint	
-		UEP1 = 0x1E;
-		ep1_o.CNT = USB_EP_BUFFER_LEN;
-		ep1_o.ADDR = (int) ep1_rx_buffer;
-		ep1_o.STAT = UOWN | DTSEN; //set up to receive stuff as soon as we get something
+		// UEP1 = 0x1E;
+		// ep1_o.CNT = USB_EP_BUFFER_LEN;
+		// ep1_o.ADDR = (int) ep1_rx_buffer;
+		// ep1_o.STAT = UOWN | DTSEN; //set up to receive stuff as soon as we get something
 		
-		ep1_i.ADDR = (int) ep1_tx_buffer;
-		ep1_i.STAT = 0;
+		// ep1_i.ADDR = (int) ep1_tx_buffer;
+		// ep1_i.STAT = 0;
 	}
 }
 // This method will be removed in the future
@@ -147,7 +199,7 @@ static void configure_tx_rx_ep() {
 //}
 
 static BYTE usb_read_ep1_buffer() {
-	ep1_o.CNT = USB_EP_BUFFER_LEN;
+	ep1_o.CNT = 2;
 	if (ep1_o.STAT & DTS)
 		ep1_o.STAT = UOWN | DTSEN;
 	else
@@ -156,15 +208,18 @@ static BYTE usb_read_ep1_buffer() {
 }
 
 static BYTE usb_write_ep1_buffer(BYTE len) {
-	ep1_i.CNT = USB_EP_BUFFER_LEN;
     // ep1_i.STAT = UOWN | DTS | DTSEN;
-	while ((ep1_i.STAT & UOWN)!=0);
+	// while ((ep1_i.STAT & UOWN)!=0);
+	// PORTB = UADDR;
+	while ((ep1_i.STAT & UOWN) == UOWN);
 	PORTB++;
+	ep1_i.STAT &= 0x48;
+	ep1_i.CNT = 2;
 	if (ep1_i.STAT & DTS)
-		ep1_i.STAT = UOWN | DTSEN;
+		ep1_i.STAT |= UOWN | DTSEN;
 	else
-		ep1_i.STAT = UOWN | DTS | DTSEN;
-	UCONbits.PKTDIS = 0;
+		ep1_i.STAT |= UOWN | DTS | DTSEN;
+
 	return USB_EP_BUFFER_LEN;
 }
 
@@ -265,7 +320,10 @@ static void process_control_transfer() {
 					device_address = LBYTE(setup_packet.wValue);
 				} else if (request == GET_DESCRIPTOR) {
 					get_descriptor();
-				} else if (request == SET_CONFIGURATION) {
+				} else if (request == GET_STATUS) {
+					get_status();
+				} 
+				else if (request == SET_CONFIGURATION) {
 					
 					request_handled = 1;
 					current_configuration = LBYTE(setup_packet.wValue);
@@ -281,8 +339,15 @@ static void process_control_transfer() {
 						// Initialize the endpoints for all interfaces
 						{ // Turn on both in and out for this endpoint
 							UEP1 = 0x1E;
-							ep1_i.ADDR = (int) ep1_rx_buffer;
+							ep1_o.CNT = USB_EP_BUFFER_LEN;
+							ep1_o.ADDR = (int) ep1_rx_buffer;
+							ep1_o.STAT = UOWN | DTSEN; //set up to receive stuff as soon as we get something
+							
+							ep1_i.ADDR = (int) ep1_tx_buffer;
 							ep1_i.STAT = DTS;
+							// UEP1 = 0x1E;
+							// ep1_i.ADDR = (int) ep1_rx_buffer;
+							// ep1_i.STAT = DTS;
 						}
 					}
 				} else if (request == GET_INTERFACE) {
@@ -291,7 +356,11 @@ static void process_control_transfer() {
 					request_handled = 1;
 					code_ptr = (codePtr) (const_values_0x00_0x00);
 					dlen = 1;
-                }
+                } else if (request == SET_INTERFACE) {
+					PORTB++;
+				} else if (request == SET_FEATURE) {
+					PORTB++;
+				}
 			}
             
 			if (!request_handled) {

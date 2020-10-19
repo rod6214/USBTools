@@ -78,7 +78,7 @@ typedef struct {
     // HIDInterfaceDescriptor_t hidInterfaceDesc1;
     EndpointDescriptor_t ep1_i;
     EndpointDescriptor_t ep1_o;
-    EndpointDescriptor_t ep2_o;
+    // EndpointDescriptor_t ep2_o;
 	// TODO: Set more interfaces here
 } config_struct;
 

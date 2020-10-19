@@ -31,7 +31,8 @@ config_descriptor = {
        0x01, // NumInterfaces
        0x01, // bConfigurationValue
        0x00, // iConfiguration
-       0xC0, // bmAttributes
+    //    0xC0, // bmAttributes
+       0x80, // bmAttributes
        50, // MaxPower (200mA)
    },
 //    Interface 1
@@ -41,9 +42,12 @@ config_descriptor = {
        0x00, // bInterfaceNumber
        0x00, // bAlternateSetting
        0x02, // bNumEndpoints
-       0xFF, // bInterfaceClass (Defined by the vendor)
-       0xFF, // bInterfaceSubClass (Defined by the vendor)
-       0xFF, // bInterfaceProtocol (Defined by the vendor)
+//       0xFF, // bInterfaceClass (Defined by the vendor)
+//       0xFF, // bInterfaceSubClass (Defined by the vendor)
+//       0xFF, // bInterfaceProtocol (Defined by the vendor)
+       0x00, // bInterfaceClass (Defined by the vendor)
+       0x00, // bInterfaceSubClass (Defined by the vendor)
+       0x00, // bInterfaceProtocol (Defined by the vendor)
        0x00, // iInterface
   },
    {/*Enpoint 1 IN descriptor*/
@@ -52,7 +56,8 @@ config_descriptor = {
        0x81, // bEndpointAddress
        ATTRIBUTE_MODE_BULK, // bmAttributes
        USB_EP_BUFFER_LEN, // MaxPacketSize (LITLE ENDIAN)
-       1, // bInterval
+    //    1, // bInterval
+       32, // bInterval
    },
    {/*Enpoint 1 OUT descriptor*/
        sizeof(EndpointDescriptor_t), // Length
@@ -60,7 +65,8 @@ config_descriptor = {
        0x01, // bEndpointAddress
        ATTRIBUTE_MODE_BULK, // bmAttributes
        USB_EP_BUFFER_LEN, // MaxPacketSize (LITLE ENDIAN)
-       1, // bInterval
+    //    1, // bInterval
+       32, // bInterval
    },
 //    {/*Enpoint 2 IN descriptor*/
 //        sizeof(EndpointDescriptor_t), // Length
@@ -70,14 +76,14 @@ config_descriptor = {
 //        USB_EP_BUFFER_LEN, // MaxPacketSize (LITLE ENDIAN)
 //        1, // bInterval
 //    },
-   {/*Enpoint 2 OUT descriptor*/
-       sizeof(EndpointDescriptor_t), // Length
-       0x05, // bDescriptorType
-       0x02, // bEndpointAddress
-       ATTRIBUTE_MODE_BULK, // bmAttributes
-       USB_EP_BUFFER_LEN, // MaxPacketSize (LITLE ENDIAN)
-       1, // bInterval
-   },
+//    {/*Enpoint 2 OUT descriptor*/
+//        sizeof(EndpointDescriptor_t), // Length
+//        0x05, // bDescriptorType
+//        0x02, // bEndpointAddress
+//        ATTRIBUTE_MODE_BULK, // bmAttributes
+//        USB_EP_BUFFER_LEN, // MaxPacketSize (LITLE ENDIAN)
+//        1, // bInterval
+//    },
 };
 
 // // Class specific descriptor - HID 
