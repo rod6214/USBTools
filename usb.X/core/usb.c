@@ -26,7 +26,7 @@ codePtr *_stringDescs;
 codePtr _hid_rpt01;
 
 
-static const char const_values_0x00_0x00[] = { 0, 0 };
+static const char const_values_0x00_0x00[] = { 1, 0 };
 volatile USBControlPacket setup_packet __at(USB_TX0_REG);
 volatile BYTE ep0_in_buffer[USB_BUFFER_CONTROL_SIZE] __at(USB_RX0_REG);
 volatile BYTE ep1_tx_buffer[USB_EP_BUFFER_LEN] __at(USB_TX1_REG);
@@ -49,7 +49,7 @@ if (epx_bd.STAT & DTS)\
 // #define __wait(epx) while ((epx.STAT & UOWN)!=0) 
 // *************** Definitions *************** //
 
-static const char const_values_status[] = { 0, 0 };
+static const char const_values_status[] = { 1, 0 };
 
 //endpoints
 volatile BDT ep0_o __at (0x0400+0*8);
@@ -65,7 +65,6 @@ static void usb_read_buffer();
 static void in_data_stage();
 static void prepare_for_setup_stage();
 static void get_descriptor();
-static void configure_tx_rx_ep();
 static BYTE usb_read_ep1_buffer();
 static BYTE usb_write_ep1_buffer(BYTE len);
 static void get_status(void);
@@ -120,6 +119,7 @@ void __flush_ep(int epid, int dir, int bytes) {
 }
 
 int usb_read(int epid, BYTE* buffer, int bytes) {
+	__wait(epid, RX);
 	if (ep_pending_data[epid] > 0) {
 		int idx = 0;
 		for (; idx < bytes; idx++) {
@@ -158,39 +158,11 @@ static void get_status(void) {
 
 	} else if (recipient == 0x01) {
 		// Interface
-		
 	} else if (recipient == 0x02) {
 	}
 	if (request_handled) {
 		dlen = 2;
 	}
-    
-	// // See where the request goes
-	// if (recipient == 0x00) {
-	// 	// Device
-	// 	request_handled = 1;
-	// 	code_ptr = (codePtr) const_values_status; // hard __code device status
-        
-	// } else if (recipient == 0x01) {
-	// 	// Interface
-	// 	code_ptr = (codePtr) const_values_0x00_0x00;
-	// 	request_handled = 1;
-	// } else if (recipient == 0x02) {
-	// 	// Endpoint
-	// 	unsigned char endpointNum = (unsigned char)(setup_packet.windex0 & 0x0F);
-	// 	unsigned char endpointDir = (unsigned char)(setup_packet.windex0 & 0x80);
-	// 	request_handled = 1;
-	// 	// Endpoint descriptors are 8 unsigned chars long, with each in and out taking 4 unsigned chars
-	// 	// within the endpoint. (See PIC datasheet.)
-	// 	in_ptr = (dataPtr) &ep0_o + (endpointNum * 8);
-	// 	if (endpointDir)
-	// 		in_ptr += 4;
-	// 	if (*in_ptr & BSTALL)
-	// 		code_ptr = (codePtr) const_values_0x01_0x00;
-	// }
-	// if (request_handled) {
-	// 	dlen = 2;
-	// }
 }
 
 static void get_descriptor() {
@@ -218,42 +190,8 @@ static void get_descriptor() {
 			code_ptr = (codePtr)_stringDescs[descriptorIndex];
 			dlen = *code_ptr;
 		}
-
-	} 
-	// else if (setup_packet.bmRequestType == 0x81) {
-
-	// 	if (descriptorType == HID_DESCRIPTOR) {
-
-	// 	} else if (descriptorType == REPORT_DESCRIPTOR) {
-
-	// 		if (!configured_ep && usb_device_state == CONFIGURED) {
-	// 			configure_tx_rx_ep();
-	// 			configured_ep++;
-	// 		}
-
-	// 		request_handled = 1;
-	// 		code_ptr = (codePtr) _hid_rpt01;
-	// 		dlen = HID_RPT01_SIZE;
-
-	// 	} else if (descriptorType == PHYSICAL_DESCRIPTOR) {
-	// 	}
-	// }
-}
-
-static void configure_tx_rx_ep() {
-	// Initialize the endpoints for all interfaces
-	{ // Turn on both in and out for this endpoint	
-		// UEP1 = 0x1E;
-		// ep1_o.CNT = USB_EP_BUFFER_LEN;
-		// ep1_o.ADDR = (int) ep1_rx_buffer;
-		// ep1_o.STAT = UOWN | DTSEN; //set up to receive stuff as soon as we get something
-		
-		// ep1_i.ADDR = (int) ep1_tx_buffer;
-		// ep1_i.STAT = 0;
 	}
 }
-
-
 
 static BYTE usb_read_ep1_buffer() {
 	ep1_o.CNT = 2;
@@ -266,7 +204,6 @@ static BYTE usb_read_ep1_buffer() {
 
 static BYTE usb_write_ep1_buffer(BYTE len) {
 	while ((ep1_i.STAT & UOWN) == UOWN);
-	// PORTB++;
 	ep1_i.STAT &= 0x48;
 	ep1_i.CNT = 2;
 	if (ep1_i.STAT & DTS)
@@ -368,10 +305,6 @@ static void process_control_transfer() {
 							
 							ep1_i.ADDR = (int) ep1_tx_buffer;
 							ep1_i.STAT = DTS;
-							// ep1_i.STAT = 0;
-							// UEP1 = 0x1E;
-							// ep1_i.ADDR = (int) ep1_rx_buffer;
-							// ep1_i.STAT = DTS;
 						}
 					}
 				} else if (request == GET_INTERFACE) {
@@ -382,6 +315,7 @@ static void process_control_transfer() {
 					dlen = 1;
                 } else if (request == SET_INTERFACE) {
 				} else if (request == SET_FEATURE) {
+					
 				}
 			}
             

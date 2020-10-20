@@ -6,6 +6,18 @@
 #include <Windows.h>
 #include <winusb.h>
 
+#define GET_STATUS         0
+#define CLEAR_FEATURE      1
+#define SET_FEATURE        3
+#define SET_ADDRESS        5
+#define GET_DESCRIPTOR     6
+#define SET_DESCRIPTOR     7
+#define GET_CONFIGURATION  8
+#define SET_CONFIGURATION  9
+#define GET_INTERFACE     10
+#define SET_INTERFACE     11
+#define SYNCH_FRAME       12
+
 int main()
 {
     void *pDeviceHandle;
@@ -85,17 +97,29 @@ int main()
             buffer[63] = 6;
 
             int ss = 0;
-
+            //WINUSB_SETUP_PACKET setup_packet = {
+            //    USB_ENDPOINT_DIRECTION_IN(0),
+            //    1,
+            //    4,
+            //    2,
+            //    8
+            //};
+            //
+            //WinUsb_ControlTransfer(interfaceHandle, setup_packet, buffer, 8, &written, NULL);
+            
             while (true) {
+                UCHAR data;
+                std::cin >> data;
+                buffer[0] = data;
+                /*std::cout << "" << std::endl;*/
+                /*buffer[0] = data;
                 if (WinUsb_ReadPipe(interfaceHandle, 129, buffer, 3, &written, NULL)) {
-                    if (buffer[0] == 7) {
-                        buffer[0] = 0;
-                    }
+                    printf("");
                 }
-                ss = GetLastError();
-                //if (WinUsb_WritePipe(interfaceHandle, 1, buffer, 3, &written, NULL)) {
-                //    std::cout << "dd" << std::endl;
-                //}
+                ss = GetLastError();*/
+                if (WinUsb_WritePipe(interfaceHandle, 1, buffer, 3, &written, NULL)) {
+                    std::cout << "Sent" << std::endl;
+                }
             }
         }
     }

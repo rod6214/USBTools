@@ -38,24 +38,26 @@ void main () {
     
     while (1)
     {
-        int pressed = 0;
+        usb_read(EP1, usb_buffer, 8);
+        PORTB = usb_buffer[0];
+        // int pressed = 0;
 
-        while ((PORTA & 1) == 1) {
-            if (pressed == 0) {
-                usb_buffer[0] = 10;
-                usb_buffer[1] = 10;
-                usb_buffer[2] = 10;
-                usb_write(EP1, usb_buffer, 3);
-                usb_buffer[0] = 1;
-                usb_buffer[1] = 2;
-                usb_buffer[2] = 3;
-                usb_write(EP1, usb_buffer, 3);
-                // usb_read(EP1, usb_buffer, 3);
-                // usb_write(usb_buffer);
-                //  PORTB++;
-                pressed++;
-            }
-        }
+        // while ((PORTA & 1) == 1) {
+        //     if (pressed == 0) {
+        //         usb_buffer[0] = 10;
+        //         usb_buffer[1] = 10;
+        //         usb_buffer[2] = 10;
+        //         usb_write(EP1, usb_buffer, 3);
+        //         usb_buffer[0] = 1;
+        //         usb_buffer[1] = 2;
+        //         usb_buffer[2] = 3;
+        //         usb_write(EP1, usb_buffer, 3);
+        //         // usb_read(EP1, usb_buffer, 3);
+        //         // usb_write(usb_buffer);
+        //         //  PORTB++;
+        //         pressed++;
+        //     }
+        // }
 //        while(usb_read(usb_buffer) == 0);
 //        
 //        PORTB = usb_buffer[0];
