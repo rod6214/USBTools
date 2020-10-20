@@ -13,12 +13,13 @@ extern "C" {
 #endif
 
 #include "usb.h"
+#include "datatypes.h"
 
-typedef unsigned char BYTE;
-typedef unsigned int UINT;
-typedef unsigned short USHORT;
-typedef const unsigned char* codePtr;
-typedef unsigned char* dataPtr;
+// typedef unsigned char BYTE;
+// typedef unsigned int UINT;
+// typedef unsigned short USHORT;
+// typedef const unsigned char* codePtr;
+// typedef unsigned char* dataPtr;
 
 /******************************************************************************
  * USB Interface Device Descriptor

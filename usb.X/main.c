@@ -3,6 +3,7 @@
 #include "descriptors.h"
 #include "usb.h"
 #include "usbtypes.h"
+#include "i2c.h"
 
  #define _XTAL_FREQ 4000000
 
@@ -25,10 +26,10 @@ void main () {
     TRISA = 255;
     ADCON1 = 15;
 
-    set_descriptors((codePtr) &device_descriptor, 
-    (codePtr) &config_descriptor, NULL, (codePtr*) string_descriptors);
+    // set_descriptors((codePtr) &device_descriptor, 
+    // (codePtr) &config_descriptor, NULL, (codePtr*) string_descriptors);
 
-    usb_init();
+    // usb_init();
 
     UIEbits.TRNIE = 1;
     INTCONbits.PEIE = 1;
@@ -41,6 +42,23 @@ void main () {
         usb_read(EP1, usb_buffer, 8);
         PORTB = usb_buffer[0];
         // int pressed = 0;
+
+        // while ((PORTA & 1) == 1) {
+        //     if (pressed == 0) {
+        //         usb_buffer[0] = 10;
+        //         usb_buffer[1] = 10;
+        //         usb_buffer[2] = 10;
+        //         usb_write(EP1, usb_buffer, 3);
+        //         usb_buffer[0] = 1;
+        //         usb_buffer[1] = 2;
+        //         usb_buffer[2] = 3;
+        //         usb_write(EP1, usb_buffer, 3);
+        //         // usb_read(EP1, usb_buffer, 3);
+        //         // usb_write(usb_buffer);
+        //         //  PORTB++;
+        //         pressed++;
+        //     }
+        // }
 
         // while ((PORTA & 1) == 1) {
         //     if (pressed == 0) {
