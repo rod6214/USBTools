@@ -5,9 +5,18 @@
 extern "C" {
 #endif
 
+#include <p18cxxx.h>
 #include "datatypes.h"
 
-void send_serial(int* port, BYTE* data, int bits);
+typedef struct _I2C_t {
+    int *port;
+    int *tris;
+} I2C_t;
+
+extern void send_serial(I2C_t *i2c_handle, BYTE data, int bits);
+extern void wait_serial(I2C_t *i2c_handle);
+extern void start_serial(I2C_t *i2c_handle);
+extern void stop_serial(I2C_t *i2c_handle);
 
 #ifdef	__cplusplus
 }
