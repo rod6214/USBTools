@@ -1,6 +1,9 @@
 {
     "files.associations": {
         "iosfwd": "c",
-        "xlocbuf": "c"
+        "xlocbuf": "c",
+        "vector": "c",
+        "xstring": "c",
+        "xutility": "c"
     }
 }

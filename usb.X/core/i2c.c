@@ -55,12 +55,14 @@ void start_serial(I2C_t *i2c_handle) {
 }
 
 void stop_serial(I2C_t *i2c_handle) {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         if (i == 0) {
-            set_sda_low(i2c_handle->port);
+            set_clock_low(i2c_handle->port);
         } else if (i == 1) {
-            set_clock_high(i2c_handle->port);
+            set_sda_low(i2c_handle->port);
         } else if (i == 2) {
+            set_clock_high(i2c_handle->port);
+        } else if (i == 3) {
             set_sda_high(i2c_handle->port);
         }
         __delay_ms(10);
@@ -68,24 +70,49 @@ void stop_serial(I2C_t *i2c_handle) {
 }
 
 void wait_serial(I2C_t *i2c_handle) {
-    set_sda_in(i2c_handle->tris);
-    while (!bit_test(*(i2c_handle->port), HIGH_SDA))
-        ;
-    set_clock_low(i2c_handle->port);
-    __delay_ms(10);
-    set_sda_out(i2c_handle->tris);
+    for (int i = 0; i < 2; i++) {
+        if (i == 0) {
+            set_sda_in(i2c_handle->tris);
+            set_clock_low(i2c_handle->port);
+            while (!bit_test(*(i2c_handle->port), 0))
+                ;
+        }  else if (i == 1) {
+            set_sda_out(i2c_handle->tris);
+            set_sda_low(i2c_handle->port);
+            
+            // set_clock_high(i2c_handle->port);
+            
+        } else if (i == 2) {
+            
+            // set_clock_high(i2c_handle->port);
+        }
+        __delay_ms(10);
+    }
+    // set_clock_low(i2c_handle->port);
+    // __delay_ms(10);
+    // set_sda_in(i2c_handle->tris);
+    // // while (!bit_test(*(i2c_handle->port), 0))
+    // //     ;
+    // __delay_ms(10);
+    // set_sda_out(i2c_handle->tris);
 }
 
 void send_serial(I2C_t *i2c_handle, BYTE *data, int bytes) {
     start_serial(i2c_handle);
     for (int i = 0; i < bytes; i++) {
         BYTE data_temp = data[i];
-        for (int j = 0; j < 9; j++) {
-            bit_shift(i2c_handle->port, data_temp);
-            data_temp = data_temp << 1;
+        for (int j = 0; j < 10; j++) {
+            // bit_shift(i2c_handle->port, data_temp);
+            //     data_temp = data_temp << 1;
+            if (j < 9) {
+                bit_shift(i2c_handle->port, data_temp);
+                data_temp = data_temp << 1;
+            } else {
+                wait_serial(i2c_handle);
+            }
         }
         
-        wait_serial(i2c_handle);
+        // wait_serial(i2c_handle);
     }
     stop_serial(i2c_handle);
 }
