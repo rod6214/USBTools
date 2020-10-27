@@ -31,8 +31,8 @@ typedef int BOOL;
 #define TX 1
 
 // #define USB_SP_MAX 256
-#define HBYTE(x) (x >> 8)
-#define LBYTE(x) (x & 255)
+// #define HBYTE(x) (x >> 8)
+// #define LBYTE(x) (x & 255)
 /** D E F I N I T I O N S ****************************************************/
 #define EP0 0
 #define EP1 1

@@ -4,7 +4,8 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
+#define HBYTE(x) (x >> 8)
+#define LBYTE(x) (x & 255)
 typedef unsigned char BYTE;
 typedef unsigned int UINT;
 typedef unsigned short USHORT;

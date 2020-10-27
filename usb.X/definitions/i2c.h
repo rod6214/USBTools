@@ -13,10 +13,12 @@ typedef struct _I2C_t {
     int *tris;
 } I2C_t;
 
-extern void send_serial(I2C_t *i2c_handle, BYTE data, int bits);
+extern void send_serial(I2C_t *i2c_handle, BYTE *data, int bytes);
 extern void wait_serial(I2C_t *i2c_handle);
 extern void start_serial(I2C_t *i2c_handle);
 extern void stop_serial(I2C_t *i2c_handle);
+extern void i2c_write();
+void bit_shift(int *port, BYTE data);
 
 #ifdef	__cplusplus
 }

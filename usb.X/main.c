@@ -5,23 +5,23 @@
 #define _XTAL_FREQ 4000000
 
 // BYTE usb_buffer[RECEPTOR_LENGTH] __at(RECEPTOR_0_REG);
-BYTE usb_buffer[3] __at(0x200);
+BYTE usb_buffer[5] __at(0x200);
 
 void main () {
 
-    PORTB = 0;
+    PORTB = 3;
     PORTA = 0;
     PORTC = 0;
-    TRISB = 3;
+    TRISB = 0;
     TRISC = 0;
     TRISA = 255;
     ADCON1 = 15;
 
-    PORTB |= 3;
-
-    usb_buffer[0] = 0xAA;
-    usb_buffer[1] = 0x77;
-    // usb_buffer[0] = 7;
+    usb_buffer[0] = 0xA0;
+    usb_buffer[1] = 0x00;
+    usb_buffer[2] = 0x00;
+    usb_buffer[3] = 0xAA;
+    usb_buffer[4] = 0x99;
 
     I2C_t hI2c = {
         (int*)&PORTB,
@@ -34,10 +34,8 @@ void main () {
 
         while ((PORTA & 1) == 1) {
             if (pressed == 0) {
-                start_serial(&hI2c);
-                send_serial(&hI2c, 0x77, 2);
-                wait_serial(&hI2c);
-                stop_serial(&hI2c);
+                // send_serial(&hI2c, usb_buffer, 3);
+                send_serial(&hI2c, usb_buffer, 4);
                 pressed++;
             }
         }

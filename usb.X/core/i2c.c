@@ -1,6 +1,8 @@
 #include <p18cxxx.h>
 #include "i2c.h"
 
+#define _XTAL_FREQ 4000000
+
 #define START           0
 #define BYTE_CONTROL    1
 #define ACK             2
@@ -9,61 +11,81 @@
 #define DATA            5
 #define STOP            6
 
+#define LOW_SCLK ~2
+#define LOW_SDA ~1
+#define HIGH_SCLK 2
+#define HIGH_SDA 1
+
+#define set_clock_low(port) (*port) &= LOW_SCLK
+#define set_clock_high(port) (*port) |= HIGH_SCLK
+#define set_sda_low(port) (*port) &= LOW_SDA
+#define set_sda_high(port) (*port) |= HIGH_SDA
+#define bit_test(data, bit) ((data & (1 << bit)) == (1 << bit))
+#define set_sda_out(tris) (*tris) &= LOW_SDA
+#define set_sda_in(tris) (*tris) |= HIGH_SDA
+
+void bit_shift(int *port, BYTE data) { 
+    for (int i = 0; i < 3; i++) {
+        if (i == 0) {
+            set_clock_low(port);
+        }  else if (i == 1) {
+            if (bit_test(data, 7)) {
+                set_sda_high(port);
+            } else {
+                set_sda_low(port);
+            }
+        } else if (i == 2) {
+            set_clock_high(port);
+        }
+        __delay_ms(10);
+    }
+}
+
+void i2c_write() {
+
+}
+
 void start_serial(I2C_t *i2c_handle) {
-    (*(i2c_handle->port)) |= 3;
-    (*(i2c_handle->tris)) &= ~3;
-    for(int i = 0; i < 2; i++);
-    (*(i2c_handle->port)) &= ~2;
+    for (int i = 0; i < 3; i++) {
+        if (i == 1) {
+            set_sda_low(i2c_handle->port);
+        }
+        __delay_ms(10);
+    }
 }
 
 void stop_serial(I2C_t *i2c_handle) {
-    for(int i = 0; i < 4; i++) {
+    for (int i = 0; i < 3; i++) {
         if (i == 0) {
-            (*(i2c_handle->port)) &= ~2;
+            set_sda_low(i2c_handle->port);
         } else if (i == 1) {
-            (*(i2c_handle->port)) &= ~1;
+            set_clock_high(i2c_handle->port);
         } else if (i == 2) {
-            (*(i2c_handle->port)) |= 1;
-        } else if (i == 3) {
-            (*(i2c_handle->port)) |= 2;
+            set_sda_high(i2c_handle->port);
         }
+        __delay_ms(10);
     }
 }
 
 void wait_serial(I2C_t *i2c_handle) {
-    (*(i2c_handle->tris)) |= 2;
-    (*(i2c_handle->port)) &= ~1;
-    while((((*(i2c_handle->port)) & 2) != 2));
-    (*(i2c_handle->tris)) &= ~2;
+    set_sda_in(i2c_handle->tris);
+    while (!bit_test(*(i2c_handle->port), HIGH_SDA))
+        ;
+    set_clock_low(i2c_handle->port);
+    __delay_ms(10);
+    set_sda_out(i2c_handle->tris);
 }
 
-void send_serial(I2C_t *i2c_handle, BYTE data, int bytes) {
-    int bits = 32;
-    BYTE dataTemp = data;
-    (*(i2c_handle->tris)) &= ~3;
-
-    for (int i = 0, j = 1; i < bits; i++, j++) {
-
-        if (j == 1) {
-            if ((*(i2c_handle->port) & 1) == 1) {
-                (*(i2c_handle->port)) &= ~1;
-            }
-            else {
-                (*(i2c_handle->port)) |= 1;
-            }
-        } 
-        else if (j == 2) {
-            if (((*(i2c_handle->port)) & 1) == 0) {
-
-                if (dataTemp & 128) {
-                    (*(i2c_handle->port)) |= 2;
-                } else {
-                    (*(i2c_handle->port)) &= ~2;
-                }
-
-                dataTemp = dataTemp << 1;
-            }
-            j = 0;
+void send_serial(I2C_t *i2c_handle, BYTE *data, int bytes) {
+    start_serial(i2c_handle);
+    for (int i = 0; i < bytes; i++) {
+        BYTE data_temp = data[i];
+        for (int j = 0; j < 9; j++) {
+            bit_shift(i2c_handle->port, data_temp);
+            data_temp = data_temp << 1;
         }
+        
+        wait_serial(i2c_handle);
     }
+    stop_serial(i2c_handle);
 }
