@@ -8,9 +8,15 @@ extern "C" {
 #include <p18cxxx.h>
 #include "datatypes.h"
 
+#define I2C_WRITE 0
+#define I2C_READ 1
+    
 typedef struct _I2C_t {
     int *port;
     int *tris;
+    int *data;
+    BYTE *tmp;
+    int index;
 } I2C_t;
 
 extern void send_serial(I2C_t *i2c_handle, BYTE *data, int bytes);
@@ -18,7 +24,7 @@ extern void wait_serial(I2C_t *i2c_handle);
 extern void start_serial(I2C_t *i2c_handle);
 extern void stop_serial(I2C_t *i2c_handle);
 extern void i2c_write();
-void bit_shift(I2C_t *i2c_handle, BYTE data, BYTE last);
+void bit_shift(I2C_t *i2c_handle, BYTE data, BYTE last, BYTE dir);
 
 #ifdef	__cplusplus
 }

@@ -20,7 +20,7 @@ void main () {
     usb_buffer[0] = 0xA0;
     usb_buffer[1] = 0x00;
     usb_buffer[2] = 0x00;
-    usb_buffer[3] = 0x99;
+    usb_buffer[3] = 0x90;
     usb_buffer[4] = 0x99;
 
     I2C_t hI2c = {
