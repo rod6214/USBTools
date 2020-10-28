@@ -25,6 +25,7 @@ extern void start_serial(I2C_t *i2c_handle);
 extern void stop_serial(I2C_t *i2c_handle);
 extern void i2c_write();
 void bit_shift(I2C_t *i2c_handle, BYTE data, BYTE last, BYTE dir);
+void receive_serial(I2C_t *i2c_handle, BYTE *data, int bytes);
 
 #ifdef	__cplusplus
 }

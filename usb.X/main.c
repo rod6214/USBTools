@@ -34,8 +34,12 @@ void main () {
 
         while ((PORTA & 1) == 1) {
             if (pressed == 0) {
-                // send_serial(&hI2c, usb_buffer, 3);
-                send_serial(&hI2c, usb_buffer, 4);
+                send_serial(&hI2c, usb_buffer, 3);
+                __delay_ms(1);
+                usb_buffer[0] = 0xA1;
+                receive_serial(&hI2c, usb_buffer, 2);
+                // send_serial(&hI2c, usb_buffer, 1);
+
                 pressed++;
             }
         }
