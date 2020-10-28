@@ -16,6 +16,7 @@
 #define HIGH_SCLK 2
 #define HIGH_SDA 1
 #define TIME_MS 1
+#define SDA_BIT (HIGH_SDA - 1)
 
 #define set_clock_low(port) (*port) &= LOW_SCLK
 #define set_clock_high(port) (*port) |= HIGH_SCLK
@@ -26,6 +27,7 @@
 #define set_sda_in(tris) (*tris) |= HIGH_SDA
 #define set_bit(ptr, bit) (*ptr) |= (1 << bit) 
 #define clear_bit(ptr, bit) (*ptr) &= ~(1 << bit) 
+#define test_sda_dir(tris) (*tris) & (1 << SDA_BIT)
 
 void bit_shift(I2C_t *i2c_handle, BYTE data, BYTE last, BYTE dir) { 
     for (int i = 0; i < 3; i++) {
@@ -48,7 +50,7 @@ void bit_shift(I2C_t *i2c_handle, BYTE data, BYTE last, BYTE dir) {
                 break;
                 case I2C_READ:
                 {
-                    
+                    // if (bit_test(*(i2c_handle->tris)))
                     set_sda_in(i2c_handle->tris);
                     // if (bit_test(*(i2c_handle->port), dir)) {
                     //     set_bit(i2c_handle->tmp, 0);
