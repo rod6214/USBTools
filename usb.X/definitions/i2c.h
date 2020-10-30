@@ -10,11 +10,17 @@ extern "C" {
 
 #define I2C_WRITE 0
 #define I2C_READ 1
+#ifndef FALSE
+#define FALSE 0
+#endif
+#ifndef TRUE
+#define TRUE 1
+#endif
     
 typedef struct _I2C_t {
     int *port;
     int *tris;
-    int *data;
+    // int *data;
     BYTE *tmp;
     int index;
 } I2C_t;
@@ -24,7 +30,7 @@ extern void wait_serial(I2C_t *i2c_handle);
 extern void start_serial(I2C_t *i2c_handle);
 extern void stop_serial(I2C_t *i2c_handle);
 extern void i2c_write();
-void bit_shift(I2C_t *i2c_handle, BYTE data, BYTE last, BYTE dir);
+void bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE random);
 void receive_serial(I2C_t *i2c_handle, BYTE *data, int bytes);
 
 #ifdef	__cplusplus
