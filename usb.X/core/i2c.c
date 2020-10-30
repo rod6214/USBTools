@@ -27,7 +27,7 @@
 #define set_sda_in(tris) (*tris) |= HIGH_SDA
 #define bit_set(ptr, bit) (*ptr) |= (1 << bit) 
 #define bit_clear(ptr, bit) (*ptr) &= ~(1 << bit) 
-#define test_sda_dir(tris) (*tris) & (1 << SDA_BIT)
+// #define test_sda_dir(tris) (*tris) & (1 << SDA_BIT)
 #define test_sda(port) bit_test((*port), SDA_BIT)
 #define set_index(data, i) (*data) = i
 #define wait_ack(port) while(!bit_test(*port, SDA_BIT))
@@ -36,6 +36,7 @@
 #define set_ack(port) set_sda_low(port)
 
 static void __process_data(I2C_t *i2c_handle, BYTE mode);
+static BYTE __get_data(I2C_t *i2c_handle);
 
 void bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE random) {
     *(i2c_handle->tmp) = data;
@@ -76,6 +77,7 @@ void bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE random) {
                             if (is_random_read(random)) {
                                 set_ack(i2c_handle->port);
                             } else {
+                                set_sda_in(i2c_handle->tris);
                                 wait_noack(i2c_handle->port);
                             }
                         }
@@ -136,6 +138,10 @@ static void __process_data(I2C_t *i2c_handle, BYTE mode) {
     *(i2c_handle->tmp) <<= 1;
 }
 
+static BYTE __get_data(I2C_t *i2c_handle) {
+    return *(i2c_handle->tmp);
+}
+
 void start_serial(I2C_t *i2c_handle) {
     for (int i = 0; i < 3; i++) {
         if (i == 1) {
@@ -165,6 +171,18 @@ void wait_serial(I2C_t *i2c_handle) {
 }
 
 void receive_serial(I2C_t *i2c_handle, BYTE *data, int bytes) {
+    data[0] = 0xA0;
+    data[1] = 0;
+    data[2] = 0;
+    send_serial(i2c_handle, data, 3);
+    start_serial(i2c_handle);
+    bit_shift(i2c_handle, 0xA1, I2C_WRITE, FALSE);
+    bit_shift(i2c_handle, 0, I2C_READ, TRUE);
+    // for (int i = 0; i < bytes; i++) {
+    //     bit_shift(i2c_handle, 0, I2C_READ, TRUE);
+    //     // data[i] = __get_data(i2c_handle);
+    // }
+    stop_serial(i2c_handle);
 }
 
 void send_serial(I2C_t *i2c_handle, BYTE *data, int bytes) {
