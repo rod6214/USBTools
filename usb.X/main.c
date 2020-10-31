@@ -17,11 +17,11 @@ void main () {
     TRISA = 255;
     ADCON1 = 15;
 
-    usb_buffer[0] = 0xA0;
-    usb_buffer[1] = 0x00;
-    usb_buffer[2] = 0x00;
-    usb_buffer[3] = 0x99;
-    usb_buffer[4] = 0x99;
+    usb_buffer[0] = 0;
+    usb_buffer[1] = 0;
+    usb_buffer[2] = 0;
+    usb_buffer[3] = 0;
+    // usb_buffer[4] = 0x99;
 
     I2C_t hI2c = {
         (int*)&PORTB,
