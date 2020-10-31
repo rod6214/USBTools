@@ -20,18 +20,14 @@ extern "C" {
 typedef struct _I2C_t {
     int *port;
     int *tris;
-    // int *data;
-    BYTE *tmp;
-    int index;
+    BYTE *data;
 } I2C_t;
 
 extern void send_serial(I2C_t *i2c_handle, BYTE *data, int bytes);
-extern void wait_serial(I2C_t *i2c_handle);
+extern void receive_serial(I2C_t *i2c_handle, BYTE *data, int bytes);
 extern void start_serial(I2C_t *i2c_handle);
 extern void stop_serial(I2C_t *i2c_handle);
-extern void i2c_write();
-void bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE random);
-void receive_serial(I2C_t *i2c_handle, BYTE *data, int bytes);
+// extern void i2c_write();
 
 #ifdef	__cplusplus
 }
