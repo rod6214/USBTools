@@ -31,14 +31,14 @@
 #define set_index(data, i) (*data) = i
 #define wait_ack(port) while(!bit_test(*port, SDA_BIT))
 #define wait_noack(port) while(bit_test(*port, SDA_BIT))
-#define is_random_read(data) data == 1
+#define is_random_read(data) (data == TRUE)
 #define set_ack(port) set_sda_low(port)
 
-static void __process_data(I2C_t *i2c_handle, BYTE mode, BYTE index);
+static void __process_data(I2C_t *i2c_handle, BYTE mode, BYTE index, BYTE no_random);
 static BYTE __get_data(I2C_t *i2c_handle);
-static void __bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE random);
+static void __bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE no_random);
 
-static void __bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE random) {
+static void __bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE no_random) {
     *(i2c_handle->data) = data;
     for(int i = 0; i < 10; i++) {
         if (i < 9) {
@@ -49,7 +49,7 @@ static void __bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE random) {
                     set_clock_low(i2c_handle->port);
                     break;
                 case 1:
-                    __process_data(i2c_handle, mode, i);
+                    __process_data(i2c_handle, mode, i, no_random);
                     break;
                 case 2:
                     set_clock_high(i2c_handle->port);
@@ -71,11 +71,8 @@ static void __bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE random) {
                         break;
                     case I2C_READ:
                         {
-                            if (is_random_read(random)) {
-                                set_ack(i2c_handle->port);
-                            } else {
+                            if (no_random) {
                                 set_sda_in(i2c_handle->tris);
-                                wait_noack(i2c_handle->port);
                             }
                         }
                         break;
@@ -103,7 +100,7 @@ void i2c_init(I2C_t *i2c_handle) {
     i2c_handle->data = &data;
 }
 
-static void __process_data(I2C_t *i2c_handle, BYTE mode, BYTE index) {
+static void __process_data(I2C_t *i2c_handle, BYTE mode, BYTE index, BYTE no_random) {
     switch (mode)
     {
     case I2C_WRITE:
@@ -124,15 +121,19 @@ static void __process_data(I2C_t *i2c_handle, BYTE mode, BYTE index) {
     case I2C_READ:
         {
             set_sda_in(i2c_handle->tris);
-            
-            if (test_sda(i2c_handle->port)) {
-                bit_set(i2c_handle->data, 0);
-            } else {
-                bit_clear(i2c_handle->data, 0);
-            }
 
-            if (index < 7) {
-                *(i2c_handle->data) <<= 1;
+            if (index < 8) {
+                if (test_sda(i2c_handle->port)) {
+                    bit_set(i2c_handle->data, 0);
+                } else {
+                    bit_clear(i2c_handle->data, 0);
+                }
+                if (index < 7) {
+                    *(i2c_handle->data) <<= 1;    
+                }
+            } else if (no_random) {
+                set_ack(i2c_handle->port);
+                set_sda_out(i2c_handle->tris);
             }
         }
         break;
@@ -176,15 +177,26 @@ void receive_serial(I2C_t *i2c_handle, BYTE *data, int bytes) {
     start_serial(i2c_handle);
     __bit_shift(i2c_handle, 0xA1, I2C_WRITE, FALSE);
     
-    if (bytes > 1) {
-        for (int i = 0; i < bytes; i++) {
+    for(int i = 0; i < bytes; i++) {
+        if (i < (bytes - 1)) {
+            __bit_shift(i2c_handle, 0, I2C_READ, TRUE);
+        } else {
             __bit_shift(i2c_handle, 0, I2C_READ, FALSE);
-            data[i] = __get_data(i2c_handle);
         }
-    } else {
-        __bit_shift(i2c_handle, 0, I2C_READ, TRUE);
-        data[0] = __get_data(i2c_handle);
+        data[i] = __get_data(i2c_handle);
     }
+
+    // if (bytes > 1) {
+    //     for (int i = 0; i < bytes; i++) {
+    //         if (i == (bytes - 1)) {
+    //             __bit_shift(i2c_handle, 0, I2C_READ, FALSE);
+    //         }
+    //         data[i] = __get_data(i2c_handle);
+    //     }
+    // } else {
+    //     __bit_shift(i2c_handle, 0, I2C_READ, TRUE);
+    //     data[0] = __get_data(i2c_handle);
+    // }
     
     stop_serial(i2c_handle);
 }
