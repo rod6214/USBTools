@@ -16,7 +16,7 @@
 #define LOW_SDA ~1
 #define HIGH_SCLK 2
 #define HIGH_SDA 1
-#define TIME_MS 2
+#define TIME_MS 1
 #define SDA_BIT (HIGH_SDA - 1)
 #define NO_DATA 0
 
@@ -31,8 +31,8 @@
 #define bit_clear(ptr, bit) (*ptr) &= ~(1 << bit)
 #define test_sda(port) bit_test((*port), SDA_BIT)
 #define set_index(data, i) (*data) = i
-#define wait_ack(port) while(!bit_test(*port, SDA_BIT))
-#define wait_noack(port) while(bit_test(*port, SDA_BIT))
+#define wait_ack(port) while(bit_test(*port, SDA_BIT))
+#define wait_noack(port) while(!bit_test(*port, SDA_BIT))
 #define is_random_read(data) (data == TRUE)
 #define set_ack(port) set_sda_low(port)
 
@@ -69,8 +69,9 @@ static void __bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE no_random)
                     {
                     case I2C_WRITE:
                         {
-                            // __delay_ms(50);
-                            wait_ack(i2c_handle->port);
+                            if (!no_random) {
+                                wait_noack(i2c_handle->port);
+                            }
                         }
                         break;
                     case I2C_READ:
@@ -78,7 +79,6 @@ static void __bit_shift(I2C_t *i2c_handle, BYTE data, BYTE mode, BYTE no_random)
                             if (no_random) {
                                 set_sda_in(i2c_handle->tris);
                             }
-                            // wait_ack(i2c_handle->port);
                         }
                         break;
                     }
@@ -113,13 +113,9 @@ static void __process_data(I2C_t *i2c_handle, BYTE mode, BYTE index, BYTE no_ran
                 set_sda_low(i2c_handle->port);
             }
 
-            if (index == 7) {
-                PORTC++;
-            }
-
             if (index == 8) {
                 set_sda_in(i2c_handle->tris);
-                PORTC++;
+                wait_ack(i2c_handle->port);
             }
 
             *(i2c_handle->data) <<= 1;
@@ -141,6 +137,10 @@ static void __process_data(I2C_t *i2c_handle, BYTE mode, BYTE index, BYTE no_ran
             } else if (no_random) {
                 set_ack(i2c_handle->port);
                 set_sda_out(i2c_handle->tris);
+            }
+
+            if (index == 8 && !no_random) {
+                wait_noack(i2c_handle->port);
             }
         }
         break;
@@ -180,7 +180,7 @@ void receive_serial(I2C_t *i2c_handle, BYTE *data, int bytes) {
     send_serial(i2c_handle, NULL, NO_DATA);
     __delay_ms(TIME_MS);
     __start_serial(i2c_handle);
-    __bit_shift(i2c_handle, 0xA1, I2C_WRITE, FALSE);
+    __bit_shift(i2c_handle, 0xA1, I2C_WRITE, TRUE);
     
     for(int i = 0; i < bytes; i++) {
         if (i < (bytes - 1)) {
