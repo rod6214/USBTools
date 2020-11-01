@@ -175,9 +175,9 @@ void __stop_serial(I2C_t *i2c_handle) {
     }
 }
 
-void receive_serial(I2C_t *i2c_handle, BYTE *data, int bytes) {
+void receive_serial(I2C_t *i2c_handle, int address, BYTE *data, int bytes) {
 
-    send_serial(i2c_handle, NULL, NO_DATA);
+    send_serial(i2c_handle, address, NULL, NO_DATA);
     __delay_ms(TIME_MS);
     __start_serial(i2c_handle);
     __bit_shift(i2c_handle, 0xA1, I2C_WRITE, TRUE);
@@ -194,9 +194,11 @@ void receive_serial(I2C_t *i2c_handle, BYTE *data, int bytes) {
     __stop_serial(i2c_handle);
 }
 
-void send_serial(I2C_t *i2c_handle, BYTE *data, int bytes) {
-    // TODO: Analyze when the memory IC only support 8bit address, and paramet
-    BYTE control[3] = {0xA0, 0, 0};
+void send_serial(I2C_t *i2c_handle, int address, BYTE *data, int bytes) {
+
+    BYTE control[3] = {0xA0};
+    control[1] = HBYTE(address);
+    control[2] = LBYTE(address);
     
     __start_serial(i2c_handle);
     for (int i = 0; i < bytes + 3; i++) {

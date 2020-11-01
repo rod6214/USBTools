@@ -18,7 +18,7 @@ void main () {
     ADCON1 = 15;
 
     usb_buffer[0] = 0xDA;
-    usb_buffer[1] = 0xDA;
+    usb_buffer[1] = 0xBB;
     usb_buffer[2] = 0xDF;
     usb_buffer[3] = 0xBC;
     // usb_buffer[4] = 0x99;
@@ -34,8 +34,8 @@ void main () {
 
         while ((PORTA & 1) == 1) {
             if (pressed == 0) {
-                receive_serial(&hI2c, usb_buffer, 4);
-                // send_serial(&hI2c, usb_buffer, 4);
+                receive_serial(&hI2c, 0x0001, usb_buffer, 5);
+                // send_serial(&hI2c, 0x0000, usb_buffer, 4);
                 // __delay_ms(1);
                 // usb_buffer[0] = 0xA1;
                 // receive_serial(&hI2c, usb_buffer, 2);

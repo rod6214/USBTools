@@ -23,10 +23,8 @@ typedef struct _I2C_t {
     BYTE *data;
 } I2C_t;
 
-extern void send_serial(I2C_t *i2c_handle, BYTE *data, int bytes);
-extern void receive_serial(I2C_t *i2c_handle, BYTE *data, int bytes);
-extern void start_serial(I2C_t *i2c_handle);
-extern void stop_serial(I2C_t *i2c_handle);
+extern void send_serial(I2C_t *i2c_handle, int address, BYTE *data, int bytes);
+extern void receive_serial(I2C_t *i2c_handle, int address, BYTE *data, int bytes);
 
 #ifdef	__cplusplus
 }
