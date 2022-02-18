@@ -279,13 +279,13 @@ void usbcdc_putchar(char c)
 }
 
 char usbcdc_wr_busy() {
-	return (ep2_i.STAT & UOWN)!=0;
+	return (ep1_i.STAT & UOWN)!=0;
 }
 
 unsigned char usbcdc_rd_ready() {
-	if (ep2_o.STAT & UOWN)
+	if (ep1_o.STAT & UOWN)
 		return 0;
-	if (rx_idx >= ep2_o.CNT) {
+	if (rx_idx >= ep1_o.CNT) {
 		usbcdc_read();
 		return 0;
 	}
@@ -318,11 +318,11 @@ void usbcdc_flush() {
 
 void usbcdc_read() {
 	rx_idx=0;
-	ep2_o.CNT = sizeof(cdc_rx_buffer);
-	if (ep2_o.STAT & DTS)
-		ep2_o.STAT = UOWN | DTSEN;
+	ep1_o.CNT = sizeof(cdc_rx_buffer);
+	if (ep1_o.STAT & DTS)
+		ep1_o.STAT = UOWN | DTSEN;
 	else
-		ep2_o.STAT = UOWN | DTS | DTSEN;
+		ep1_o.STAT = UOWN | DTS | DTSEN;
 }
 
 void usb_write(BYTE* data, int length) 
@@ -336,7 +336,7 @@ char usbcdc_getchar() {
 	while (!usbcdc_rd_ready());
     
 	c = cdc_rx_buffer[rx_idx++];
-	if (rx_idx>=ep2_o.CNT) {
+	if (rx_idx>=ep1_o.CNT) {
 		usbcdc_read();
     }
 	return c;
@@ -515,11 +515,11 @@ void prepare_for_setup_stage(void) {
 
 void process_control_transfer(void) {
 	// This comment works fine receiving data from host with interrupt transaction
-// 	unsigned char _ep = (((15 << 3) & USTAT) >> 3);
-// if (usbcdc_device_state == CONFIGURED && _ep == 1) {
-// 			usbcdc_read();
-// 						PORTB = cdc_rx_buffer[1];
-// 					}
+	unsigned char _ep = (((15 << 3) & USTAT) >> 3);
+if (usbcdc_device_state == CONFIGURED && _ep == 1) {
+			usbcdc_read();
+						PORTB = cdc_rx_buffer[0];
+					}
 	if (USTAT == USTAT_OUT) {
 
 		unsigned char PID = (ep0_o.STAT & 0x3C) >> 2; // Pull PID from middle of BD0STAT
@@ -568,23 +568,6 @@ void process_control_transfer(void) {
 					} else {
 						// Set the configuration.
 						usbcdc_device_state = CONFIGURED;
-                        
-						// Initialize the endpoints for all interfaces
-						{ // Turn on both in and out for this endpoint
-							UEP1 = 0x1E;
-                            
-							ep1_i.ADDR = (int) cdcint_buffer;
-							ep1_i.STAT = DTS;
-                            
-							UEP2 = 0x1E;
-                            
-							ep2_o.CNT = sizeof(cdc_rx_buffer);
-							ep2_o.ADDR = (int) cdc_rx_buffer;
-							ep2_o.STAT = UOWN | DTSEN; //set up to receive stuff as soon as we get something
-                            
-							ep2_i.ADDR = (int) cdc_tx_buffer;
-							ep2_i.STAT = DTS;
-						}
 					}
 				} else if (request == GET_CONFIGURATION) { // Never seen in Windows
 				                   
