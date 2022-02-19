@@ -81,7 +81,7 @@ config_descriptor = {
        0x05, // bDescriptorType
        0x81, // bEndpointAddress
        0x03, // bmAttributes
-       ENDPOINT_0_SIZE, // MaxPacketSize (LITLE ENDIAN)
+       32, // MaxPacketSize (LITLE ENDIAN)
        1, // bInterval
    },
    {/*Enpoint 1 OUT descriptor*/
@@ -89,7 +89,7 @@ config_descriptor = {
        0x05, // bDescriptorType
        0x01, // bEndpointAddress
        0x03, // bmAttributes
-       ENDPOINT_0_SIZE, // MaxPacketSize (LITLE ENDIAN)
+       32, // MaxPacketSize (LITLE ENDIAN)
        1, // bInterval
    },
 };

@@ -36,10 +36,10 @@ static unsigned char dlen; // Number of unsigned chars of data
 
 // Bytes transmited
 static unsigned char tx_len = 0;
-// Bytes received
+// Rx pointer
 static unsigned char rx_idx = 0;
 
-static void _usb_read();
+static size_t _usb_read();
 static void _usb_flush();
 static void _usb_write(unsigned char len);
 static unsigned char _usb_wr_busy();
@@ -69,15 +69,15 @@ void usb_putchar(char c)
 	}
 }
 
-char usb_getchar() 
+char usb_getchar()
 {
 	char c;
-	while (!_usb_rd_ready());
+//	while (!_usb_rd_ready());
     
-	c = rx_buffer[rx_idx++];
-	if (rx_idx>=ep1_o.CNT) {
-		_usb_read();
-    }
+//	c = rx_buffer[rx_idx++];
+	// if (rx_idx>=ep1_o.CNT) {
+	// 	_usb_read();
+    // }
 	return c;
 }
 
@@ -93,13 +93,20 @@ static void _usb_flush()
 	tx_len = 0;
 }
 
-static void _usb_read() {
+static size_t _usb_read() {
 	rx_idx=0;
-	ep1_o.CNT = sizeof(rx_buffer);
-	if (ep1_o.STAT & DTS)
-		ep1_o.STAT = UOWN | DTSEN;
-	else
-		ep1_o.STAT = UOWN | DTS | DTSEN;
+    size_t dataReceived = 0;
+
+    if (_usb_rd_ready()) {
+        dataReceived = sizeof(rx_buffer);
+         ep1_o.CNT = sizeof(rx_buffer);
+        if (ep1_o.STAT & DTS)
+            ep1_o.STAT = UOWN | DTSEN;
+        else
+            ep1_o.STAT = UOWN | DTS | DTSEN;
+    }
+    
+    return dataReceived;
 }
 
 static unsigned char _usb_wr_busy() {
@@ -107,13 +114,14 @@ static unsigned char _usb_wr_busy() {
 }
 
 static unsigned char _usb_rd_ready() {
-	if (ep1_o.STAT & UOWN)
-		return 0;
-	if (rx_idx >= ep1_o.CNT) {
-		_usb_read();
-		return 0;
-	}
-	return 1;
+	return (unsigned char)((ep1_o.STAT & UOWN) == 0);
+	// if (ep1_o.STAT & UOWN)
+	// 	return 0;
+	// if (rx_idx == 0 && ep1_o.CNT > 0) {
+	// 	_usb_read();
+	// 	return 0;
+	// }
+	// return 1;
 }
 
 static void _usb_write(unsigned char len)
@@ -297,12 +305,18 @@ static unsigned char get_endpoint_processed()
 
 void process_control_transfer(void) 
 {
+//    PORTB++;
+//    PORTB = ep1_o.CNT;
 	// This comment works fine receiving data from host with interrupt transaction
 	unsigned char _ep = get_endpoint_processed();
 	if (usb_device_state == CONFIGURED && _ep == 1) {
+//        PORTB = ep1_o.CNT;
 //                _usb_flush();
-				_usb_read();
-							PORTB = rx_buffer[0];
+//			  _usb_read();
+//              _usb_read();
+//        PORTB = usb_getchar();
+							PORTB = rx_buffer[1];
+              
 						}
 	if (USTAT == USTAT_OUT) {
 
@@ -473,6 +487,9 @@ void process_control_transfer(void)
 		}
 	}
 }
+
+#define usb_as_lowpriority() (IPR2 = (IPR2)|(1 << 5)&(~(1 << 5)));
+#define usb_as_highpriority() (IPR2 = (IPR2)|(1 << 5));
 
 void usb_init() {
 	UCFG = 0x14; // Enable pullup resistors; full speed mode

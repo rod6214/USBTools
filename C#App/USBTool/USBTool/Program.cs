@@ -25,7 +25,7 @@
             {
                 while (true) 
                 {
-                    if (USB.ReadFile(readHandler, data, 3, ref read, 0)) 
+                    if (USB.ReadFile(readHandler, data, 8, ref read, 0)) 
                     {
                         Console.WriteLine("");
                     }
@@ -42,14 +42,15 @@
             {
                 byte[] data = new byte[66];
 
-                data[1] = 15;
-                data[32] = 2;
+                data[1] = 3;
+                data[2] = 4;
+                data[3] = 8;
+                data[32] = 9;
 
                 int written = 0;
 
                 if (USB.WriteFile(writeHandler, data, 32, ref written, 0))
                 {
-
                     Console.WriteLine("Data written");
                 }
             }
