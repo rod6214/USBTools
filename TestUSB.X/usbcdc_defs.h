@@ -4,7 +4,8 @@
 #define PTR16(x) ((unsigned int)(((unsigned long)x) & 0xFFFF))
 
 // Size of the buffer for endpoint 0
-#define E0SZ 8
+// #define E0SZ 8
+//#define ENDPOINT_0_SIZE 8
 //
 //////////////CDC/////////
 

@@ -1,36 +1,7 @@
-/* 
-This file is licensed under the MIT license:
-
-Copyright (c) 2010,2013 Kustaa Nyholm / SpareTimeLabs
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
- Version 1.1     Compatible with SDCC 3.x
-
- */
-
-
+// #define _XTAL_FREQ 4000000
 #include "pic18f2550.h"
-#include "usbcdc.h"
+#include "usb.h"
 #include "usb_defs.h"
-#include "pic-config.c"
-#include "printft.h"
 #include <xc.h>
 
 
@@ -38,7 +9,7 @@ void __interrupt(high_priority) high_isr(void)
 {
 	if(PIR2bits.USBIF)
 	{
-		usbcdc_handler();
+		usb_handler();
 		PIR2bits.USBIF=0;
 	}
 }
@@ -49,21 +20,21 @@ void __interrupt(low_priority) low_isr(void)
 }
 
 
-void putchar(char c)
-{
-	if (c=='\n') {
-		usbcdc_putchar('\r');
-		}
+// void putchar(char c)
+// {
+// 	if (c=='\n') {
+// 		usbcdc_putchar('\r');
+// 		}
 
-	usbcdc_putchar(c);
-	if (c=='\n')
-		usbcdc_flush();
-}
+// 	usbcdc_putchar(c);
+// 	if (c=='\n')
+// 		usbcdc_flush();
+// }
 
-char getchar() {
-	usbcdc_flush();
-	return usbcdc_getchar();
-}
+// char getchar() {
+// 	usbcdc_flush();
+// 	return usbcdc_getchar();
+// }
 
 const char params[] = {
 3,4,5
@@ -71,13 +42,13 @@ const char params[] = {
 
 typedef void (*my)(const char* params);
 
-void test(my call) {
-    call(params);
-}
-
-void testCallback(const char* params) {
-    PORTB = 3;
-}
+//void test(my call) {
+//    call(params);
+//}
+//
+//void testCallback(const char* params) {
+//    PORTB = 3;
+//}
 
 
 
@@ -110,13 +81,13 @@ void main(void) {
     // SUSPND = 0;
 //    INTCONbits.GIEH = 1;
 
-	usbcdc_init();
+	usb_init();
 //
 	INTCONbits.PEIE = 1;
 	INTCONbits.GIE = 1;
 //	// INTCONbits.GIEH = 1;
 //
-	while (usbcdc_device_state != CONFIGURED)
+	while (usb_device_state != CONFIGURED)
 		;
 //	while (PORTC == 0);
 	// PORTB++;

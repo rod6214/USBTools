@@ -42,7 +42,7 @@
             {
                 byte[] data = new byte[66];
 
-                data[1] = 5;
+                data[1] = 15;
                 data[32] = 2;
 
                 int written = 0;

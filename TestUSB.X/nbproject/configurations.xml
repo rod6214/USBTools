@@ -6,9 +6,10 @@
                    projectFiles="true">
       <itemPath>printft.h</itemPath>
       <itemPath>usb_defs.h</itemPath>
-      <itemPath>usbcdc.h</itemPath>
       <itemPath>usbcdc_defs.h</itemPath>
       <itemPath>usbpic_defs.h</itemPath>
+      <itemPath>usb.h</itemPath>
+      <itemPath>descriptor.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -21,7 +22,7 @@
       <itemPath>main.c</itemPath>
       <itemPath>pic-config.c</itemPath>
       <itemPath>printft.c</itemPath>
-      <itemPath>usbcdc.c</itemPath>
+      <itemPath>usb.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

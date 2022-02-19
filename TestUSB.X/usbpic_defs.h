@@ -1,7 +1,6 @@
 #ifndef USBPIC_H
 #define USBPIC_H
-
-// Version 1.1     Compatible with SDCC 3.x
+#define ENDPOINT_0_SIZE 8
 
 // Buffer Descriptor bit masks (from PIC datasheet)
 #define UOWN   0x80 // USB Own Bit
