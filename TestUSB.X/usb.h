@@ -6,7 +6,7 @@
 
 extern unsigned char usb_device_state;
 
-#define USB_BUFFER_LEN 32
+#define USB_BUFFER_LEN 64
 #define USB_SELF_POWERED 1
 #define USB_MAXPOWER 100
 
@@ -36,7 +36,7 @@ void usb_write(BYTE* data, unsigned int length);
 #define TX_REG (CONTROL_TRANSFER_REG + ENDPOINT_0_SIZE)
 #define RX_REG (TX_REG + USB_BUFFER_LEN)
 #define INT_REG (RX_REG + USB_BUFFER_LEN)
-#define HID_RPT01_SIZE 28
+#define HID_RPT01_SIZE 29
 
 volatile setup_packet_struct setup_packet __at(SETUP_PACKET_REG);
 volatile unsigned char control_transfer_buffer[ENDPOINT_0_SIZE] __at(CONTROL_TRANSFER_REG);

@@ -97,14 +97,12 @@ static size_t _usb_read() {
 	rx_idx=0;
     size_t dataReceived = 0;
 
-    if (_usb_rd_ready()) {
-        dataReceived = sizeof(rx_buffer);
+    dataReceived = sizeof(rx_buffer);
          ep1_o.CNT = sizeof(rx_buffer);
         if (ep1_o.STAT & DTS)
             ep1_o.STAT = UOWN | DTSEN;
         else
             ep1_o.STAT = UOWN | DTS | DTSEN;
-    }
     
     return dataReceived;
 }
@@ -175,12 +173,11 @@ static void get_descriptor(void) {
 		if (descriptorType == HID_DESCRIPTOR) {
 		} 
 		else if (descriptorType == REPORT_DESCRIPTOR) {
-
 			if (!configured_ep && usb_device_state == CONFIGURED) {
 				configure_tx_rx_ep();
 				configured_ep++;
 			}
-
+			
 			request_handled = 1;
 			code_ptr = (codePtr) &hid_rpt01;
 			dlen = HID_RPT01_SIZE;
@@ -312,10 +309,10 @@ void process_control_transfer(void)
 	if (usb_device_state == CONFIGURED && _ep == 1) {
 //        PORTB = ep1_o.CNT;
 //                _usb_flush();
-//			  _usb_read();
+			  _usb_read();
 //              _usb_read();
 //        PORTB = usb_getchar();
-							PORTB = rx_buffer[1];
+							 PORTB = rx_buffer[31];
               
 						}
 	if (USTAT == USTAT_OUT) {

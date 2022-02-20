@@ -49,7 +49,7 @@
 
                 int written = 0;
 
-                if (USB.WriteFile(writeHandler, data, 32, ref written, 0))
+                if (USB.WriteFile(writeHandler, data, 65, ref written, 0))
                 {
                     Console.WriteLine("Data written");
                 }

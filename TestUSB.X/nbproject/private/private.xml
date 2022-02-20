@@ -5,10 +5,8 @@
         <group>
             <file>file:/C:/Develop/USBTools/TestUSB.X/usb_defs.h</file>
             <file>file:/C:/Develop/USBTools/TestUSB.X/main.c</file>
-            <file>file:/C:/Develop/USBTools/TestUSB.X/usb.c</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/configuration_bits.c</file>
             <file>file:/C:/Develop/USBTools/TestUSB.X/usbcdc_defs.h</file>
-            <file>file:/C:/Develop/USBTools/TestUSB.X/descriptor.h</file>
-            <file>file:/C:/Develop/USBTools/TestUSB.X/usb.h</file>
             <file>file:/C:/Develop/USBTools/TestUSB.X/usbpic_defs.h</file>
         </group>
     </open-files>
