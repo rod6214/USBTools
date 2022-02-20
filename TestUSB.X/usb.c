@@ -7,6 +7,8 @@
 #include "usbpic_defs.h"
 #include "usb_defs.h"
 
+struct USBHandler UPtr;
+
 typedef const unsigned char* codePtr;
 typedef unsigned char* dataPtr;
 
@@ -60,25 +62,28 @@ void configure_tx_rx_ep()
 	}
 }
 
-void usb_putchar(char c)
+int usb_putchar(char c)
 {
-	while (_usb_wr_busy());
 	tx_buffer[tx_len++]=c;
 	if (tx_len>=sizeof(tx_buffer)) {
 		_usb_flush();
+        return 1;
 	}
+    
+    return 0;
 }
 
 char usb_getchar()
 {
-	char c;
-//	while (!_usb_rd_ready());
-    
-//	c = rx_buffer[rx_idx++];
-	// if (rx_idx>=ep1_o.CNT) {
-	// 	_usb_read();
-    // }
+	char c = 0;
+	if (rx_idx < USB_BUFFER_LEN) {
+		c = rx_buffer[rx_idx++];
+	}
 	return c;
+}
+
+void rewind() {
+	rx_idx = 0;
 }
 
 void usb_write(BYTE* data, size_t length) 
@@ -98,11 +103,11 @@ static size_t _usb_read() {
     size_t dataReceived = 0;
 
     dataReceived = sizeof(rx_buffer);
-         ep1_o.CNT = sizeof(rx_buffer);
-        if (ep1_o.STAT & DTS)
-            ep1_o.STAT = UOWN | DTSEN;
-        else
-            ep1_o.STAT = UOWN | DTS | DTSEN;
+	ep1_o.CNT = sizeof(rx_buffer);
+	if (ep1_o.STAT & DTS)
+		ep1_o.STAT = UOWN | DTSEN;
+	else
+		ep1_o.STAT = UOWN | DTS | DTSEN;
     
     return dataReceived;
 }
@@ -113,13 +118,6 @@ static unsigned char _usb_wr_busy() {
 
 static unsigned char _usb_rd_ready() {
 	return (unsigned char)((ep1_o.STAT & UOWN) == 0);
-	// if (ep1_o.STAT & UOWN)
-	// 	return 0;
-	// if (rx_idx == 0 && ep1_o.CNT > 0) {
-	// 	_usb_read();
-	// 	return 0;
-	// }
-	// return 1;
 }
 
 static void _usb_write(unsigned char len)
@@ -302,19 +300,13 @@ static unsigned char get_endpoint_processed()
 
 void process_control_transfer(void) 
 {
-//    PORTB++;
-//    PORTB = ep1_o.CNT;
-	// This comment works fine receiving data from host with interrupt transaction
 	unsigned char _ep = get_endpoint_processed();
-	if (usb_device_state == CONFIGURED && _ep == 1) {
-//        PORTB = ep1_o.CNT;
-//                _usb_flush();
-			  _usb_read();
-//              _usb_read();
-//        PORTB = usb_getchar();
-							 PORTB = rx_buffer[31];
-              
-						}
+	if (usb_device_state == CONFIGURED && _ep == 1) 
+	{
+		UPtr.Status = DATA_RECEIVED;
+		UPtr.Length = _usb_read();  
+	}
+
 	if (USTAT == USTAT_OUT) {
 
 		unsigned char PID = (unsigned char)((ep0_o.STAT & 0x3C) >> 2); // Pull PID from middle of BD0STAT
@@ -515,11 +507,12 @@ void usb_init() {
 }
 
 // Main entry point for USB tasks.  Checks interrupts, then checks for transactions.
-void usb_handler(void) {
+void* usb_handler(void) {
+	UPtr.Length = 0;
 	if ((UCFGbits.UTEYE == 1) || //eye test
         (usb_device_state == DETACHED) || //not connected
         (UCONbits.SUSPND == 1))//suspended
-        return;
+        return NULL;
 
 	// Process a bus reset
 	if (UIRbits.URSTIF && UIEbits.URSTIE) {
@@ -579,4 +572,6 @@ void usb_handler(void) {
 			UIRbits.TRNIF = 0;
 		}
 	}
+
+	return &UPtr;
 }

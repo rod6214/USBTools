@@ -20,15 +20,18 @@ extern unsigned char usb_device_state;
 #define SET_CONTROL_LINE_STATE      0x22
 #define SEND_BREAK                  0x23
 
+#define DATA_RECEIVED 0x35
+
 #include "usbpic_defs.h"
 
 // initialize usbcdc module
 void usb_init(void);
 // handle usb control messages, poll atleast every 1ms or call from IRQ
-void usb_handler(void);
-void usb_putchar(char c);
+void* usb_handler(void);
+int usb_putchar(char c);
 char usb_getchar();
 void usb_write(BYTE* data, unsigned int length);
+void rewind();
 
 #define RAM_BUFFER_BASE 0x500
 #define SETUP_PACKET_REG RAM_BUFFER_BASE
@@ -43,5 +46,10 @@ volatile unsigned char control_transfer_buffer[ENDPOINT_0_SIZE] __at(CONTROL_TRA
 volatile unsigned char tx_buffer[USB_BUFFER_LEN] __at(TX_REG);
 volatile unsigned char rx_buffer[USB_BUFFER_LEN] __at(RX_REG);
 volatile unsigned char  cdcint_buffer[USB_BUFFER_LEN] __at(INT_REG);
+
+struct USBHandler {
+    int Status;
+    unsigned int Length;
+};
 
 #endif
