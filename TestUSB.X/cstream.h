@@ -12,10 +12,16 @@
 extern "C" {
 #endif
 
-    typedef uint16_t* STREAM;
-    typedef uint16_t* HANDLE;
-
-
+#include <stdlib.h>
+    
+    typedef unsigned int* STREAM;
+    typedef unsigned int* HANDLE;
+    typedef unsigned char TYPE;
+#define USB_STREAM 0x45
+#define LOG_STREAM 0x123
+    extern void WriteStream(STREAM stream, size_t offset, size_t bytes);
+    extern void ReadStream(STREAM stream, size_t offset, size_t bytes);
+    extern void CopyTo(STREAM streamSrc, STREAM streamDest, size_t readOffset, size_t writeOffset) ;
 #ifdef	__cplusplus
 }
 #endif

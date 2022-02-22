@@ -1,2 +1,6 @@
+#include <xc.h>
 
-void message() {}
+void message() 
+{
+    PORTB = 0;
+}

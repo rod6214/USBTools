@@ -1,9 +1,9 @@
 // #define _XTAL_FREQ 4000000
-#include "pic18f2550.h"
+//#include "pic18f2550.h"
 #include "usb.h"
 #include "usb_defs.h"
 #include <xc.h>
-#include "printer.h"
+#include "logger.h"
 
 void __interrupt(high_priority) high_isr(void)
 {
@@ -58,7 +58,7 @@ void test_ptr(void* ptr)
 {
     PORTB = ptr;
 }
-
+extern void message();
 void main(void) {
 //	PORTB = 0;
 //	PORTC = 0;
@@ -72,7 +72,7 @@ void main(void) {
 //	while (usb_device_state != CONFIGURED)
 //		;
 //
-    
+    message();
     
     struct VALUES test;
     
