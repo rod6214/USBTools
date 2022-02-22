@@ -3,7 +3,7 @@
 #include "usb.h"
 #include "usb_defs.h"
 #include <xc.h>
-
+#include "printer.h"
 
 void __interrupt(high_priority) high_isr(void)
 {
@@ -49,19 +49,38 @@ void __interrupt(low_priority) low_isr(void)
 	;
 }
 
+struct VALUES {
+    int x;
+    long y;
+};
+
+void test_ptr(void* ptr) 
+{
+    PORTB = ptr;
+}
+
 void main(void) {
-	PORTB = 0;
-	PORTC = 0;
-	TRISB = 0;
-	TRISC = 1;
-
-	usb_init();
-	INTCONbits.PEIE = 1;
-	INTCONbits.GIE = 1;
-
-	while (usb_device_state != CONFIGURED)
-		;
-
+//	PORTB = 0;
+//	PORTC = 0;
+//	TRISB = 0;
+//	TRISC = 1;
+//    message();
+//	usb_init();
+//	INTCONbits.PEIE = 1;
+//	INTCONbits.GIE = 1;
+//
+//	while (usb_device_state != CONFIGURED)
+//		;
+//
+    
+    
+    struct VALUES test;
+    
+    test.x = 12;
+    test.y = 3;
+    
+    test_ptr(&test);
+    
 	while (1) {}
 
 }

@@ -3,8 +3,8 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>TestUSB</name>
-            <creation-uuid>62255a2b-fdf1-4549-b436-d30b0c26945a</creation-uuid>
+            <name>DevPrinter</name>
+            <creation-uuid>7d7429e4-fbac-4bd7-9bf5-cd59d3241760</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>
             <cpp-extensions/>
@@ -12,14 +12,11 @@
             <asminc-extensions/>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>
-            <sourceRootList>
-                <sourceRootElem>.</sourceRootElem>
-                <sourceRootElem>../DevPrinter.X</sourceRootElem>
-            </sourceRootList>
+            <sourceRootList/>
             <confList>
                 <confElem>
                     <name>default</name>
-                    <type>2</type>
+                    <type>3</type>
                 </confElem>
             </confList>
             <formatting>
