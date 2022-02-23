@@ -1,7 +1,7 @@
 
 #include <stdint.h>
 
-const char* message_list[] = 
+const unsigned char* message_list[] = 
 {
     "DevTool for PIC18, your free communication program\n",
     "version 0.0.0.1\n",

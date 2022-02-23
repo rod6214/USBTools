@@ -4,7 +4,6 @@
 #include "usb_defs.h"
 #include <xc.h>
 #include "logger.h"
-#include "kernel.h"
 
 void __interrupt(high_priority) high_isr(void)
 {
@@ -57,39 +56,30 @@ struct VALUES {
 
 void test_ptr(void* ptr) 
 {
-    PORTB = (char)ptr;
+    PORTB = ptr;
 }
-
+extern void message();
 void main(void) {
-
-    List_t* list = CreateList();
-    kpush(list, 'a');
-    kpush(list, 'b');
-    kpush(list, 'c');
-    int count = kcount(list);
-    TRISB = 0;
+//	PORTB = 0;
+//	PORTC = 0;
+//	TRISB = 0;
+//	TRISC = 1;
+//    message();
+//	usb_init();
+//	INTCONbits.PEIE = 1;
+//	INTCONbits.GIE = 1;
+//
+//	while (usb_device_state != CONFIGURED)
+//		;
+//
+    message();
     
-    if (count > 0)
-    PORTB = (char)count;
+    struct VALUES test;
     
-    void* begin = (void*)list;
-//    void* test = keval(begin);
-//    char c;
+    test.x = 12;
+    test.y = 3;
     
-    {
-        foreach(begin) 
-        {
-            char c = kgetchar(begin);
-            PORTB = c;
-        }
-    }
-    
-    
-    
-//    for (char c = kgetchar(begin); test; kinc(begin)) 
-//    {
-//        PORTB = c;
-//    }
+    test_ptr(&test);
     
 	while (1) {}
 

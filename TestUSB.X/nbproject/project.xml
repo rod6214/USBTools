@@ -4,7 +4,7 @@
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
             <name>TestUSB</name>
-            <creation-uuid>62255a2b-fdf1-4549-b436-d30b0c26945a</creation-uuid>
+            <creation-uuid>48779fb2-e852-473c-b47d-22409dc5d423</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>
             <cpp-extensions/>
@@ -14,7 +14,6 @@
             <make-dep-projects/>
             <sourceRootList>
                 <sourceRootElem>.</sourceRootElem>
-                <sourceRootElem>../DevPrinter.X</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

@@ -25,16 +25,15 @@ void WriteStream(STREAM stream, size_t offset, size_t bytes)
     TYPE type = strm->type;
     unsigned char* elements = (unsigned char*)strm->writeHandle;
     char data;
-    int i = 0;
+    size_t i = 0;
 
-    for(i = (int)offset; i < bytes; i++) 
+    for(i = offset; i < bytes; i++) 
     {
         data = elements[i];
         _putchar(data, type);
     }
-    int sigOff = (int)offset;
-    int len = (int)(i + 1 - sigOff);
-    strm->bytesWrite = abs(len);
+
+    strm->bytesWrite = abs(i + 1 - offset);
 }
 
 void ReadStream(STREAM stream, size_t offset, size_t bytes) 
@@ -51,9 +50,7 @@ void ReadStream(STREAM stream, size_t offset, size_t bytes)
         (elements)[i++] = data;
     }
     
-    int sigOff = (int)offset;
-    int len = (int)(i + 1 - sigOff);
-    strm->bytesRead = abs(len);
+    strm->bytesRead = abs(i + 1 - offset);
 }
 
 static int _putchar(char c, TYPE type) 
@@ -66,8 +63,6 @@ static int _putchar(char c, TYPE type)
             return bytes;
         }
     }
-    
-    return 0;
 }
 
 static char _getchar(TYPE type) 
@@ -82,7 +77,6 @@ static char _getchar(TYPE type)
         case LOG_STREAM:
             break;
     }
-    return 0;
 }
 
 static void _copymem(HANDLE src, HANDLE dest, size_t offset, size_t bytes) 

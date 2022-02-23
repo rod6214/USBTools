@@ -1,6 +1,0 @@
-{
-    "files.associations": {
-        "usbpic_defs.h": "c",
-        "usb.h": "c"
-    }
-}

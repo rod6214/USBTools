@@ -22,7 +22,7 @@ static unsigned char request_handled; // Set to 1 if request was understood and 
 static dataPtr data_ptr; // Data to host from RAM
 static codePtr code_ptr; // Data to host from FLASH
 static dataPtr in_ptr; // Data from the host
-static unsigned int dlen; // Number of unsigned chars of data
+static unsigned char dlen; // Number of unsigned chars of data
 
 // See USB spec chapter 5
 #define SETUP_STAGE    0
@@ -34,7 +34,7 @@ static unsigned int dlen; // Number of unsigned chars of data
 #define EPOUTEN (1 << 2)
 #define EPHSHK (1 << 4)
 
-#include "descriptor.h"
+#include "descriptor.h";
 
 // Bytes transmited
 static unsigned char tx_len = 0;
@@ -54,10 +54,10 @@ void configure_tx_rx_ep()
 		UEP1 = 0x1E;
 		// OUT endpoint host to device.
 		ep1_o.CNT = sizeof(rx_buffer);
-		ep1_o.ADDR = (unsigned int)rx_buffer;
+		ep1_o.ADDR = (int)rx_buffer;
 		ep1_o.STAT = UOWN | DTSEN; //set up to receive stuff as soon as we get something
 		// IN endpoint device to host.
-		ep1_i.ADDR = (unsigned int)tx_buffer;
+		ep1_i.ADDR = (int) tx_buffer;
 		ep1_i.STAT = DTS;
 	}
 }
@@ -88,8 +88,8 @@ void rewind() {
 
 void usb_write(BYTE* data, size_t length) 
 {
-	memcpy((void*)tx_buffer, data, length);
-	_usb_write((unsigned char)length);
+	memcpy(tx_buffer, data, length);
+	_usb_write(length);
 }
 
 static void _usb_flush() 
@@ -259,7 +259,7 @@ void in_data_stage(void) {
 	unsigned char bufferSize;
 	// Determine how many unsigned chars are going to the host
 	if (dlen < ENDPOINT_0_SIZE)
-		bufferSize = (unsigned char)dlen;
+		bufferSize = dlen;
 	else
 		bufferSize = ENDPOINT_0_SIZE;
     
@@ -268,7 +268,7 @@ void in_data_stage(void) {
 	//ep0_i.STAT |= (unsigned char) ((bufferSize & 0x0300) >> 8);
 	//ep0_i.CNT = (unsigned char) (bufferSize & 0xFF);
 	ep0_i.CNT = bufferSize;
-	ep0_i.ADDR = (unsigned int) &control_transfer_buffer[0];
+	ep0_i.ADDR = (int) &control_transfer_buffer[0];
 	// Update the number of unsigned chars that still need to be sent.  Getting
 	// all the data back to the host can take multiple transactions, so
 	// we need to track how far along we are.
@@ -286,7 +286,7 @@ void prepare_for_setup_stage(void) {
 	// UEP0 = EPINEN | EPOUTEN | EPHSHK;
 	control_stage = SETUP_STAGE;
 	ep0_o.CNT = ENDPOINT_0_SIZE;
-	ep0_o.ADDR = (unsigned int) &setup_packet;
+	ep0_o.ADDR = (int) &setup_packet;
 	ep0_o.STAT = UOWN | DTSEN;
 	ep0_i.STAT = 0x00;
 	UCONbits.PKTDIS = 0;
@@ -385,7 +385,7 @@ void process_control_transfer(void)
 			if (!request_handled) {
 				// If this service wasn't handled then stall endpoint 0
 				ep0_o.CNT = ENDPOINT_0_SIZE;
-				ep0_o.ADDR = (unsigned int) &setup_packet;
+				ep0_o.ADDR = (int) &setup_packet;
 				ep0_o.STAT = UOWN | BSTALL;
 				ep0_i.STAT = UOWN | BSTALL;
 			} else if (setup_packet.bmrequesttype & 0x80) {
@@ -397,7 +397,7 @@ void process_control_transfer(void)
 				control_stage = DATA_IN_STAGE;
 				// Reset the out buffer descriptor for endpoint 0
 				ep0_o.CNT = ENDPOINT_0_SIZE;
-				ep0_o.ADDR = (unsigned int) &setup_packet;
+				ep0_o.ADDR = (int) &setup_packet;
 				ep0_o.STAT = UOWN;
 				// Give to SIE, DATA1 packet, enable data toggle checks
 				ep0_i.STAT = UOWN | DTS | DTSEN;
