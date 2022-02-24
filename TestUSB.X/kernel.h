@@ -30,7 +30,7 @@ typedef struct List
 #define foreach(y) int count = kcount(y); \
 for(int i = 0; y != NULL && i < count; kinc(y), i++)
 
-extern List_t* CreateList();
+extern List_t* CreateList(int bytes);
 extern void kpush(List_t* ls, char data);
 extern int kcount(List_t* ls);
 extern void* kgetBegin(List_t* ls);
@@ -40,6 +40,7 @@ extern char kgetchar(List_t* ls);
 extern void* kprev(List_t* ls);
 extern void* kmalloc(int bytes);
 void kfree(void* ptr);
+char kpop(List_t* ls);
 #ifdef	__cplusplus
 }
 #endif
