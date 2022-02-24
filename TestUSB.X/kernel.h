@@ -17,6 +17,14 @@ typedef struct List
     int length;
 } List_t;
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
 #define keval(x) (x != NULL)
 #define kinc(x) (x = knext((List_t*)x))
 #define foreach(y) int count = kcount(y); \
@@ -30,6 +38,8 @@ extern void* kgetLast(List_t* ls);
 extern void* knext(List_t* ls);
 extern char kgetchar(List_t* ls);
 extern void* kprev(List_t* ls);
+extern void* kmalloc(int bytes);
+void kfree(void* ptr);
 #ifdef	__cplusplus
 }
 #endif

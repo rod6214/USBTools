@@ -61,28 +61,33 @@ void test_ptr(void* ptr)
 }
 
 void main(void) {
-
-    List_t* list = CreateList();
-    kpush(list, 'a');
-    kpush(list, 'b');
-    kpush(list, 'c');
-    int count = kcount(list);
     TRISB = 0;
-    
-    if (count > 0)
-    PORTB = (char)count;
-    
-    void* begin = (void*)list;
+    kmalloc(2);
+    void* pMem = kmalloc(10);
+    kmalloc(15);
+    kfree(pMem);
+    kmalloc(12);
+//    List_t* list = CreateList();
+//    kpush(list, 'a');
+//    kpush(list, 'b');
+//    kpush(list, 'c');
+//    int count = kcount(list);
+//    TRISB = 0;
+//    
+//    if (count > 0)
+//    PORTB = (char)count;
+//    
+//    void* begin = (void*)list;
 //    void* test = keval(begin);
 //    char c;
     
-    {
-        foreach(begin) 
-        {
-            char c = kgetchar(begin);
-            PORTB = c;
-        }
-    }
+//    {
+//        foreach(begin) 
+//        {
+//            char c = kgetchar(begin);
+//            PORTB = c;
+//        }
+//    }
     
     
     

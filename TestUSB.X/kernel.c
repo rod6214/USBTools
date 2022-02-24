@@ -2,10 +2,12 @@
 #include <xc.h>
 #include "kernel.h"
 
+volatile unsigned char BANK2[255] __at(0x200);
 volatile unsigned char BANK3[255] __at(0x300);
 
 int mem_pointer = 0;
 int mem_available = 500;
+int stack_pointer = 0;
 
 typedef struct _List 
 {
@@ -14,6 +16,18 @@ typedef struct _List
     void* prev;
 }_List_t;
 
+typedef struct _Allocation 
+{
+  void* next;
+  void* ptr;
+  void* link;
+  int used;
+  int length;
+} Allocation_t;
+
+
+
+Allocation_t kernel_alloc;
 static void _incrementPointer();
 
 List_t* CreateList() 
@@ -31,7 +45,7 @@ static void _incrementPointer()
 
 void kpush(List_t* ls, char data) 
 {
-    _List_t* old = (List_t*)ls;
+    _List_t* old = ls;
     
     if (old->next)
     {
@@ -79,7 +93,7 @@ int kcount(List_t* ls)
 
 void* knext(List_t* ls) 
 {
-    _List_t* old = (List_t*)ls;
+    _List_t* old = ls;
     _List_t* pCurr = old;
     _List_t* pNext = (_List_t*)pCurr->next;
     
@@ -93,7 +107,7 @@ void* knext(List_t* ls)
 
 void* kprev(List_t* ls) 
 {
-    _List_t* old = (List_t*)ls;
+    _List_t* old = ls;
     _List_t* pCurr = old;
     _List_t* pPrev = (_List_t*)pCurr->prev;
     
@@ -135,4 +149,120 @@ char kgetchar(List_t* ls)
 {
     _List_t* old = (List_t*)ls;
     return old->data;
+}
+
+static int _alloc_count(Allocation_t* alloc) 
+{
+    int count = 0;
+    Allocation_t* pCurr = alloc;
+    
+    if (pCurr->next == NULL || alloc == NULL) 
+    {
+        return NULL;
+    }
+    else if (pCurr == pCurr->next) 
+    {
+        return 1;
+    }
+    
+    while(pCurr != NULL) 
+    {
+        pCurr = (Allocation_t*)pCurr->next;
+        count++;
+    }
+    
+    return count;
+}
+
+void* kmalloc(int bytes)
+{
+    
+    int count = _alloc_count(&kernel_alloc);
+    Allocation_t* alloc = NULL;
+    int requiredLength = bytes;
+    
+    if (count > 0) 
+    {
+        Allocation_t* pCurr = &kernel_alloc;
+        int finish = FALSE;
+        
+        int same = pCurr == pCurr->next;
+        
+        while(pCurr != NULL && !finish && !same) 
+//        while(pCurr != NULL && !same) 
+        {
+//            int le = pCurr->length;
+//            PORTB = le;
+            
+            if (!pCurr->used) 
+            {
+                if (alloc != NULL) 
+                {
+                    Allocation_t* linked = alloc->link;
+                    linked->link = pCurr;
+                    linked->used = TRUE;
+                }
+                else
+                {
+                    alloc = pCurr;
+                    alloc->link = pCurr;
+                    alloc->used = TRUE;
+                }
+
+                requiredLength -= pCurr->length;
+                finish = (bytes - pCurr->length) <= 0;
+            }
+
+            pCurr = pCurr->next;
+        }
+    }
+
+    if (requiredLength > 0) 
+    {
+        Allocation_t* pCurr = &kernel_alloc;
+        
+        if (pCurr->next) 
+        {
+            Allocation_t* newAlloc = (Allocation_t*)&BANK2[mem_pointer];
+            mem_pointer += sizeof(Allocation_t);
+            Allocation_t* curr = pCurr->next;
+            curr->next = newAlloc;
+            newAlloc->length = requiredLength;
+            newAlloc->used = TRUE;
+            newAlloc->ptr = (void*)&BANK3[stack_pointer];
+        }
+        else 
+        {
+            pCurr->next = pCurr;
+            pCurr->length = requiredLength;
+            pCurr->used = TRUE;
+            pCurr->ptr = (void*)&BANK3[stack_pointer];
+        }
+
+        if (alloc != NULL) 
+        {
+            Allocation_t* curr = pCurr->next;
+            alloc->link = curr->next;
+        }
+        else 
+        {
+            Allocation_t* curr = pCurr->next;
+            alloc = curr;
+        }
+
+        stack_pointer += requiredLength;
+    }
+
+    return alloc;
+}
+
+void kfree(void* ptr) 
+{
+    Allocation_t* alloc = ptr;
+    
+    if (alloc != NULL) 
+    {
+        alloc->used = FALSE;
+        alloc->link = NULL;
+    }
 }
