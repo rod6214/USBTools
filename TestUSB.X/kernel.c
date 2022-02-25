@@ -2,6 +2,8 @@
 #include <xc.h>
 #include "kernel.h"
 
+#if __KERNEL__
+
 volatile unsigned char BANK2[255] __at(0x200);
 volatile unsigned char BANK3[255] __at(0x300);
 
@@ -311,3 +313,4 @@ void kfree(void* ptr)
         alloc->pos = 0;
     }
 }
+#endif

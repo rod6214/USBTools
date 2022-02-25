@@ -8,6 +8,8 @@
 #include "usb_defs.h"
 #include "cstream.h"
 
+#if __USB__
+
 typedef struct _PrinterStream 
 {
     HANDLE writeHandle;
@@ -602,3 +604,5 @@ void* usb_handler(void) {
 
 	return &UPtr;
 }
+
+#endif

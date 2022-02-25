@@ -3,6 +3,7 @@
 #include "logger.h"
 #include "cstream.h"
 
+#if __LOGGER__
 // Commands
 #define PWM_MODULE 0x22
 #define MEMORY 0x52
@@ -90,3 +91,5 @@ void log_free()
     logList = NULL;
     stream = NULL;
 }
+
+#endif

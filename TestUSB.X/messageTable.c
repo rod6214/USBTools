@@ -9,3 +9,10 @@ const char* message_list[] =
     "Listening...\n",
     "Are you sure to quick?",
 };
+
+void showVersion() {}
+
+void commandLine(char *arg, ...) 
+{
+    
+}

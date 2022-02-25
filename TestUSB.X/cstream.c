@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include "cstream.h"
 #include "usb.h"
+#include "logger.h"
+
+#if __STREAM__
 
 typedef struct _Stream 
 {
@@ -42,7 +45,7 @@ void ReadStream(STREAM stream, size_t offset, size_t bytes)
     _Stream_t* strm = (_Stream_t*)stream;
     TYPE type = strm->type;
     unsigned char* elements = (unsigned char*)strm->readHandle;
-    char data = 'a';
+    char data = '-';
     int i = 0;
     
     while (!data)
@@ -65,6 +68,11 @@ static int _putchar(char c, TYPE type)
             int bytes = usb_putchar(c);
             return bytes;
         }
+        case LOG_STREAM:
+        {
+            int bytes = log_putchar(c);
+            return bytes;
+        }
     }
     
     return 0;
@@ -80,7 +88,10 @@ static char _getchar(TYPE type)
             return c;
         }
         case LOG_STREAM:
-            break;
+        {
+            char c = log_getchar();
+            return c;
+        }
     }
     return 0;
 }
@@ -109,3 +120,4 @@ void CopyTo(STREAM streamSrc, STREAM streamDest, size_t readOffset, size_t write
         _copymem(strmSrc->writeHandle, strmDest->writeHandle, writeOffset, strmSrc->writeBufferSize);
     }
 }
+#endif
