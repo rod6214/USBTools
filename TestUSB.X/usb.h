@@ -25,25 +25,24 @@ extern unsigned char usb_device_state;
 #include "usbpic_defs.h"
 
 // initialize usbcdc module
-void usb_init(void);
+extern void usb_init(void);
 // handle usb control messages, poll atleast every 1ms or call from IRQ
-void* usb_handler(void);
-int usb_putchar(char c);
-char usb_getchar();
-void usb_write(BYTE* data, unsigned int length);
-void rewind();
+extern void* usb_handler(void);
+extern int usb_putchar(char c);
+extern char usb_getchar();
+extern void usb_write(BYTE* data, unsigned int length);
+extern void rewind();
+extern void* usb_getStream();
 
 #define RAM_BUFFER_BASE 0x500
 #define SETUP_PACKET_REG RAM_BUFFER_BASE
 volatile setup_packet_struct setup_packet __at(SETUP_PACKET_REG);
-
 
 #define CONTROL_TRANSFER_REG (SETUP_PACKET_REG + ENDPOINT_0_SIZE + sizeof(setup_packet))
 #define TX_REG (CONTROL_TRANSFER_REG + ENDPOINT_0_SIZE)
 #define RX_REG (TX_REG + USB_BUFFER_LEN)
 #define INT_REG (RX_REG + USB_BUFFER_LEN)
 #define HID_RPT01_SIZE 29
-
 
 volatile unsigned char control_transfer_buffer[ENDPOINT_0_SIZE] __at(CONTROL_TRANSFER_REG);
 volatile unsigned char tx_buffer[USB_BUFFER_LEN] __at(TX_REG);

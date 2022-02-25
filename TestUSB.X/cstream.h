@@ -14,8 +14,8 @@ extern "C" {
 
 #include <stdlib.h>
     
-    typedef unsigned int* STREAM;
-    typedef unsigned int* HANDLE;
+    typedef void* STREAM;
+    typedef void* HANDLE;
     typedef unsigned char TYPE;
 #define USB_STREAM (char)0x45
 #define LOG_STREAM (char)0x123

@@ -8,14 +8,17 @@ volatile unsigned char BANK3[255] __at(0x300);
 int mem_pointer = 0;
 int mem_available = 500;
 int stack_pointer = 0;
+int data_memmory = 255;
 
 typedef struct _Allocation 
 {
+  // Memory allocation part.
   void* next;
   void* ptr;
   void* link;
   int used;
   int length;
+  // List part that keeps list states.
   int pos;
   int index;
 } Allocation_t;
@@ -23,10 +26,8 @@ typedef struct _Allocation
 Allocation_t* kernel_alloc = NULL;
 static void _incrementPointer(int bytes);
 static int _alloc_count(Allocation_t* alloc);
-static void _alloc_push(void* ls, char data);
+static char _alloc_push(void* ls, char data);
 static char _alloc_pop(void* ls);
-
-
 
 void* CreateList(int bytes) 
 {
@@ -36,6 +37,19 @@ void* CreateList(int bytes)
     }
     void* ptr = kmalloc(bytes);
     return ptr;
+}
+
+void kclearAll(void* ls) 
+{
+    Allocation_t* alloc = ls;
+    alloc->pos = 0;
+    alloc->index = 0;
+}
+
+void krewind(void* ls) 
+{
+    Allocation_t* alloc = ls;
+    alloc->index = 0;
 }
 
 char alloc_getData(void* ls, int index) 
@@ -63,7 +77,7 @@ char alloc_getData(void* ls, int index)
     return (char)-1;
 }
 
-static void _alloc_push(void* ls, char data) 
+static char _alloc_push(void* ls, char data) 
 {
     Allocation_t* alloc = (Allocation_t*)ls;
     Allocation_t* principal = (Allocation_t*)ls;
@@ -80,11 +94,13 @@ static void _alloc_push(void* ls, char data)
             int idx = alloc->length == lastLength ? pos : abs(lastLength - alloc->length - pos);
             ptr[idx] = data;
             principal->pos++;
-            return;
+            return ptr[idx];
         }
         alloc = alloc->link;
         lastLength += alloc->length;
     }
+
+    return (char)-1;
 }
 
 static char _alloc_pop(void* ls) 
@@ -113,10 +129,15 @@ static char _alloc_pop(void* ls)
     return (char)-1;
 }
 
-
-void kpush(void* ls, char data) 
+int kavail_mem() 
 {
-    _alloc_push(ls, data);
+    return (data_memmory - stack_pointer - 1);
+}
+
+char kpush(void* ls, char data) 
+{
+    char c = _alloc_push(ls, data);
+    return c;
 }
 
 char kpop(void* ls)
@@ -138,20 +159,20 @@ void* knext(void* ls)
     return ls;
 }
 
-void* kprev(void* ls) 
-{    
-    return NULL;
-}
+// void* kprev(void* ls) 
+// {    
+//     return NULL;
+// }
 
-void* kgetBegin(void* ls) 
-{
-    return NULL;
-}
+// void* kgetBegin(void* ls) 
+// {
+//     return NULL;
+// }
 
-void* kgetLast(void* ls) 
-{
-    return NULL;
-}
+// void* kgetLast(void* ls) 
+// {
+//     return NULL;
+// }
 
 char kgetchar(void* ls) 
 {
@@ -193,7 +214,13 @@ static void _incrementPointer(int bytes)
 
 void* kmalloc(int bytes)
 {
-    
+    int availMem = kavail_mem();
+
+    if (availMem <= 0) 
+    {
+        return NULL;
+    }
+
     int count = _alloc_count(kernel_alloc);
     Allocation_t* alloc = NULL;
     int requiredLength = bytes;

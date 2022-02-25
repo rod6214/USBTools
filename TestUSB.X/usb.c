@@ -6,6 +6,20 @@
 #include "usb.h"
 #include "usbpic_defs.h"
 #include "usb_defs.h"
+#include "cstream.h"
+
+typedef struct _PrinterStream 
+{
+    HANDLE writeHandle;
+    HANDLE readHandle;
+    unsigned int index;
+    size_t readBufferSize;
+    size_t writeBufferSize;
+    int bytesRead;
+    int bytesWrite;
+    TYPE type;
+    unsigned char sector;
+} PrinterStream_t;
 
 struct USBHandler UPtr;
 
@@ -40,12 +54,25 @@ static unsigned int dlen; // Number of unsigned chars of data
 static unsigned char tx_len = 0;
 // Rx pointer
 static unsigned char rx_idx = 0;
+// Stream pointer
+static PrinterStream_t stream;
 
 static size_t _usb_read();
 static void _usb_flush();
 static void _usb_write(unsigned char len);
 static unsigned char _usb_wr_busy();
 static unsigned char _usb_rd_ready();
+
+void* usb_getStream() 
+{
+	stream.writeHandle = (HANDLE)tx_buffer;
+	stream.readHandle = (HANDLE)rx_buffer;
+	stream.readBufferSize = USB_BUFFER_LEN;
+	stream.writeBufferSize = USB_BUFFER_LEN;
+	stream.type = USB_STREAM;
+	stream.index = 0;
+	return &stream;
+}
 
 void configure_tx_rx_ep() 
 {

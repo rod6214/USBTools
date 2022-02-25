@@ -89,9 +89,11 @@ static void _copymem(HANDLE src, HANDLE dest, size_t offset, size_t bytes)
 {
     if (src!= NULL && dest != NULL) 
     {    
-        for(size_t i = 0; i < bytes; i++) 
+        for(size_t i = offset; i < bytes; i++) 
         {
-            (dest)[i] = (src)[i];
+            char* _dest = (char*)dest;
+            char* _src = (char*)src;
+            (_dest)[i] = (_src)[i];
         }
     }
 }

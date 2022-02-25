@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "cstream.h": "c",
+        "kernel.h": "c"
+    }
+}

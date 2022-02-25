@@ -29,11 +29,64 @@ typedef struct _PrinterStream
     unsigned char sector;
 } _PrinterStream_t;
 
-void* CreateLogger(int bytes) 
+typedef struct _Allocation 
 {
-    List_t* list = CreateList(bytes);
-    
-    return NULL;
+  void* next;
+  void* ptr;
+  void* link;
+  int used;
+  int length;
+  int pos;
+  int index;
+} Allocation_t;
+
+Allocation_t* logList = NULL;
+_PrinterStream_t* stream;
+
+void* CreateLogger(int bytes)
+{
+    if (stream == NULL) 
+    {
+        stream = kmalloc(sizeof(_PrinterStream_t));
+        logList = CreateList(bytes);
+        stream->readBufferSize = (size_t)bytes;
+        stream->writeBufferSize = (size_t)bytes;
+    }
+
+    return logList;
 }
-//void ExcuteCommand(STREAM stream) {}
-//void ReadCommand(STREAM stream) {}
+
+void log_rewind() 
+{
+    krewind(&logList);
+}
+
+void* log_getStream() 
+{
+    stream->writeHandle = logList->ptr;
+    stream->readHandle = logList->ptr;
+    stream->index = 0;
+    stream->type = LOG_STREAM;
+    return stream;
+}
+
+int log_putchar(char c) 
+{
+    char result = kpush(&logList, c);
+    return result;
+}
+
+char log_getchar() 
+{
+    char c = kgetchar(logList);
+    logList = knext(logList);
+    return c;
+}
+
+void log_free() 
+{
+    kfree(stream);
+    kfree(logList);
+    logList = NULL;
+    stream = NULL;
+}
