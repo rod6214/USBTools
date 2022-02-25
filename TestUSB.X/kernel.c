@@ -23,20 +23,22 @@ typedef struct _Allocation
 Allocation_t* kernel_alloc = NULL;
 static void _incrementPointer(int bytes);
 static int _alloc_count(Allocation_t* alloc);
-static void _alloc_push(List_t* ls, char data);
-static char _alloc_pop(List_t* ls);
+static void _alloc_push(void* ls, char data);
+static char _alloc_pop(void* ls);
 
-List_t* CreateList(int bytes) 
+
+
+void* CreateList(int bytes) 
 {
     if (kernel_alloc == NULL) 
     {
         kernel_alloc = (Allocation_t*)&BANK2[mem_pointer];
     }
-    List_t* ptr = kmalloc(bytes);
+    void* ptr = kmalloc(bytes);
     return ptr;
 }
 
-char alloc_getData(List_t* ls, int index) 
+char alloc_getData(void* ls, int index) 
 {
     Allocation_t* alloc = (Allocation_t*)ls;
     int lastLength = alloc->length;
@@ -61,7 +63,7 @@ char alloc_getData(List_t* ls, int index)
     return (char)-1;
 }
 
-static void _alloc_push(List_t* ls, char data) 
+static void _alloc_push(void* ls, char data) 
 {
     Allocation_t* alloc = (Allocation_t*)ls;
     Allocation_t* principal = (Allocation_t*)ls;
@@ -85,7 +87,7 @@ static void _alloc_push(List_t* ls, char data)
     }
 }
 
-static char _alloc_pop(List_t* ls) 
+static char _alloc_pop(void* ls) 
 {
     Allocation_t* alloc = ls;
     Allocation_t* principal = ls;
@@ -108,50 +110,50 @@ static char _alloc_pop(List_t* ls)
         lastLength += alloc->length;
     }
 
-    return -1;
+    return (char)-1;
 }
 
 
-void kpush(List_t* ls, char data) 
+void kpush(void* ls, char data) 
 {
     _alloc_push(ls, data);
 }
 
-char kpop(List_t* ls)
+char kpop(void* ls)
 {
     char c = _alloc_pop(ls);
     return c;
 }
 
-int kcount(List_t* ls) 
+int kcount(void* ls) 
 {
     Allocation_t* alloc = (Allocation_t*)ls;
     return alloc->pos;
 }
 
-void* knext(List_t* ls) 
+void* knext(void* ls) 
 {
     Allocation_t* alloc = ls;
     alloc->index++;
     return ls;
 }
 
-void* kprev(List_t* ls) 
+void* kprev(void* ls) 
 {    
     return NULL;
 }
 
-void* kgetBegin(List_t* ls) 
+void* kgetBegin(void* ls) 
 {
     return NULL;
 }
 
-void* kgetLast(List_t* ls) 
+void* kgetLast(void* ls) 
 {
     return NULL;
 }
 
-char kgetchar(List_t* ls) 
+char kgetchar(void* ls) 
 {
     Allocation_t* alloc = ls;
     int index = alloc->index;
@@ -166,7 +168,7 @@ static int _alloc_count(Allocation_t* alloc)
     
     if (pCurr->next == NULL || alloc == NULL) 
     {
-        return NULL;
+        return 0;
     }
     else if (pCurr == pCurr->next) 
     {

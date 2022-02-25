@@ -35,13 +35,16 @@ void rewind();
 
 #define RAM_BUFFER_BASE 0x500
 #define SETUP_PACKET_REG RAM_BUFFER_BASE
-#define CONTROL_TRANSFER_REG (SETUP_PACKET_REG + ENDPOINT_0_SIZE)
+volatile setup_packet_struct setup_packet __at(SETUP_PACKET_REG);
+
+
+#define CONTROL_TRANSFER_REG (SETUP_PACKET_REG + ENDPOINT_0_SIZE + sizeof(setup_packet))
 #define TX_REG (CONTROL_TRANSFER_REG + ENDPOINT_0_SIZE)
 #define RX_REG (TX_REG + USB_BUFFER_LEN)
 #define INT_REG (RX_REG + USB_BUFFER_LEN)
 #define HID_RPT01_SIZE 29
 
-volatile setup_packet_struct setup_packet __at(SETUP_PACKET_REG);
+
 volatile unsigned char control_transfer_buffer[ENDPOINT_0_SIZE] __at(CONTROL_TRANSFER_REG);
 volatile unsigned char tx_buffer[USB_BUFFER_LEN] __at(TX_REG);
 volatile unsigned char rx_buffer[USB_BUFFER_LEN] __at(RX_REG);

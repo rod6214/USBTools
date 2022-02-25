@@ -33,8 +33,9 @@ typedef struct _setup_packet_struct
     unsigned char wvalue1;       // MSB of wValue
     unsigned char windex0;       // LSB of wIndex
     unsigned char windex1;       // MSB of wIndex
-    unsigned short wlength;       // Number of unsigned chars to transfer if there's a data stage
-    unsigned char extra[56];     // Fill out to same size as Endpoint 0 max buffer
+    unsigned short wlength;      // Number of unsigned chars to transfer if there's a data stage
+    void* extra;
+//    unsigned char extra[56];     // Fill out to same size as Endpoint 0 max buffer
 } setup_packet_struct;
 
 #define USTAT_IN (0x04)

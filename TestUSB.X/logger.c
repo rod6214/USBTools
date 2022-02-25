@@ -1,5 +1,8 @@
 #include <xc.h>
+#include "kernel.h"
 #include "logger.h"
+#include "cstream.h"
+
 // Commands
 #define PWM_MODULE 0x22
 #define MEMORY 0x52
@@ -26,6 +29,11 @@ typedef struct _PrinterStream
     unsigned char sector;
 } _PrinterStream_t;
 
-void CreateLogger(STREAM stream) {}
+void* CreateLogger(int bytes) 
+{
+    List_t* list = CreateList(bytes);
+    
+    return NULL;
+}
 //void ExcuteCommand(STREAM stream) {}
 //void ReadCommand(STREAM stream) {}

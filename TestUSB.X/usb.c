@@ -112,13 +112,13 @@ static size_t _usb_read() {
     return dataReceived;
 }
 
-static unsigned char _usb_wr_busy() {
-	return (unsigned char)((ep1_i.STAT & UOWN)!=0);
-}
-
-static unsigned char _usb_rd_ready() {
-	return (unsigned char)((ep1_o.STAT & UOWN) == 0);
-}
+//static unsigned char _usb_wr_busy() {
+//	return (unsigned char)((ep1_i.STAT & UOWN)!=0);
+//}
+//
+//static unsigned char _usb_rd_ready() {
+//	return (unsigned char)((ep1_o.STAT & UOWN) == 0);
+//}
 
 static void _usb_write(unsigned char len)
 {

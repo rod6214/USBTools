@@ -14,9 +14,11 @@
 extern "C" {
 #endif
 
+
 extern const unsigned char* message_list[];
 //extern STREAM CreatePrinter();
 //extern void InitDevTool(STREAM stream);
+extern void* CreateLogger(int bytes);
 extern int log_putchar(char c);
 extern char log_getchar();
 extern void log_rewind();
