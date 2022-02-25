@@ -9,13 +9,6 @@ int mem_pointer = 0;
 int mem_available = 500;
 int stack_pointer = 0;
 
-typedef struct _List 
-{
-    char data;
-    void* next;
-    void* prev;
-}_List_t;
-
 typedef struct _Allocation 
 {
   void* next;
@@ -24,13 +17,14 @@ typedef struct _Allocation
   int used;
   int length;
   int pos;
+  int index;
 } Allocation_t;
-
-
 
 Allocation_t* kernel_alloc = NULL;
 static void _incrementPointer(int bytes);
 static int _alloc_count(Allocation_t* alloc);
+static void _alloc_push(List_t* ls, char data);
+static char _alloc_pop(List_t* ls);
 
 List_t* CreateList(int bytes) 
 {
@@ -42,57 +36,104 @@ List_t* CreateList(int bytes)
     return ptr;
 }
 
-
-void kpush(List_t* ls, char data) 
+char alloc_getData(List_t* ls, int index) 
 {
-    Allocation_t* alloc = ls;
+    Allocation_t* alloc = (Allocation_t*)ls;
+    int lastLength = alloc->length;
 
     while(alloc != NULL) 
     {
-        int pos = alloc->pos;
-        if (pos < alloc->length) 
+        int pos = index;
+        int overflow = pos >= lastLength;
+        
+        if (!overflow)
+        {
+            int idx = alloc->length == lastLength ? pos : abs(lastLength - alloc->length - pos);
+            unsigned char* ptr = alloc->ptr;
+            char data = ptr[idx];
+            return data;
+        }
+
+        alloc = alloc->link;
+        lastLength += alloc->length;
+    }
+
+    return (char)-1;
+}
+
+static void _alloc_push(List_t* ls, char data) 
+{
+    Allocation_t* alloc = (Allocation_t*)ls;
+    Allocation_t* principal = (Allocation_t*)ls;
+    int lastLength = alloc->length;
+
+    while(alloc != NULL) 
+    {
+        int pos = principal->pos;
+        int overflow = pos >= lastLength;
+        
+        if (!overflow) 
         {
             unsigned char* ptr = alloc->ptr;
-            ptr[pos] = data;
-            alloc->pos++;
+            int idx = alloc->length == lastLength ? pos : abs(lastLength - alloc->length - pos);
+            ptr[idx] = data;
+            principal->pos++;
             return;
         }
         alloc = alloc->link;
+        lastLength += alloc->length;
     }
 }
 
-char kpop(List_t* ls)
+static char _alloc_pop(List_t* ls) 
 {
     Allocation_t* alloc = ls;
+    Allocation_t* principal = ls;
+    int lastLength = alloc->length;
 
     while(alloc != NULL) 
     {
-        int pos = alloc->pos;
-        int overflow = pos < alloc->length && alloc->link != NULL;
+        int pos = principal->pos;
+        int overflow = pos >= lastLength;
         if (!overflow)
         {
+            int idx = alloc->length == lastLength ? pos : abs(lastLength - alloc->length - pos);
             unsigned char* ptr = alloc->ptr;
-            char data = ptr[pos - 1];
-            ptr[pos - 1] = '\0';
-            alloc->pos--;
+            char data = ptr[idx - 1];
+            ptr[idx - 1] = '\0';
+            principal->pos--;
             return data;
         }
         alloc = alloc->link;
+        lastLength += alloc->length;
     }
 
     return -1;
 }
 
+
+void kpush(List_t* ls, char data) 
+{
+    _alloc_push(ls, data);
+}
+
+char kpop(List_t* ls)
+{
+    char c = _alloc_pop(ls);
+    return c;
+}
+
 int kcount(List_t* ls) 
 {
-    int count = _alloc_count(ls);
-    return count;
+    Allocation_t* alloc = (Allocation_t*)ls;
+    return alloc->pos;
 }
 
 void* knext(List_t* ls) 
 {
     Allocation_t* alloc = ls;
-    return alloc->link;
+    alloc->index++;
+    return ls;
 }
 
 void* kprev(List_t* ls) 
@@ -112,7 +153,10 @@ void* kgetLast(List_t* ls)
 
 char kgetchar(List_t* ls) 
 {
-    return 0;
+    Allocation_t* alloc = ls;
+    int index = alloc->index;
+    char data = alloc_getData(ls, index);
+    return data;
 }
 
 static int _alloc_count(Allocation_t* alloc) 
@@ -199,6 +243,7 @@ void* kmalloc(int bytes)
             newAlloc->used = TRUE;
             newAlloc->ptr = (void*)&BANK3[stack_pointer];
             newAlloc->pos = 0;
+            newAlloc->index = 0;
         }
         else 
         {
@@ -208,6 +253,7 @@ void* kmalloc(int bytes)
             pCurr->used = TRUE;
             pCurr->ptr = (void*)&BANK3[stack_pointer];
             pCurr->pos = 0; 
+            pCurr->index = 0;
         }
 
         if (alloc != NULL) 

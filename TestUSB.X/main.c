@@ -87,13 +87,15 @@ void main(void) {
 	kpush(l3, 'f');
     kfree(l2);
     
-    List_t* l4 = CreateList(6);
+    List_t* l4 = CreateList(8);
     kpush(l4, '1');
     kpush(l4, '2');
 	kpush(l4, '3');
 	kpush(l4, '4');
     kpush(l4, '5');
 	kpush(l4, '6');
+    kpush(l4, '7');
+    PORTB = kpop(l4);
     // TRISB = 0;
     // kmalloc(2);
     // void* pMem = kmalloc(10);
@@ -114,13 +116,13 @@ void main(void) {
 //    void* test = keval(begin);
 //    char c;
     
-//    {
-//        foreach(begin) 
-//        {
-//            char c = kgetchar(begin);
-//            PORTB = c;
-//        }
-//    }
+    {
+        foreach(l4) 
+        {
+            char c = kgetchar(l4);
+            PORTB = c;
+        }
+    }
     
     
     

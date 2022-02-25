@@ -41,6 +41,7 @@ extern void* kprev(List_t* ls);
 extern void* kmalloc(int bytes);
 void kfree(void* ptr);
 char kpop(List_t* ls);
+char alloc_getData(List_t* ls, int index);
 #ifdef	__cplusplus
 }
 #endif
