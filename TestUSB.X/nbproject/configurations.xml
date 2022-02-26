@@ -13,6 +13,7 @@
       <itemPath>usbcdc_defs.h</itemPath>
       <itemPath>usbpic_defs.h</itemPath>
       <itemPath>kernel.h</itemPath>
+      <itemPath>prompt.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -26,10 +27,10 @@
       <itemPath>kernel.c</itemPath>
       <itemPath>logger.c</itemPath>
       <itemPath>main.c</itemPath>
-      <itemPath>messageTable.c</itemPath>
       <itemPath>pic-config.c</itemPath>
       <itemPath>printft.c</itemPath>
       <itemPath>usb.c</itemPath>
+      <itemPath>prompt.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -89,7 +90,7 @@
         <property key="call-prologues" value="false"/>
         <property key="default-bitfield-type" value="true"/>
         <property key="default-char-type" value="true"/>
-        <property key="define-macros" value=""/>
+        <property key="define-macros" value="__DEVTOOL__;__KERNEL__;__STREAM__"/>
         <property key="disable-optimizations" value="true"/>
         <property key="extra-include-directories" value=""/>
         <property key="favor-optimization-for" value="-speed,+space"/>
@@ -177,7 +178,7 @@
         <property key="oscillator.rcfrequency" value="250"/>
         <property key="oscillator.rcfrequencyunit" value="Kilo"/>
         <property key="periphADC1.altscl" value="false"/>
-        <property key="periphADC1.minTacq" value=""/>
+        <property key="periphADC1.minTacq" value="5"/>
         <property key="periphADC1.tacqunits" value="microseconds"/>
         <property key="periphADC2.altscl" value="false"/>
         <property key="periphADC2.minTacq" value=""/>
@@ -649,7 +650,7 @@
         <property key="oscillator.rcfrequency" value="250"/>
         <property key="oscillator.rcfrequencyunit" value="Kilo"/>
         <property key="periphADC1.altscl" value="false"/>
-        <property key="periphADC1.minTacq" value=""/>
+        <property key="periphADC1.minTacq" value="5"/>
         <property key="periphADC1.tacqunits" value="microseconds"/>
         <property key="periphADC2.altscl" value="false"/>
         <property key="periphADC2.minTacq" value=""/>

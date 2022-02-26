@@ -45,6 +45,9 @@ extern char kpop(void* ls);
 extern char alloc_getData(void* ls, int index);
 extern void kclearAll(void* ls);
 extern void krewind(void* ls);
+extern void kaddRange(void* ls, const char* src, int offset, int length);
+extern void ktoArray(void* ls, char** dest);
+
 
 #ifdef	__cplusplus
 }

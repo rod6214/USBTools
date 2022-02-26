@@ -214,6 +214,26 @@ static void _incrementPointer(int bytes)
     stack_pointer += bytes;
 }
 
+void kaddRange(void* ls, const char* src, int offset, int length) 
+{
+    for(int i = offset; i < length; i++) 
+    {
+        kpush(ls, src[i]);
+    }
+}
+
+void ktoArray(void* ls, char** dest) 
+{
+    {  
+        int j = 0;
+        foreach(ls) 
+        {
+            char c = kgetchar(ls);
+            (*dest)[j] = c;
+        }
+    }
+}
+
 void* kmalloc(int bytes)
 {
     int availMem = kavail_mem();

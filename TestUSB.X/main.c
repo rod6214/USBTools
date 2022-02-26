@@ -5,10 +5,11 @@
 #include "usb.h"
 #include "usb_defs.h"
 #include <xc.h>
-#include "logger.h"
+//#include "logger.h"
+//#include "printft.h"
 //#include "kernel.h"
 
-
+#include "prompt.h"
 
 void __interrupt(high_priority) high_isr(void)
 {
@@ -64,8 +65,9 @@ void __interrupt(low_priority) low_isr(void)
 //    PORTB = (char)ptr;
 //}
 
-void main(void) {
-    
+void main(void) 
+{
+    commandLine("command -d 4545 -g 7895 -t pen -p 3900\0");
 	while (1) {}
 
 }
