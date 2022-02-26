@@ -17,6 +17,7 @@ extern void processCommands(char* arg, void* cmd, void* sub);
 extern void* getCommand();
 extern void* getSubcommands();
 extern char* getSubCommandValue(char command);
+extern char getSubCommandKey(int index);
 
 #ifdef	__cplusplus
 }

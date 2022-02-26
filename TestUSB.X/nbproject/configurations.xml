@@ -90,7 +90,7 @@
         <property key="call-prologues" value="false"/>
         <property key="default-bitfield-type" value="true"/>
         <property key="default-char-type" value="true"/>
-        <property key="define-macros" value="__DEVTOOL__;__KERNEL__;__STREAM__"/>
+        <property key="define-macros" value="__DEVTOOL__;__KERNEL__;__STREAM__;__USB__"/>
         <property key="disable-optimizations" value="true"/>
         <property key="extra-include-directories" value=""/>
         <property key="favor-optimization-for" value="-speed,+space"/>

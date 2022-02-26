@@ -1,5 +1,5 @@
 #define LOGGER_ACTIVE
-#define __STREAM__
+//#define __STREAM__
 // #define _XTAL_FREQ 4000000
 //#include "pic18f2550.h"
 #include "usb.h"
@@ -13,41 +13,31 @@
 
 void __interrupt(high_priority) high_isr(void)
 {
-//	struct USBHandler* usbPtr;
-//	const char* data = "Hello world!!!";
-//    int idx = 0;
-//    int finish = 0;
-//    
-//	if(PIR2bits.USBIF)
-//	{
-//		usbPtr = usb_handler();
-//		PIR2bits.USBIF=0;
-//
-//		switch (usbPtr->Status)
-//		{
-//			case DATA_RECEIVED:
-//				{
-//					PORTB = usb_getchar();
-//                    
-//                    while(!finish) 
-//                    {
-//                        char c = data[idx];
-//                        if (idx < 14) {
-//							c = data[idx];
-//						}
-//						else {
-//							c = 0;
-//						}
-//                        finish = usb_putchar(c);
-//                        idx++;
-//                    }
-//				}
-//				break;
-//			
-//			default:
-//				break;
-//		}
-//	}
+	struct USBHandler* usbPtr;
+    
+	if(PIR2bits.USBIF)
+	{
+		usbPtr = usb_handler();
+		PIR2bits.USBIF=0;
+
+		switch (usbPtr->Status)
+		{
+			case DATA_RECEIVED:
+				{
+                    commandLine((char*)rx_buffer);
+                    char* command = getCommandKey();
+                    int cmd = strncmp(command, "version", 8);
+                    
+                    if (cmd == 0) 
+                    {}
+//                    getSubCommandValue('v');
+				}
+				break;
+			
+			default:
+				break;
+		}
+	}
 }
 
 void __interrupt(low_priority) low_isr(void)
@@ -55,19 +45,8 @@ void __interrupt(low_priority) low_isr(void)
 	// ;
 }
 
-// struct VALUES {
-//     int x;
-//     long y;
-// };
-
-//void test_ptr(void* ptr) 
-//{
-//    PORTB = (char)ptr;
-//}
-
 void main(void) 
 {
-    commandLine("command -d 4545 -g 7895 -t pen -p 3900\0");
 	while (1) {}
 
 }

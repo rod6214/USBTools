@@ -47,6 +47,37 @@ void* getSubcommands()
     return subCommands;
 }
 
+char* getCommandKey() 
+{
+    ktoArray(command, &result);
+    return result;
+}
+
+char getSubCommandKey(int index) 
+{
+    {
+        int j = 0;
+        int closeTokens = 0;
+        foreach(subCommands)
+        {
+            char c = kgetchar(subCommands);
+            
+            if ((c == '-' && closeTokens == 0)) 
+            {
+                closeTokens++;
+            }
+            else if (closeTokens == 1 && j == index) 
+            {
+                return c;
+            }
+            
+            j++;
+        }
+    }
+    
+    return (char)-1;
+}
+
 char* getSubCommandValue(char command) 
 {
     {
@@ -56,7 +87,7 @@ char* getSubCommandValue(char command)
         {
             char c = kgetchar(subCommands);
             
-            if (c == '-' && closeTokens == 0 || closeTokens == 1 && c == command) 
+            if ((c == '-' && closeTokens == 0) || (closeTokens == 1 && c == command)) 
             {
                 closeTokens++;
             }
@@ -72,7 +103,7 @@ char* getSubCommandValue(char command)
             j++;
         }
     }
-    return (char)-1;
+    return NULL;
 }
 
 void processCommands(char* arg, void* command, void* subCommands) 
