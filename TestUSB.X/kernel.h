@@ -29,7 +29,6 @@ typedef struct List
 #define kinc(x) (x = knext((List_t*)x))
 #define foreach(y) int count = kcount(y); \
 for(int i = 0; y != NULL && i < count; kinc(y), i++)
-#define kbreak(y) krewind(y); break
 
 extern int kavail_mem();
 extern void* CreateList(int bytes);

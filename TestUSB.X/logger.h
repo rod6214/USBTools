@@ -19,6 +19,7 @@ extern void* CreateLogger(int bytes);
 extern int log_putchar(char c);
 extern char log_getchar();
 extern void log_rewind();
+extern void log_free();
 
 #ifdef	__cplusplus
 }

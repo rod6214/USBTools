@@ -14,16 +14,26 @@ extern "C" {
 
 #include <stdlib.h>
     
-    typedef void* STREAM;
-    typedef void* HANDLE;
-    typedef unsigned char TYPE;
 #define USB_STREAM (char)0x45
 #define LOG_STREAM (char)0x123
+#define MEMORY_STREAM (char)0x28
 
-    extern void WriteStream(STREAM stream, size_t offset, size_t bytes);
-    extern void ReadStream(STREAM stream, size_t offset, size_t bytes);
-    extern void CopyTo(STREAM streamSrc, STREAM streamDest, size_t readOffset, size_t writeOffset);
-    extern int ProgramMemToStream(const char* src, TYPE type, size_t offset, int bytes);
+typedef void* STREAM;
+typedef void* HANDLE;
+typedef unsigned char TYPE;
+    
+typedef struct _Stream 
+{
+    HANDLE ptr;
+    unsigned int index;
+    TYPE type;
+    unsigned char sector;
+} Stream_t;
+
+extern int WriteStream(STREAM stream, char* __restrict ptr, size_t offset, size_t bytes);
+extern int ReadStream(STREAM stream, char* __restrict ptr, size_t offset);
+extern void CloseMemoryStream();
+extern void ResetStreamMemory();
 
 #ifdef	__cplusplus
 }

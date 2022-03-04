@@ -17,19 +17,6 @@
 #define SET_MEMORY 0x12
 #define GET_MEMORY 0x13
 
-typedef struct _PrinterStream 
-{
-    HANDLE writeHandle;
-    HANDLE readHandle;
-    unsigned int index;
-    size_t readBufferSize;
-    size_t writeBufferSize;
-    int bytesRead;
-    int bytesWrite;
-    TYPE type;
-    unsigned char sector;
-} _PrinterStream_t;
-
 typedef struct _Allocation 
 {
   void* next;
@@ -41,55 +28,51 @@ typedef struct _Allocation
   int index;
 } Allocation_t;
 
-Allocation_t* logList = NULL;
-_PrinterStream_t* stream;
+volatile Stream_t stream;
 
 void* CreateLogger(int bytes)
 {
-    if (stream == NULL) 
+    if (stream.ptr == NULL) 
     {
-        stream = kmalloc(sizeof(_PrinterStream_t));
-        logList = CreateList(bytes);
-        stream->readBufferSize = (size_t)bytes;
-        stream->writeBufferSize = (size_t)bytes;
+        stream.ptr = CreateList(bytes);
+        stream.index = 0;
+        stream.type = LOG_STREAM;
     }
 
-    return logList;
+    return (void*)&stream;
 }
 
 void log_rewind() 
 {
-    krewind(&logList);
+    krewind(stream.ptr);
 }
 
 void* log_getStream() 
 {
-    stream->writeHandle = logList->ptr;
-    stream->readHandle = logList->ptr;
-    stream->index = 0;
-    stream->type = LOG_STREAM;
-    return stream;
+    stream.index = 0;
+    stream.type = LOG_STREAM;
+    return (void*)&stream;
 }
 
 int log_putchar(char c) 
 {
-    char result = kpush(&logList, c);
+    char result = kpush(stream.ptr, c);
     return result;
 }
 
 char log_getchar() 
 {
-    char c = kgetchar(logList);
-    logList = knext(logList);
+    char c = kgetchar(stream.ptr);
+    knext(stream.ptr);
     return c;
 }
 
 void log_free() 
 {
-    kfree(stream);
-    kfree(logList);
-    logList = NULL;
-    stream = NULL;
+//    kfree(stream);
+    kfree(stream.ptr);
+    stream.ptr = NULL;
+//    stream = NULL;
 }
 
 #endif

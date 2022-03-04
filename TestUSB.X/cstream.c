@@ -1,43 +1,15 @@
 #include <stdlib.h>
 #include "cstream.h"
+#include "kernel.h"
 #include "usb.h"
 #include "logger.h"
 
 #if __STREAM__
 
-typedef struct _Stream 
-{
-    HANDLE writeHandle;
-    HANDLE readHandle;
-    unsigned int index;
-    size_t readBufferSize;
-    size_t writeBufferSize;
-    int bytesRead;
-    int bytesWrite;
-    TYPE type;
-    unsigned char sector;
-} _Stream_t;
-
 static void _copymem(HANDLE src, HANDLE dest, size_t offset, size_t bytes);
 static int _putchar(char c, TYPE type);
 static char _getchar(TYPE type);
 static int _bytesReadOrWrite(int i, size_t offset);
-
-
-int ProgramMemToStream(const char* src, TYPE type, size_t offset, int bytes) 
-{
-    char data;
-    size_t i = 0;
-
-    for (i = offset; i < bytes; i++) 
-    {
-        data = src[i];
-        _putchar(data, type);
-    }
-
-    int total = _bytesReadOrWrite((int)i, offset);
-    return total;
-}
 
 static int _bytesReadOrWrite(int i, size_t offset) 
 {
@@ -47,44 +19,50 @@ static int _bytesReadOrWrite(int i, size_t offset)
     return result;
 }
 
-void WriteStream(STREAM stream, size_t offset, size_t bytes) 
+void ResetStreamMemory() 
 {
-    _Stream_t* strm = (_Stream_t*)stream;
+    log_rewind();
+}
+
+void CloseMemoryStream() 
+{
+    log_free();
+}
+
+int WriteStream(STREAM stream, char* __restrict ptr, size_t offset, size_t bytes) 
+{
+    Stream_t* strm = (Stream_t*)stream;
     TYPE type = strm->type;
-    unsigned char* elements = (unsigned char*)strm->writeHandle;
     char data;
     int i = 0;
 
     for(i = (int)offset; i < bytes; i++) 
     {
-        data = elements[i];
+        data = ptr[i];
         _putchar(data, type);
     }
 
-    strm->bytesWrite = _bytesReadOrWrite(i, offset);
-    // int sigOff = (int)offset;
-    // int len = (int)(i + 1 - sigOff);
-    // strm->bytesWrite = abs(len);
+    int _bytes = _bytesReadOrWrite(i, offset);
+    return _bytes;
 }
 
-void ReadStream(STREAM stream, size_t offset, size_t bytes) 
+int ReadStream(STREAM stream, char* __restrict ptr, size_t offset) 
 {
-    _Stream_t* strm = (_Stream_t*)stream;
+    Stream_t* strm = (Stream_t*)stream;
     TYPE type = strm->type;
-    unsigned char* elements = (unsigned char*)strm->readHandle;
-    char data = '-';
+    char data = '\0';
     int i = 0;
     
-    while (!data)
+    do 
     {
         data = _getchar(type);
-        (elements)[i++] = data;
-    }
+        (ptr)[(int)offset + i] = data;
+        i++;
+    } 
+    while(!data);
     
-    strm->bytesRead = _bytesReadOrWrite(i, offset);
-    // int sigOff = (int)offset;
-    // int len = (int)(i + 1 - sigOff);
-    // strm->bytesRead = abs(len);
+    int _bytes = _bytesReadOrWrite(i, offset);
+    return _bytes;
 }
 
 static int _putchar(char c, TYPE type) 
@@ -137,15 +115,4 @@ static void _copymem(HANDLE src, HANDLE dest, size_t offset, size_t bytes)
     }
 }
 
-void CopyTo(STREAM streamSrc, STREAM streamDest, size_t readOffset, size_t writeOffset) 
-{
-    if (streamSrc != NULL && streamDest != NULL) 
-    { 
-        _Stream_t* strmSrc = (_Stream_t*)streamSrc;
-        _Stream_t* strmDest = (_Stream_t*)streamDest;
-        
-        _copymem(strmSrc->readHandle, strmDest->readHandle, readOffset, strmSrc->readBufferSize);
-        _copymem(strmSrc->writeHandle, strmDest->writeHandle, writeOffset, strmSrc->writeBufferSize);
-    }
-}
 #endif

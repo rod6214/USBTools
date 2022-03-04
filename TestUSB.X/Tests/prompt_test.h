@@ -14,7 +14,7 @@ extern "C" {
     
 #include "../prompt.h"
 
-int executeTests();
+int Prompt_ExecuteTests();
 
 
 #ifdef	__cplusplus

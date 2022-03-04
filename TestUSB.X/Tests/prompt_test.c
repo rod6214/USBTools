@@ -76,7 +76,7 @@ int Prompt_CanGetValuesFromSubCommands()
     return assert1 && assert2 && assert3 && assert4;
 }
 
-int executeTests() 
+int Prompt_ExecuteTests() 
 {
     int fails = 0;
 

@@ -16,6 +16,7 @@
       <itemPath>prompt.h</itemPath>
       <itemPath>Tests/prompt_test.h</itemPath>
       <itemPath>constants.h</itemPath>
+      <itemPath>Tests/logger_test.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -35,6 +36,7 @@
       <itemPath>prompt.c</itemPath>
       <itemPath>Tests/prompt_test.c</itemPath>
       <itemPath>constants.c</itemPath>
+      <itemPath>Tests/logger_test.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
