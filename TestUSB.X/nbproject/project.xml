@@ -3,7 +3,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>TestUSB</name>
+            <name>USBTool</name>
             <creation-uuid>48779fb2-e852-473c-b47d-22409dc5d423</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>

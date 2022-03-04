@@ -6,14 +6,7 @@
 #include "kernel.h"
 
 #if __DEVTOOL__
-const char* message_list[] = 
-{
-    "DevTool for PIC18, your free communication program\n",
-    "version 0.0.0.1\n",
-    "You can start by typing a command:\n",
-    "Listening...\n",
-    "Are you sure to quick?",
-};
+
 
 enum _States {
     COMMAND,
@@ -28,13 +21,19 @@ void showVersion() {}
 
 void commandLine(char *arg) 
 {
-    command = CreateList(8);
-    subCommands = CreateList(64);
+    if (command == NULL || subCommands == NULL) 
+    {
+        command = CreateList(8);
+        subCommands = CreateList(64);
+    }
+    
     processCommands(arg, command, subCommands);
-//    
-//    char* result = getSubCommandValue('d');
-//    
-//    PORTB = result[0];
+}
+
+void closeCommand() 
+{
+    kfree(command);
+    kfree(subCommands);
 }
 
 void* getCommand() 
@@ -49,7 +48,7 @@ void* getSubcommands()
 
 char* getCommandKey() 
 {
-    ktoArray(command, &result);
+    ktoArray(command, result);
     return result;
 }
 
@@ -78,11 +77,26 @@ char getSubCommandKey(int index)
     return (char)-1;
 }
 
+int subCommandExists(char c) 
+{
+    char r;
+    int index = 0;
+
+    while(r != (char)-1) 
+    {
+        r = getSubCommandKey(index);
+        index++;
+    }
+
+    return r != (char)-1;
+}
+
 char* getSubCommandValue(char command) 
 {
     {
         int j = 0;
         int closeTokens = 0;
+        memset(result, 0, 16);
         foreach(subCommands)
         {
             char c = kgetchar(subCommands);
@@ -98,9 +112,8 @@ char* getSubCommandValue(char command)
             else if (closeTokens == 2) 
             {
                 result[j] = c;
+                j++;
             }
-            
-            j++;
         }
     }
     return NULL;
@@ -110,7 +123,7 @@ void processCommands(char* arg, void* command, void* subCommands)
 {
     char temp[16];
     int index = 0;
-    int state;
+    int state = COMMAND;
     
     while((*arg) != '\0')
     {
@@ -129,20 +142,31 @@ void processCommands(char* arg, void* command, void* subCommands)
         }
         else if (value != ' ' && state == SUBCOMMAND) 
         {
-            int j = 0;
+            // int j = 0;
             int finish = FALSE;
             int closeTokens = 0;
+            int initToken = 0;
             
             while(!finish) 
             {
+                if (value == '-')
+                {
+                    initToken++;
+                    arg--;
+                }
+                
+                if (initToken) 
+                {
+                    finish = TRUE;
+                    kpush(subCommands, '\0');
+                    continue;
+                }
+                
                 if (value != ' ') 
                 {
                     kpush(subCommands, value);
                 }
-                
-                value = *(arg++);
-                
-                if (value == ' ') 
+                else
                 {
                     closeTokens++;
                 }
@@ -153,7 +177,8 @@ void processCommands(char* arg, void* command, void* subCommands)
                     kpush(subCommands, '\0');
                 }
                 
-                j++;
+                value = *(arg++);
+                // j++;
             }
         }
         index++;

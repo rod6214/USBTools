@@ -21,6 +21,31 @@ typedef struct _Stream
 static void _copymem(HANDLE src, HANDLE dest, size_t offset, size_t bytes);
 static int _putchar(char c, TYPE type);
 static char _getchar(TYPE type);
+static int _bytesReadOrWrite(int i, size_t offset);
+
+
+int ProgramMemToStream(const char* src, TYPE type, size_t offset, int bytes) 
+{
+    char data;
+    int i = 0;
+
+    for (i = offset; i < bytes; i++) 
+    {
+        data = src[i];
+        _putchar(data, type);
+    }
+
+    int total = _bytesReadOrWrite(i, offset);
+    return total;
+}
+
+static int _bytesReadOrWrite(int i, size_t offset) 
+{
+    int sigOff = (int)offset;
+    int len = (int)(i + 1 - sigOff);
+    int result = abs(len);
+    return result;
+}
 
 void WriteStream(STREAM stream, size_t offset, size_t bytes) 
 {
@@ -35,9 +60,11 @@ void WriteStream(STREAM stream, size_t offset, size_t bytes)
         data = elements[i];
         _putchar(data, type);
     }
-    int sigOff = (int)offset;
-    int len = (int)(i + 1 - sigOff);
-    strm->bytesWrite = abs(len);
+
+    strm->bytesWrite = _bytesReadOrWrite(i, offset);
+    // int sigOff = (int)offset;
+    // int len = (int)(i + 1 - sigOff);
+    // strm->bytesWrite = abs(len);
 }
 
 void ReadStream(STREAM stream, size_t offset, size_t bytes) 
@@ -54,9 +81,10 @@ void ReadStream(STREAM stream, size_t offset, size_t bytes)
         (elements)[i++] = data;
     }
     
-    int sigOff = (int)offset;
-    int len = (int)(i + 1 - sigOff);
-    strm->bytesRead = abs(len);
+    strm->bytesRead = _bytesReadOrWrite(i, offset);
+    // int sigOff = (int)offset;
+    // int len = (int)(i + 1 - sigOff);
+    // strm->bytesRead = abs(len);
 }
 
 static int _putchar(char c, TYPE type) 

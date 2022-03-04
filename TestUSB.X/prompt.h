@@ -18,6 +18,18 @@ extern void* getCommand();
 extern void* getSubcommands();
 extern char* getSubCommandValue(char command);
 extern char getSubCommandKey(int index);
+extern char* getCommandKey();
+extern int subCommandExists(char c);
+void closeCommand();
+
+const char* message_list[] = 
+{
+    "DevTool for PIC18, your free communication program\n",
+    "version 0.0.0.1\n",
+    "You can start by typing a command:\n",
+    "Listening...\n",
+    "Are you sure to quick?",
+};
 
 #ifdef	__cplusplus
 }

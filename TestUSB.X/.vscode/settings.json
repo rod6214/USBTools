@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "cstream.h": "c",
-        "kernel.h": "c"
+        "kernel.h": "c",
+        "prompt_test.h": "c",
+        "string.h": "c"
     }
 }

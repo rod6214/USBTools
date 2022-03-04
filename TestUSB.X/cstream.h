@@ -22,7 +22,8 @@ extern "C" {
 
     extern void WriteStream(STREAM stream, size_t offset, size_t bytes);
     extern void ReadStream(STREAM stream, size_t offset, size_t bytes);
-    extern void CopyTo(STREAM streamSrc, STREAM streamDest, size_t readOffset, size_t writeOffset) ;
+    extern void CopyTo(STREAM streamSrc, STREAM streamDest, size_t readOffset, size_t writeOffset);
+    extern int ProgramMemToStream(const char* src, TYPE type, size_t offset, int bytes);
 
 #ifdef	__cplusplus
 }

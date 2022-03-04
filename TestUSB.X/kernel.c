@@ -222,14 +222,15 @@ void kaddRange(void* ls, const char* src, int offset, int length)
     }
 }
 
-void ktoArray(void* ls, char** dest) 
+void ktoArray(void* ls, char* __restrict dest) 
 {
     {  
         int j = 0;
         foreach(ls) 
         {
             char c = kgetchar(ls);
-            (*dest)[j] = c;
+            (dest)[j] = c;
+            j++;
         }
     }
 }
