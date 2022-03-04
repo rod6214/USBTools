@@ -14,26 +14,27 @@ enum _States {
 } States;
 
 void* command = NULL;
-void* subCommands = NULL;
-char result[16];
+char result[RESULT_LENGTH];
 
 void showVersion() {}
 
-void commandLine(char *arg) 
+void commandLine(char *arg, int size) 
 {
-    if (command == NULL || subCommands == NULL) 
+    if (command == NULL) 
     {
-        command = CreateList(8);
-        subCommands = CreateList(64);
+        command = CreateList(size);
     }
-    
-    processCommands(arg, command, subCommands);
+    else 
+    {
+        kclearAll(command);
+    }
+
+    processCommands(arg);
 }
 
 void closeCommand() 
 {
     kfree(command);
-    kfree(subCommands);
 }
 
 void* getCommand() 
@@ -41,147 +42,98 @@ void* getCommand()
     return command;
 }
 
-void* getSubcommands() 
-{
-    return subCommands;
-}
-
 char* getCommandKey() 
 {
-    ktoArray(command, result);
+    int j = 0;
+    memset(result, 0, RESULT_LENGTH);
+    {
+        foreach(command) 
+        {
+            char c = kgetchar(command);
+            if (c == ' ') 
+            {
+                break;
+            }
+            result[j] = c;
+            j++;
+        }
+        krewind(command);
+    }
     return result;
 }
 
-char getSubCommandKey(int index) 
+int subCommandExists(char cmd) 
 {
+    int step = 0;
     {
-        int j = 0;
-        int closeTokens = 0;
-        foreach(subCommands)
+        memset(result, 0, RESULT_LENGTH);
+        foreach(command) 
         {
-            char c = kgetchar(subCommands);
-            
-            if ((c == '-' && closeTokens == 0)) 
+            char c = kgetchar(command);
+
+            if (c == '-' && step == 0) 
             {
-                closeTokens++;
+                step++;
             }
-            else if (closeTokens == 1 && j == index) 
+            else if (step == 1 && c == cmd)
             {
-                return c;
+                step++;
+                break;
             }
-            
-            j++;
+            else {
+                step = 0;
+            }
         }
-    }
-    
-    return (char)-1;
-}
-
-int subCommandExists(char c) 
-{
-    char r;
-    int index = 0;
-
-    while(r != (char)-1) 
-    {
-        r = getSubCommandKey(index);
-        index++;
+        krewind(command);
     }
 
-    return r != (char)-1;
+    return step == 2;
 }
 
-char* getSubCommandValue(char command) 
+char* getSubCommandValue(char cmd) 
 {
     {
+        int step = 0;
         int j = 0;
-        int closeTokens = 0;
-        memset(result, 0, 16);
-        foreach(subCommands)
+        memset(result, 0, RESULT_LENGTH);
+        foreach(command) 
         {
-            char c = kgetchar(subCommands);
-            
-            if ((c == '-' && closeTokens == 0) || (closeTokens == 1 && c == command)) 
+            char c = kgetchar(command);
+
+            if ((c == '-') && step > 0) 
             {
-                closeTokens++;
+                break;
             }
-            else if (closeTokens == 2 && c == '\0') 
+            else if ((c == '-') || (step == 1 && c == cmd) || (step == 2 && c == ' ')) 
             {
-                return result;
+                step++;
             }
-            else if (closeTokens == 2) 
+            else if (step == 3) 
             {
+                if (c == ' ' || c == '\0') 
+                {
+                    break;
+                }
+
                 result[j] = c;
                 j++;
             }
-        }
-    }
-    return NULL;
-}
-
-void processCommands(char* arg, void* command, void* subCommands) 
-{
-    char temp[16];
-    int index = 0;
-    int state = COMMAND;
-    
-    while((*arg) != '\0')
-    {
-        char value = *(arg++);
-        temp[index] = value;
-        if (value == ' ' && state == COMMAND) 
-        {
-            temp[index] = '\0';
-            kaddRange(command, temp, 0, index + 1);
-            state = SUBCOMMAND;
-        }
-        
-        if (value == '-' && state == SUBCOMMAND) 
-        {
-            kpush(subCommands, value);
-        }
-        else if (value != ' ' && state == SUBCOMMAND) 
-        {
-            // int j = 0;
-            int finish = FALSE;
-            int closeTokens = 0;
-            int initToken = 0;
-            
-            while(!finish) 
-            {
-                if (value == '-')
-                {
-                    initToken++;
-                    arg--;
-                }
-                
-                if (initToken) 
-                {
-                    finish = TRUE;
-                    kpush(subCommands, '\0');
-                    continue;
-                }
-                
-                if (value != ' ') 
-                {
-                    kpush(subCommands, value);
-                }
-                else
-                {
-                    closeTokens++;
-                }
-                
-                finish = closeTokens == 2 || value == '\0';
-                if (finish) 
-                {
-                    kpush(subCommands, '\0');
-                }
-                
-                value = *(arg++);
-                // j++;
+            else {
+                step = 0;
             }
         }
-        index++;
+        krewind(command);
+    }
+    return result;
+}
+
+void processCommands(char* arg) 
+{
+    size_t len = strlen(arg);
+    
+    for(int i = 0; i < len; i++, arg++) 
+    {
+        kpush(command, (*arg));
     }
 }
 

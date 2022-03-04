@@ -4,7 +4,7 @@
  *
  * Created on February 25, 2022, 5:18 PM
  */
-
+#if __DEVTOOL__
 #ifndef PRONT_H
 #define	PRONT_H
 
@@ -12,27 +12,19 @@
 extern "C" {
 #endif
 
-extern void commandLine(char *arg);
-extern void processCommands(char* arg, void* cmd, void* sub);
+    
+#define RESULT_LENGTH 16
+extern void commandLine(char *arg, int size);
+extern void processCommands(char* arg);
 extern void* getCommand();
-extern void* getSubcommands();
 extern char* getSubCommandValue(char command);
-extern char getSubCommandKey(int index);
 extern char* getCommandKey();
 extern int subCommandExists(char c);
 void closeCommand();
-
-const char* message_list[] = 
-{
-    "DevTool for PIC18, your free communication program\n",
-    "version 0.0.0.1\n",
-    "You can start by typing a command:\n",
-    "Listening...\n",
-    "Are you sure to quick?",
-};
 
 #ifdef	__cplusplus
 }
 #endif
 
 #endif	/* PRONT_H */
+#endif

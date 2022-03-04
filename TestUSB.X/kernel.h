@@ -4,7 +4,7 @@
  *
  * Created on February 22, 2022, 4:29 PM
  */
-
+#if __KERNEL__
 #ifndef KERNEL_H
 #define	KERNEL_H
 
@@ -29,6 +29,7 @@ typedef struct List
 #define kinc(x) (x = knext((List_t*)x))
 #define foreach(y) int count = kcount(y); \
 for(int i = 0; y != NULL && i < count; kinc(y), i++)
+#define kbreak(y) krewind(y); break
 
 extern int kavail_mem();
 extern void* CreateList(int bytes);
@@ -54,4 +55,4 @@ extern void ktoArray(void* ls, char* dest);
 #endif
 
 #endif	/* KERNEL_H */
-
+#endif

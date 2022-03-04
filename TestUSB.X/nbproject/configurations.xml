@@ -15,6 +15,7 @@
       <itemPath>kernel.h</itemPath>
       <itemPath>prompt.h</itemPath>
       <itemPath>Tests/prompt_test.h</itemPath>
+      <itemPath>constants.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -33,6 +34,7 @@
       <itemPath>usb.c</itemPath>
       <itemPath>prompt.c</itemPath>
       <itemPath>Tests/prompt_test.c</itemPath>
+      <itemPath>constants.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -93,7 +95,7 @@
         <property key="default-bitfield-type" value="true"/>
         <property key="default-char-type" value="true"/>
         <property key="define-macros"
-                  value="__DEVTOOL__;__KERNEL__;__STREAM__;__USB__;__LOGGER__;__TEST__"/>
+                  value="__DEVTOOL__;__KERNEL__;__STREAM__;__USB__;__LOGGER__;__CONSTANTS__"/>
         <property key="disable-optimizations" value="true"/>
         <property key="extra-include-directories" value=""/>
         <property key="favor-optimization-for" value="-speed,+space"/>

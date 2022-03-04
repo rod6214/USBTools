@@ -1,4 +1,4 @@
-#if __TEST__
+#if __TEST_PROMPT__
 #include <stdlib.h>
 #include <string.h>
 #include "prompt_test.h"
@@ -15,7 +15,7 @@ int Prompt_CanManageCommands()
     char* command;
     memset(_rx_buffer, 0, 32);
     strncpy(_rx_buffer, stdCommand, 32);
-    commandLine((char*)_rx_buffer);
+    commandLine((char*)_rx_buffer, 32);
     command = getCommandKey();
     closeCommand();
     assert = strncmp(command, "dev", 8) == 0;
@@ -28,7 +28,7 @@ int Prompt_CanGetValueFromSubCommand()
     int assert;
     memset(_rx_buffer, 0, 32);
     strncpy(_rx_buffer, stdCommand, 32);
-    commandLine((char*)_rx_buffer);
+    commandLine((char*)_rx_buffer, 32);
     value = getSubCommandValue('d');
     closeCommand();
     assert = strncmp(value, "45", 64) == 0;
@@ -42,7 +42,7 @@ int Prompt_CanGetEmptyValueFromSubCommand()
     int assert;
     memset(_rx_buffer, 0, 32);
     strncpy(_rx_buffer, emptyCommand, 32);
-    commandLine((char*)_rx_buffer);
+    commandLine((char*)_rx_buffer, 32);
     value = getSubCommandValue('v');
     closeCommand();
     assert = strncmp(value, "", 64) == 0;
@@ -62,7 +62,7 @@ int Prompt_CanGetValuesFromSubCommands()
 
     memset(_rx_buffer, 0, 32);
     strncpy(_rx_buffer, fewCommands, 32);
-    commandLine((char*)_rx_buffer);
+    commandLine((char*)_rx_buffer, 32);
     value1 = getSubCommandValue('v');
     assert1 = strncmp(value1, "", 64) == 0;
     value2 = getSubCommandValue('g');
@@ -80,20 +80,20 @@ int executeTests()
 {
     int fails = 0;
 
-//    if (!Prompt_CanManageCommands()) 
-//    {
-//        fails++;
-//    }
-//    
-//    if (!Prompt_CanGetValueFromSubCommand()) 
-//    {
-//        fails++;
-//    }
-//
-//    if (!Prompt_CanGetEmptyValueFromSubCommand()) 
-//    {
-//        fails++;
-//    }
+    if (!Prompt_CanManageCommands()) 
+    {
+        fails++;
+    }
+    
+    if (!Prompt_CanGetValueFromSubCommand()) 
+    {
+        fails++;
+    }
+
+    if (!Prompt_CanGetEmptyValueFromSubCommand()) 
+    {
+        fails++;
+    }
 
     if (!Prompt_CanGetValuesFromSubCommands()) 
     {

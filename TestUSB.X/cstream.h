@@ -4,7 +4,7 @@
  *
  * Created on February 21, 2022, 8:57 PM
  */
-
+#if __STREAM__
 #ifndef CSTREAM_H
 #define	CSTREAM_H
 
@@ -30,4 +30,4 @@ extern "C" {
 #endif
 
 #endif	/* CSTREAM_H */
-
+#endif

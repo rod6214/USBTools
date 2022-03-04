@@ -4,7 +4,7 @@
  *
  * Created on March 3, 2022, 10:19 AM
  */
-
+#if __TEST_PROMPT__
 #ifndef PROMPT_TEST_H
 #define	PROMPT_TEST_H
 
@@ -23,3 +23,4 @@ int executeTests();
 
 #endif	/* PROMPT_TEST_H */
 
+#endif

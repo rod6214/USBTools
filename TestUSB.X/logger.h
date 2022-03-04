@@ -4,7 +4,7 @@
  *
  * Created on February 21, 2022, 8:37 PM
  */
-
+#if __LOGGER__
 #ifndef PRINTER_H
 #define	PRINTER_H
 
@@ -25,4 +25,4 @@ extern void log_rewind();
 #endif
 
 #endif	/* PRINTER_H */
-
+#endif

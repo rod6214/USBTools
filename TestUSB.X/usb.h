@@ -1,3 +1,4 @@
+#if __USB__
 #ifndef USB_H
 #define USB_H
 
@@ -21,6 +22,7 @@ extern unsigned char usb_device_state;
 #define SEND_BREAK                  0x23
 
 #define DATA_RECEIVED 0x35
+#define HID_RPT01_SIZE 29
 
 #include "usbpic_defs.h"
 
@@ -34,24 +36,12 @@ extern void usb_write(BYTE* data, unsigned int length);
 extern void rewind();
 extern void* usb_getStream();
 
-#define RAM_BUFFER_BASE 0x500
-#define SETUP_PACKET_REG RAM_BUFFER_BASE
-volatile setup_packet_struct setup_packet __at(SETUP_PACKET_REG);
-
-#define CONTROL_TRANSFER_REG (SETUP_PACKET_REG + ENDPOINT_0_SIZE + sizeof(setup_packet))
-#define TX_REG (CONTROL_TRANSFER_REG + ENDPOINT_0_SIZE)
-#define RX_REG (TX_REG + USB_BUFFER_LEN)
-#define INT_REG (RX_REG + USB_BUFFER_LEN)
-#define HID_RPT01_SIZE 29
-
-volatile unsigned char control_transfer_buffer[ENDPOINT_0_SIZE] __at(CONTROL_TRANSFER_REG);
-volatile unsigned char tx_buffer[USB_BUFFER_LEN] __at(TX_REG);
-volatile unsigned char rx_buffer[USB_BUFFER_LEN] __at(RX_REG);
-volatile unsigned char  cdcint_buffer[USB_BUFFER_LEN] __at(INT_REG);
-
 struct USBHandler {
     int Status;
     unsigned int Length;
+    void* pTxBuffer;
+    void* pRxBuffer;
 };
 
+#endif
 #endif

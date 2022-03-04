@@ -27,7 +27,7 @@ static int _bytesReadOrWrite(int i, size_t offset);
 int ProgramMemToStream(const char* src, TYPE type, size_t offset, int bytes) 
 {
     char data;
-    int i = 0;
+    size_t i = 0;
 
     for (i = offset; i < bytes; i++) 
     {
@@ -35,7 +35,7 @@ int ProgramMemToStream(const char* src, TYPE type, size_t offset, int bytes)
         _putchar(data, type);
     }
 
-    int total = _bytesReadOrWrite(i, offset);
+    int total = _bytesReadOrWrite((int)i, offset);
     return total;
 }
 

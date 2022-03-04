@@ -1,4 +1,5 @@
 
+#if __USB__
 // #define _XTAL_FREQ 4000000
 #include <xc.h>
 #include <string.h>
@@ -8,7 +9,17 @@
 #include "usb_defs.h"
 #include "cstream.h"
 
-#if __USB__
+#define RAM_BUFFER_BASE 0x500
+#define SETUP_PACKET_REG RAM_BUFFER_BASE
+volatile setup_packet_struct setup_packet __at(SETUP_PACKET_REG);
+
+#define CONTROL_TRANSFER_REG (SETUP_PACKET_REG + ENDPOINT_0_SIZE + sizeof(setup_packet))
+#define TX_REG (CONTROL_TRANSFER_REG + ENDPOINT_0_SIZE)
+#define RX_REG (TX_REG + USB_BUFFER_LEN)
+
+volatile unsigned char control_transfer_buffer[ENDPOINT_0_SIZE] __at(CONTROL_TRANSFER_REG);
+volatile unsigned char tx_buffer[USB_BUFFER_LEN] __at(TX_REG);
+volatile unsigned char rx_buffer[USB_BUFFER_LEN] __at(RX_REG);
 
 typedef struct _PrinterStream 
 {
@@ -538,6 +549,8 @@ void usb_init() {
 // Main entry point for USB tasks.  Checks interrupts, then checks for transactions.
 void* usb_handler(void) {
 	UPtr.Length = 0;
+    UPtr.pRxBuffer = (void*)rx_buffer;
+    UPtr.pTxBuffer = (void*)tx_buffer;
 	if ((UCFGbits.UTEYE == 1) || //eye test
         (usb_device_state == DETACHED) || //not connected
         (UCONbits.SUSPND == 1))//suspended
