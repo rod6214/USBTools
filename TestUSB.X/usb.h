@@ -22,9 +22,11 @@ extern unsigned char usb_device_state;
 #define SEND_BREAK                  0x23
 
 #define DATA_RECEIVED 0x35
+#define DATA_PROCESSING 0x74
 #define HID_RPT01_SIZE 29
 
 #include "usbpic_defs.h"
+#include "kernel.h"
 
 // initialize usbcdc module
 extern void usb_init(void);
@@ -33,14 +35,18 @@ extern void* usb_handler(void);
 extern int usb_putchar(char c);
 extern char usb_getchar();
 extern void usb_write(BYTE* data, unsigned int length);
-extern void rewind();
+extern void usb_rewind();
 extern void* usb_getStream();
+extern void usb_SetUsbAsHighPriority();
+
+#define usb_wait_read(x) while(x->read)
 
 struct USBHandler {
     int Status;
     unsigned int Length;
     void* pTxBuffer;
     void* pRxBuffer;
+    int read;
 };
 
 #endif

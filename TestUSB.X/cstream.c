@@ -59,7 +59,7 @@ int ReadStream(STREAM stream, char* __restrict ptr, size_t offset)
         (ptr)[(int)offset + i] = data;
         i++;
     } 
-    while(!data);
+    while(data != '\0');
     
     int _bytes = _bytesReadOrWrite(i, offset);
     return _bytes;

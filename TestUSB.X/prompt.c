@@ -50,8 +50,14 @@ char* getCommandKey()
         foreach(command) 
         {
             char c = kgetchar(command);
+//            if (c == 'd' && j == 0) 
+//            {
+//                PORTB++;
+//            }
             if (c == ' ') 
             {
+                result[j] = '\0';
+//                PORTB++;
                 break;
             }
             result[j] = c;
@@ -130,7 +136,7 @@ char* getSubCommandValue(char cmd)
 void processCommands(char* arg) 
 {
     size_t len = strlen(arg);
-    
+//    PORTB = (char)len;
     for(int i = 0; i < len; i++, arg++) 
     {
         kpush(command, (*arg));

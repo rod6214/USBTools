@@ -10,8 +10,40 @@
         
         static void Main(string[] args)
         {
-            writeExample();
-            readExample();
+            bool finish = false;
+
+            while(!finish) 
+            {
+                Console.Write("DevTool\\>");
+                var value = System.Console.ReadLine();
+                writeCommand(value);
+            }
+            //writeExample();
+            //readExample();
+        }
+
+        static void writeCommand(string command) 
+        {
+            IntPtr writeHandler = IntPtr.Zero;
+            IntPtr readHandler = IntPtr.Zero;
+
+            if (USB.Find_This_Device(0x048d, 0x003f, 0, ref readHandler, ref writeHandler))
+            {
+                byte[] data = new byte[66];
+                byte[] cmd = Encoding.ASCII.GetBytes(command);
+                
+                for(int i = 0; i < cmd.Length; i++) 
+                {
+                    data[i + 1] = cmd[i];
+                }
+
+                int written = 0;
+
+                if (USB.WriteFile(writeHandler, data, 65, ref written, 0))
+                {
+                    Console.WriteLine("Data written");
+                }
+            }
         }
 
         static void readExample()

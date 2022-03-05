@@ -21,19 +21,6 @@ volatile unsigned char control_transfer_buffer[ENDPOINT_0_SIZE] __at(CONTROL_TRA
 volatile unsigned char tx_buffer[USB_BUFFER_LEN] __at(TX_REG);
 volatile unsigned char rx_buffer[USB_BUFFER_LEN] __at(RX_REG);
 
-typedef struct _PrinterStream 
-{
-    HANDLE writeHandle;
-    HANDLE readHandle;
-    unsigned int index;
-    size_t readBufferSize;
-    size_t writeBufferSize;
-    int bytesRead;
-    int bytesWrite;
-    TYPE type;
-    unsigned char sector;
-} PrinterStream_t;
-
 struct USBHandler UPtr;
 
 typedef const unsigned char* codePtr;
@@ -64,24 +51,24 @@ static unsigned int dlen; // Number of unsigned chars of data
 #include "descriptor.h"
 
 // Bytes transmited
-static unsigned char tx_len = 0;
+static int tx_len = 0;
 // Rx pointer
-static unsigned char rx_idx = 0;
+static int rx_idx = 0;
 // Stream pointer
-static PrinterStream_t stream;
+static Stream_t stream;
 
 static size_t _usb_read();
 static void _usb_flush();
-static void _usb_write(unsigned char len);
+static void _usb_write(int len);
 static unsigned char _usb_wr_busy();
 static unsigned char _usb_rd_ready();
 
 void* usb_getStream() 
 {
-	stream.writeHandle = (HANDLE)tx_buffer;
-	stream.readHandle = (HANDLE)rx_buffer;
-	stream.readBufferSize = USB_BUFFER_LEN;
-	stream.writeBufferSize = USB_BUFFER_LEN;
+//	stream.writeHandle = (HANDLE)tx_buffer;
+//	stream.readHandle = (HANDLE)rx_buffer;
+//	stream.readBufferSize = USB_BUFFER_LEN;
+//	stream.writeBufferSize = USB_BUFFER_LEN;
 	stream.type = USB_STREAM;
 	stream.index = 0;
 	return &stream;
@@ -116,13 +103,18 @@ int usb_putchar(char c)
 char usb_getchar()
 {
 	char c = 0;
-	if (rx_idx < USB_BUFFER_LEN) {
+    size_t len = strlen((char*)rx_buffer);
+	if (rx_idx < len) {
 		c = rx_buffer[rx_idx++];
+	}
+	else 
+	{
+		UPtr.Length = _usb_read();
 	}
 	return c;
 }
 
-void rewind() {
+void usb_rewind() {
 	rx_idx = 0;
 }
 
@@ -148,7 +140,7 @@ static size_t _usb_read() {
 		ep1_o.STAT = UOWN | DTSEN;
 	else
 		ep1_o.STAT = UOWN | DTS | DTSEN;
-    
+    UPtr.read = FALSE;
     return dataReceived;
 }
 
@@ -160,10 +152,10 @@ static size_t _usb_read() {
 //	return (unsigned char)((ep1_o.STAT & UOWN) == 0);
 //}
 
-static void _usb_write(unsigned char len)
+static void _usb_write(int len)
 {
 	if (len> 0) {
-		ep1_i.CNT = len;
+		ep1_i.CNT = (char)len;
 		if (ep1_i.STAT & DTS)
 			ep1_i.STAT = UOWN | DTSEN;
 		else
@@ -340,11 +332,12 @@ static unsigned char get_endpoint_processed()
 
 void process_control_transfer(void) 
 {
+    UPtr.read = TRUE;
 	unsigned char _ep = get_endpoint_processed();
 	if (usb_device_state == CONFIGURED && _ep == 1) 
 	{
 		UPtr.Status = DATA_RECEIVED;
-		UPtr.Length = _usb_read();  
+		// UPtr.Length = _usb_read();
 	}
 
 	if (USTAT == USTAT_OUT) {
@@ -375,6 +368,7 @@ void process_control_transfer(void)
 					// transaction uses address 0. 
 					request_handled = 1;
 					usb_device_state = ADDRESS;
+					UPtr.Status = ADDRESS;
 					device_address = setup_packet.wvalue0;
 				} else if (request == GET_DESCRIPTOR) {
 
@@ -389,9 +383,11 @@ void process_control_transfer(void)
 						// If configuration value is zero, device is put in
 						// address state (USB 2.0 - 9.4.7)
 						usb_device_state = ADDRESS;
+						UPtr.Status = ADDRESS;
 					} else {
 						// Set the configuration.
 						usb_device_state = CONFIGURED;
+						UPtr.Status = CONFIGURED;
 					}
 				} else if (request == GET_CONFIGURATION) { // Never seen in Windows
 				                   
@@ -496,6 +492,7 @@ void process_control_transfer(void)
 				// If we get a reset after a SET_ADDRESS, then we need
 				// to drop back to the Default state.
 				usb_device_state = DEFAULT;
+				UPtr.Status = DEFAULT;
 			}
 		}
         
@@ -524,6 +521,7 @@ void usb_init() {
 	UCFG = 0x14; // Enable pullup resistors; full speed mode
 //    UCFG = UPUEN; // Important: for HID must be low speed
 	usb_device_state = DETACHED;
+	UPtr.Status = DETACHED;
 	//	remote_wakeup = 0x00;
 	current_configuration = 0x00;            
     
@@ -534,6 +532,7 @@ void usb_init() {
         
 		UCONbits.USBEN = 1;
 		usb_device_state = ATTACHED;
+		UPtr.Status = ATTACHED;
 	}
     
 	{//Wait for bus reset
@@ -541,6 +540,7 @@ void usb_init() {
 		UIE = 0;
 		UIEbits.URSTIE = 1;
 		usb_device_state = POWERED;
+		UPtr.Status = POWERED;
 	}
     
 	PIE2bits.USBIE = 1;
@@ -581,7 +581,7 @@ void* usb_handler(void) {
             
 			current_configuration = 0; // Clear active configuration
 			usb_device_state = DEFAULT;
-            
+			UPtr.Status = DEFAULT;
 		}
 		UIRbits.URSTIF = 0;
 	}
@@ -606,7 +606,7 @@ void* usb_handler(void) {
     
 	// A transaction has finished.  Try default processing on endpoint 0.
 	if (UIRbits.TRNIF && UIEbits.TRNIE) {
-
+		UPtr.Status = DATA_PROCESSING;
 		process_control_transfer();
 		// Turn off interrupt
 		// UIRbits.TRNIF = 0;
@@ -616,6 +616,22 @@ void* usb_handler(void) {
 	}
 
 	return &UPtr;
+}
+
+void usb_SetUsbAsHighPriority() 
+{
+    // High interrupt disable
+    di();
+    // USB as priority level
+    IPR2bits.USBIP = 1;
+    // Interrupt priority enable
+    RCONbits.IPEN = 1;
+    // Low interrupt disable
+    INTCONbits.PEIE = 0;
+    // USB interrupt enable
+    PIE2bits.USBIE = 1;
+    // High interrupt enable
+    ei();
 }
 
 #endif

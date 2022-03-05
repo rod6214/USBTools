@@ -29,25 +29,27 @@ void __interrupt(high_priority) high_isr(void)
 		switch (usbPtr->Status)
 		{
 			case DATA_RECEIVED:
-				{
+				{                    
+                    memset(buffer, 0, 64);
 					Stream_t* pUsbStream = usb_getStream();
-					int bytes = ReadStream(pUsbStream, buffer, 0);
+					ReadStream(pUsbStream, buffer, 0);
+                    usb_rewind();
 
                    	commandLine(buffer, 64);
                    	char* command = getCommandKey();
                    	int isDev = strncmp(command, "dev", 8) == 0;
-                   
-					if (isDev) 
-					{
-						if (subCommandExists('v')) 
-						{
-							PORTB = 1;
-						}
-						else if (subCommandExists('d')) 
-						{
-							PORTB = 2;
-						}
-					}
+
+					 if (isDev) 
+					 {
+					 	 if (subCommandExists('v')) 
+					 	 {
+					 	 	PORTB = 1;
+					 	 }
+					 	 else if (subCommandExists('d')) 
+					 	 {
+					 	 	PORTB = 2;
+					 	 }
+					 }
 				}
 				break;
 			
@@ -64,6 +66,10 @@ void __interrupt(low_priority) low_isr(void)
 
 void main(void) 
 {
+    TRISB = 0;
+    PORTB = 0;
+    usb_SetUsbAsHighPriority();
+    usb_init();
     #if __TEST_PROMPT__
     TRISB = 0;
     int prompt_fails = Prompt_ExecuteTests();
