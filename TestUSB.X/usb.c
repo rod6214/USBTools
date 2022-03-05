@@ -89,15 +89,20 @@ void configure_tx_rx_ep()
 	}
 }
 
+//int test = 0;
+
 int usb_putchar(char c)
 {
 	tx_buffer[tx_len++]=c;
-	if (tx_len>=sizeof(tx_buffer)) {
-		_usb_flush();
-        return 1;
-	}
     
-    return 0;
+    if (tx_len > stream.length - 1) 
+    {
+        tx_buffer[tx_len]= '\0';
+        _usb_flush();
+        return TRUE;
+    }
+    
+    return FALSE;
 }
 
 char usb_getchar()
@@ -116,6 +121,7 @@ char usb_getchar()
 
 void usb_rewind() {
 	rx_idx = 0;
+    tx_len = 0;
 }
 
 void usb_write(BYTE* data, size_t length) 
@@ -126,7 +132,7 @@ void usb_write(BYTE* data, size_t length)
 
 static void _usb_flush() 
 {
-	_usb_write(tx_len);
+	_usb_write(USB_BUFFER_LEN);
 	tx_len = 0;
 }
 
@@ -154,13 +160,18 @@ static size_t _usb_read() {
 
 static void _usb_write(int len)
 {
-	if (len> 0) {
+	if (len > 0) {
 		ep1_i.CNT = (char)len;
 		if (ep1_i.STAT & DTS)
 			ep1_i.STAT = UOWN | DTSEN;
 		else
 			ep1_i.STAT = UOWN | DTS | DTSEN;
 	}
+}
+
+int usb_ready() 
+{
+   return  ep1_i.STAT & UOWN != UOWN;
 }
 
 int configured_ep = 0;
@@ -332,6 +343,7 @@ static unsigned char get_endpoint_processed()
 
 void process_control_transfer(void) 
 {
+    PORTB++;
     UPtr.read = TRUE;
 	unsigned char _ep = get_endpoint_processed();
 	if (usb_device_state == CONFIGURED && _ep == 1) 

@@ -29,14 +29,24 @@ void CloseMemoryStream()
     log_free();
 }
 
-int WriteStream(STREAM stream, char* __restrict ptr, size_t offset, size_t bytes) 
+//int test = 0;
+
+int WriteStream(STREAM stream, char* ptr, size_t offset, size_t bytes) 
 {
     Stream_t* strm = (Stream_t*)stream;
     TYPE type = strm->type;
+    strm->length = bytes;
     char data;
     int i = 0;
-
-    for(i = (int)offset; i < bytes; i++) 
+    
+//    if (test == 3) 
+//    {
+//        PORTB = strm->length == 51;
+//    }
+//    
+//    test++;
+    
+    for(i = (int)offset; i < strm->length; i++) 
     {
         data = ptr[i];
         _putchar(data, type);

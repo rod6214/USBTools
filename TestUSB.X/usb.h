@@ -38,6 +38,7 @@ extern void usb_write(BYTE* data, unsigned int length);
 extern void usb_rewind();
 extern void* usb_getStream();
 extern void usb_SetUsbAsHighPriority();
+extern int usb_ready();
 
 #define usb_wait_read(x) while(x->read)
 

@@ -28,9 +28,10 @@ typedef struct _Stream
     unsigned int index;
     TYPE type;
     unsigned char sector;
+    size_t length;
 } Stream_t;
 
-extern int WriteStream(STREAM stream, char* __restrict ptr, size_t offset, size_t bytes);
+extern int WriteStream(STREAM stream, char* ptr, size_t offset, size_t bytes);
 extern int ReadStream(STREAM stream, char* __restrict ptr, size_t offset);
 extern void CloseMemoryStream();
 extern void ResetStreamMemory();

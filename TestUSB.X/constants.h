@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-
+extern const char* message_list[];
 
 
 #ifdef	__cplusplus
