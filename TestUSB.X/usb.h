@@ -4,6 +4,7 @@
 
 #include <xc.h>
 #include "pic18f2550.h"
+#include "cstream.h"
 
 extern unsigned char usb_device_state;
 
@@ -38,7 +39,8 @@ extern void usb_write(BYTE* data, unsigned int length);
 extern void usb_rewind();
 extern void* usb_getStream();
 extern void usb_SetUsbAsHighPriority();
-extern int usb_ready();
+//extern int usb_ready();
+extern void usb_reset_buffers();
 
 #define usb_wait_read(x) while(x->read)
 

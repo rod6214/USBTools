@@ -7,4 +7,9 @@ const char* message_list[] =
     "Listening...\n",
     "Are you sure to quick?",
 };
+
+const char* errors[] = 
+{
+  "Command doesn't exist."  
+};
 #endif

@@ -14,13 +14,36 @@
 
 #define MAIN_BUFFER_LENGTH 64
 /**
- * Note: You can activate the tests configuring the macro __TEST__ in the compiler
- * 
+ * NOTE: 
+ * You can activate the tests configuring the macro __TEST__ in the compiler
  */
 char buffer[MAIN_BUFFER_LENGTH];
+int index = 0;
+int pending = TRUE;
+
+int USB_SendData(STREAM pUsbStream, const char* data, int pkgIndex, int totalPackages, size_t bufferLength) 
+{
+	if (pkgIndex < totalPackages) 
+	{
+		memset(buffer, 0, bufferLength);
+		size_t len = strlen(data);
+		strncpy(buffer, data, len);
+		WriteStream(pUsbStream, buffer, 0, len);
+		pkgIndex++;
+	}
+	else 
+	{
+		memset(buffer, 0, bufferLength);
+		WriteStream(pUsbStream, buffer, 0, bufferLength);
+		pkgIndex = 0;
+	}
+
+	return pkgIndex;
+}
 
 void __interrupt(high_priority) high_isr(void)
 {
+    
 	struct USBHandler* usbPtr;
     
 	if(PIR2bits.USBIF)
@@ -31,38 +54,35 @@ void __interrupt(high_priority) high_isr(void)
 		switch (usbPtr->Status)
 		{
 			case DATA_RECEIVED:
-				{   
-                    
+				{
+					// Read usb memory and copy its content
                     memset(buffer, 0, MAIN_BUFFER_LENGTH);
 					Stream_t* pUsbStream = usb_getStream();
 					ReadStream(pUsbStream, buffer, 0);
                     usb_rewind();
 
+                    // Decode commands
                    	commandLine(buffer, MAIN_BUFFER_LENGTH);
                    	char* command = getCommandKey();
                    	int isDev = strncmp(command, "dev", 8) == 0;
-
-					 if (isDev) 
-					 {
-					 	 if (subCommandExists('v')) 
-					 	 {
-                             char* pValue = getSubCommandValue('v');
-                             
-                             if (pValue) 
-                             {
-                                int index = atoi(pValue);
-                                memset(buffer, 0, MAIN_BUFFER_LENGTH);
-                                size_t len = strlen(message_list[index]);
-                                strncpy(buffer, message_list[index], len);
-                                WriteStream(pUsbStream, buffer, 0, len);
-                             }          
-//					 	 	PORTB = 1;
-					 	 }
-					 	 else if (subCommandExists('d')) 
-					 	 {
-					 	 	PORTB = 2;
-					 	 }
-					 }
+                    int isFin = strncmp(command, "fin", 8) == 0;
+                    PORTB++;
+					if (isDev) 
+					{
+						if (subCommandExists('v')) 
+						{
+							/**
+							 * NOTE:
+							 * We must send one package in an interrupt one at a time because HID requires steps.
+							 * Don't disable interrupts or use FOR cicles individually.
+							 */
+							index = USB_SendData(pUsbStream, message_list[index], index, 5, MAIN_BUFFER_LENGTH);
+						}
+					}
+                    else if (isFin) 
+                    {
+						index = USB_SendData(pUsbStream, "Hello world", index, 1, MAIN_BUFFER_LENGTH);
+                    }
 				}
 				break;
 			

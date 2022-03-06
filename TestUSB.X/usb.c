@@ -3,6 +3,7 @@
 // #define _XTAL_FREQ 4000000
 #include <xc.h>
 #include <string.h>
+#include <stdlib.h>
 #include "pic18f2550.h"
 #include "usb.h"
 #include "usbpic_defs.h"
@@ -56,6 +57,8 @@ static int tx_len = 0;
 static int rx_idx = 0;
 // Stream pointer
 static Stream_t stream;
+// Flag to check when to send the completion package
+int _pending = TRUE;
 
 static size_t _usb_read();
 static void _usb_flush();
@@ -65,10 +68,6 @@ static unsigned char _usb_rd_ready();
 
 void* usb_getStream() 
 {
-//	stream.writeHandle = (HANDLE)tx_buffer;
-//	stream.readHandle = (HANDLE)rx_buffer;
-//	stream.readBufferSize = USB_BUFFER_LEN;
-//	stream.writeBufferSize = USB_BUFFER_LEN;
 	stream.type = USB_STREAM;
 	stream.index = 0;
 	return &stream;
@@ -97,6 +96,7 @@ int usb_putchar(char c)
     
     if (tx_len > stream.length - 1) 
     {
+        
         tx_buffer[tx_len]= '\0';
         _usb_flush();
         return TRUE;
@@ -117,6 +117,12 @@ char usb_getchar()
 		UPtr.Length = _usb_read();
 	}
 	return c;
+}
+
+void usb_reset_buffers() 
+{
+    memset((void*)rx_buffer, 0, USB_BUFFER_LEN);
+    memset((void*)tx_buffer, 0, USB_BUFFER_LEN);
 }
 
 void usb_rewind() {
@@ -161,6 +167,7 @@ static size_t _usb_read() {
 static void _usb_write(int len)
 {
 	if (len > 0) {
+        
 		ep1_i.CNT = (char)len;
 		if (ep1_i.STAT & DTS)
 			ep1_i.STAT = UOWN | DTSEN;
@@ -169,10 +176,10 @@ static void _usb_write(int len)
 	}
 }
 
-int usb_ready() 
-{
-   return  ep1_i.STAT & UOWN != UOWN;
-}
+//int usb_ready() 
+//{
+//   return  ep1_i.STAT & UOWN != UOWN;
+//}
 
 int configured_ep = 0;
 
@@ -343,7 +350,7 @@ static unsigned char get_endpoint_processed()
 
 void process_control_transfer(void) 
 {
-    PORTB++;
+//    PORTB++;
     UPtr.read = TRUE;
 	unsigned char _ep = get_endpoint_processed();
 	if (usb_device_state == CONFIGURED && _ep == 1) 
@@ -619,6 +626,7 @@ void* usb_handler(void) {
 	// A transaction has finished.  Try default processing on endpoint 0.
 	if (UIRbits.TRNIF && UIEbits.TRNIE) {
 		UPtr.Status = DATA_PROCESSING;
+        
 		process_control_transfer();
 		// Turn off interrupt
 		// UIRbits.TRNIF = 0;

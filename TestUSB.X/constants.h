@@ -13,6 +13,7 @@ extern "C" {
 #endif
 
 extern const char* message_list[];
+extern const char* errors[];
 
 
 #ifdef	__cplusplus
