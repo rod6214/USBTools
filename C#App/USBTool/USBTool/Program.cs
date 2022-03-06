@@ -10,76 +10,18 @@
     {
 
         
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            bool finish = false;
+            var client = new USBClient(0x048d, 0x003f);
 
-            IntPtr writeHandler = IntPtr.Zero;
-            IntPtr readHandler = IntPtr.Zero;
-            Thread.Sleep(5);
-
-            var task = Task.Run(() =>
+            while(true) 
             {
-
-                while (true)
-                {
-                    if (readHandler != IntPtr.Zero)
-                    {
-                        string re = readCommand(readHandler);
-
-                        if (string.IsNullOrEmpty(re))
-                        {
-                            writeCommand("", writeHandler);
-                        }
-                        else 
-                        {
-                            Console.WriteLine(re);
-                        }
-                    }
-                }
-
-            });
-
-
-            if (USB.Find_This_Device(0x048d, 0x003f, 0, ref readHandler, ref writeHandler))
-            {
-                while (!finish)
-                {
-                    Console.Write("DevTool\\>");
-                    var value = System.Console.ReadLine();
-                    writeCommand(value, writeHandler);
-                    
-                    
-                    //int i = 0;
-                    //while(i < 3) 
-                    //{
-                    //    readCommand(readHandler);
-                    //    i++;
-                    //}
-                    //writeCommand("", writeHandler);
-
-                    //readCommand(readHandler);
-                    //writeCommand("end", writeHandler);
-                    //writeCommand("", writeHandler);
-                    //readCommand(readHandler);
-                    //writeCommand("", writeHandler);
-
-                    //writeCommand("end", writeHandler);
-                    //writeCommand("", writeHandler);
-                    //writeCommand("", writeHandler);
-                    //writeCommand("", writeHandler);
-                    //writeCommand("", writeHandler);
-                }
+                Console.Write("DevTool\\>");
+                var commmand = System.Console.ReadLine();
+                var result = await client.GetAsync(commmand);
+                Console.WriteLine(result);
             }
-
-
-
-            task.Wait();
-            //writeExample();
-            //readExample();
         }
-
-
 
         static void writeCommand(string command, IntPtr writeHandler) 
         {
