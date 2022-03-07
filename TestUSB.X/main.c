@@ -20,7 +20,6 @@
 char buffer[MAIN_BUFFER_LENGTH];
 int index = 0;
 int pending = TRUE;
-int errorIndex = 0;
 
 int USB_SendData(STREAM pUsbStream, const char* data, int pkgIndex, int totalPackages, size_t bufferLength) 
 {
@@ -77,7 +76,7 @@ void __interrupt(high_priority) high_isr(void)
 						 * We must send one package in an interrupt one at a time because HID requires steps.
 						 * Don't disable interrupts or use FOR cicles individually.
 						 */
-						index = USB_SendData(pUsbStream, message_list[index], index, 5, MAIN_BUFFER_LENGTH);
+						index = USB_SendData(pUsbStream, message_list[index], index, 2, MAIN_BUFFER_LENGTH);
 					}
                     else if (isFin) 
                     {
@@ -86,7 +85,6 @@ void __interrupt(high_priority) high_isr(void)
                     else if (isEmptyToken) 
                     {
                         index = 0;
-                        errorIndex = 0;
                     }
                     else if (!isEnd)
                     {
@@ -98,7 +96,6 @@ void __interrupt(high_priority) high_isr(void)
                          */
                         index = USB_SendData(pUsbStream, "Command not found.", index, 1, MAIN_BUFFER_LENGTH);
                     }
-                    
 				}
 				break;
 			
