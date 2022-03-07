@@ -305,7 +305,6 @@ static void set_feature(void) {
 
 // Data stage for a Control Transfer that sends data to the host
 void in_data_stage(void) {
-    
 	unsigned char bufferSize;
 	// Determine how many unsigned chars are going to the host
 	if (dlen < ENDPOINT_0_SIZE)

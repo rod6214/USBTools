@@ -23,6 +23,7 @@ namespace USBTool
 
         public async Task<string> GetAsync(string command) 
         {
+            command = command.Equals("") ? "NULL" : command;
             writeCommand(command);
             var response = await GetResponse();
             return response;
@@ -42,7 +43,7 @@ namespace USBTool
 
                         if (string.IsNullOrEmpty(temp))
                         {
-                            writeCommand("");
+                            writeCommand("-");
                             exit = true;
                         }
                         else

@@ -20,6 +20,7 @@
 char buffer[MAIN_BUFFER_LENGTH];
 int index = 0;
 int pending = TRUE;
+int errorIndex = 0;
 
 int USB_SendData(STREAM pUsbStream, const char* data, int pkgIndex, int totalPackages, size_t bufferLength) 
 {
@@ -35,7 +36,7 @@ int USB_SendData(STREAM pUsbStream, const char* data, int pkgIndex, int totalPac
 	{
 		memset(buffer, 0, bufferLength);
 		WriteStream(pUsbStream, buffer, 0, bufferLength);
-		pkgIndex = 0;
+//		pkgIndex = 0;
 	}
 
 	return pkgIndex;
@@ -66,23 +67,38 @@ void __interrupt(high_priority) high_isr(void)
                    	char* command = getCommandKey();
                    	int isDev = strncmp(command, "dev", 8) == 0;
                     int isFin = strncmp(command, "fin", 8) == 0;
-                    PORTB++;
-					if (isDev) 
+                    int isEnd = strncmp(command, "-", 8) == 0;
+                    int isEmptyToken = strncmp(command, "", 8) == 0;
+                    
+					if (isDev && subCommandExists('v')) 
 					{
-						if (subCommandExists('v')) 
-						{
-							/**
-							 * NOTE:
-							 * We must send one package in an interrupt one at a time because HID requires steps.
-							 * Don't disable interrupts or use FOR cicles individually.
-							 */
-							index = USB_SendData(pUsbStream, message_list[index], index, 5, MAIN_BUFFER_LENGTH);
-						}
+						/**
+						 * NOTE:
+						 * We must send one package in an interrupt one at a time because HID requires steps.
+						 * Don't disable interrupts or use FOR cicles individually.
+						 */
+						index = USB_SendData(pUsbStream, message_list[index], index, 5, MAIN_BUFFER_LENGTH);
 					}
                     else if (isFin) 
                     {
 						index = USB_SendData(pUsbStream, "Hello world", index, 1, MAIN_BUFFER_LENGTH);
                     }
+                    else if (isEmptyToken) 
+                    {
+                        index = 0;
+                        errorIndex = 0;
+                    }
+                    else if (!isEnd)
+                    {
+                        PORTB++;
+                        /**
+                         * NOTE:
+                         * If the command is empty and index is 0,
+                         * we need to inform that the command is incorrect
+                         */
+                        index = USB_SendData(pUsbStream, "Command not found.", index, 1, MAIN_BUFFER_LENGTH);
+                    }
+                    
 				}
 				break;
 			
