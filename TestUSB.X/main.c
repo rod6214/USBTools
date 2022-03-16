@@ -11,6 +11,7 @@
 #include "constants.h"
 #include "Tests/prompt_test.h"
 #include "Tests/logger_test.h"
+#include "pwm.h"
 
 #define MAIN_BUFFER_LENGTH 64
 /**
@@ -20,6 +21,7 @@
 char buffer[MAIN_BUFFER_LENGTH];
 int index = 0;
 int pending = TRUE;
+PWM_t pwmData;
 
 int USB_SendData(STREAM pUsbStream, const char* data, int pkgIndex, int totalPackages, size_t bufferLength) 
 {
@@ -66,6 +68,7 @@ void __interrupt(high_priority) high_isr(void)
                    	char* command = getCommandKey();
                    	int isDev = strncmp(command, "dev", 8) == 0;
                     int isFin = strncmp(command, "fin", 8) == 0;
+                    int isPwm = strncmp(command, "pwm", 8) == 0;
                     int isEnd = strncmp(command, "-", 8) == 0;
                     int isEmptyToken = strncmp(command, "", 8) == 0;
                     
@@ -81,6 +84,34 @@ void __interrupt(high_priority) high_isr(void)
                     else if (isFin) 
                     {
 						index = USB_SendData(pUsbStream, "Hello world", index, 1, MAIN_BUFFER_LENGTH);
+                    }
+                    else if (isPwm) 
+                    {
+                        if (subCommandExists('i')) 
+                        {
+                            pwm_setFreq(&pwmData, PWM_FREQ_50K);
+                            pwm_setCCPPort(&pwmData, PWM_RB3);
+                            pwm_turnOnCPPModules(&pwmData, PWM_CPP2);
+                            pwm_init(&pwmData);
+                            pwm_setPulse(&pwmData, 2);
+                            index = USB_SendData(pUsbStream, "PWM started :)", index, 1, MAIN_BUFFER_LENGTH);
+                        }
+                        else if (subCommandExists('d'))
+                        {
+                            char* pValue = getSubCommandValue('d');
+                            int value = atoi(pValue);
+                            pwm_setPulse(&pwmData, value + 1);
+                            index = USB_SendData(pUsbStream, "PWM received :)", index, 1, MAIN_BUFFER_LENGTH);
+                        }
+                        else if (subCommandExists('o')) 
+                        {
+                            pwm_finish(&pwmData);
+                            index = USB_SendData(pUsbStream, "PWM finished :(", index, 1, MAIN_BUFFER_LENGTH);
+                        }
+                        else 
+                        {
+                            index = USB_SendData(pUsbStream, "PWM error: SubCommand not found.", index, 1, MAIN_BUFFER_LENGTH);
+                        }
                     }
                     else if (isEmptyToken) 
                     {
@@ -112,8 +143,8 @@ void __interrupt(low_priority) low_isr(void)
 
 void main(void) 
 {
-    TRISB = 0;
-    PORTB = 0;
+//    TRISB = 0;
+//    PORTB = 0;
     usb_SetUsbAsHighPriority();
     usb_init();
     #if __TEST_PROMPT__

@@ -116,7 +116,7 @@ char* getSubCommandValue(char cmd)
     int step = 0;
     memset(result, 0, RESULT_LENGTH);
 
-    for (int i = 0; i < _size; i++) 
+    for (int i = 0, j = 0; i < _size; i++) 
     {
         char c = _buffer[i];
 
@@ -135,7 +135,7 @@ char* getSubCommandValue(char cmd)
                 break;
             }
 
-            result[i] = c;
+            result[j++] = c;
         }
         else {
             step = 0;
