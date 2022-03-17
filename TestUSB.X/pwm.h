@@ -14,19 +14,19 @@
 extern "C" {
 #endif
     
-#define PWM_FREQ_2K 375
-#define PWM_FREQ_3K 250
-#define PWM_FREQ_5K 148
-#define PWM_FREQ_10K 73
-#define PWM_FREQ_15K 48
-#define PWM_FREQ_25K 28 // no
-#define PWM_FREQ_30K 23 // no
-#define PWM_FREQ_50K 13 // no
-#define PWM_FREQ_75K 8 //no
-#define PWM_FREQ_125K 4 
-#define PWM_FREQ_150K 3
-#define PWM_FREQ_250K 1
-#define PWM_FREQ_375K 0
+//#define PWM_FREQ_2K 375
+//#define PWM_FREQ_3K 250
+//#define PWM_FREQ_5K 148
+//#define PWM_FREQ_10K 73
+//#define PWM_FREQ_15K 48
+//#define PWM_FREQ_25K 28
+//#define PWM_FREQ_30K 23
+#define PWM_FREQ_50K 13
+//#define PWM_FREQ_75K 8
+//#define PWM_FREQ_125K 4 
+//#define PWM_FREQ_150K 3
+//#define PWM_FREQ_250K 1
+//#define PWM_FREQ_375K 0
 #define PWM_CPP2 2
 #define PWM_CPP1 1
 

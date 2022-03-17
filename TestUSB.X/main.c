@@ -98,10 +98,28 @@ void __interrupt(high_priority) high_isr(void)
                         }
                         else if (subCommandExists('d'))
                         {
-                            char* pValue = getSubCommandValue('d');
-                            int value = atoi(pValue);
-                            pwm_setPulse(&pwmData, value + 1);
-                            index = USB_SendData(pUsbStream, "PWM received :)", index, 1, MAIN_BUFFER_LENGTH);
+                            if (pwmData.IsActivated) 
+                            {
+                                char* pValue = getSubCommandValue('d');
+                                int value = atoi(pValue);
+                                pwm_setPulse(&pwmData, value + 1);
+                                index = USB_SendData(pUsbStream, "PWM received :)", index, 1, MAIN_BUFFER_LENGTH);
+                            }
+                            else 
+                            {
+                                index = USB_SendData(pUsbStream, "Error: PWM module is deactivated", index, 1, MAIN_BUFFER_LENGTH);
+                            }
+                        }
+                        else if (subCommandExists('s'))
+                        {
+                            if (pwmData.IsActivated) 
+                            {
+                                index = USB_SendData(pUsbStream, "PWM is activated", index, 1, MAIN_BUFFER_LENGTH);
+                            }
+                            else 
+                            {
+                                index = USB_SendData(pUsbStream, "PWM is deactivated", index, 1, MAIN_BUFFER_LENGTH);
+                            }
                         }
                         else if (subCommandExists('o')) 
                         {
