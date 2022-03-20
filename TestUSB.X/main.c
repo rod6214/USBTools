@@ -12,6 +12,7 @@
 #include "Tests/prompt_test.h"
 #include "Tests/logger_test.h"
 #include "pwm.h"
+#include "converters.h"
 
 #define MAIN_BUFFER_LENGTH 64
 /**
@@ -159,12 +160,15 @@ void __interrupt(low_priority) low_isr(void)
 	// ;
 }
 
+char digits[2];
+
 void main(void) 
 {
+    getBCD(digits, 4, 179);
 //    TRISB = 0;
 //    PORTB = 0;
-    usb_SetUsbAsHighPriority();
-    usb_init();
+//    usb_SetUsbAsHighPriority();
+//    usb_init();
     #if __TEST_PROMPT__
     TRISB = 0;
     int prompt_fails = Prompt_ExecuteTests();

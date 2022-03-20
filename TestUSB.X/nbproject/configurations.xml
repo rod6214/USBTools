@@ -18,6 +18,7 @@
       <itemPath>constants.h</itemPath>
       <itemPath>Tests/logger_test.h</itemPath>
       <itemPath>pwm.h</itemPath>
+      <itemPath>converters.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -39,6 +40,7 @@
       <itemPath>constants.c</itemPath>
       <itemPath>Tests/logger_test.c</itemPath>
       <itemPath>pwm.c</itemPath>
+      <itemPath>converters.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -57,7 +59,7 @@
         <targetDevice>PIC18F2550</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>PICkit3PlatformTool</platformTool>
+        <platformTool>Simulator</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>2.36</languageToolchainVersion>
         <platform>3</platform>

@@ -6,9 +6,11 @@
             <file>file:/C:/Develop/USBTools/TestUSB.X/main.c</file>
             <file>file:/C:/Develop/USBTools/TestUSB.X/pwm.h</file>
             <file>file:/C:/Develop/USBTools/TestUSB.X/usb.c</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/configuration_bits.c</file>
             <file>file:/C:/Develop/USBTools/TestUSB.X/pwm.c</file>
             <file>file:/C:/Develop/USBTools/TestUSB.X/Tests/logger_test.c</file>
             <file>file:/C:/Develop/USBTools/TestUSB.X/constants.c</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/logger.c</file>
             <file>file:/C:/Develop/USBTools/TestUSB.X/prompt.c</file>
         </group>
     </open-files>
