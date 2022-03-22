@@ -1,12 +1,13 @@
 #if __PRINTFT__
 #include "printft.h"
+#include "lcd.h"
 
 
-void putchar(char c);
+//void putchar(char c);
 
 static char* bf;
 static char buf[12];
-static unsigned int num;
+static int num;
 static char uc;
 static char zs;
 
@@ -30,7 +31,7 @@ static void divOut(unsigned int div) {
 		outDgt(dgt);
     }
 
-void printft(char *fmt, ...)
+void lcd_printft(char *fmt, ...)
 	{
 	va_list va;
 	char ch;
@@ -40,7 +41,8 @@ void printft(char *fmt, ...)
 
 	while ((ch=*(fmt++))) {
 		if (ch!='%') {
-			putchar(ch);
+//			putchar(ch);
+            lcd_putchar(ch);
 			}
 		else {
 			char lz=0;
@@ -53,7 +55,7 @@ void printft(char *fmt, ...)
 			if (ch>='0' && ch<='9') {
 				w=0;
 				while (ch>='0' && ch<='9') {
-					w=(((w<<2)+w)<<1)+ch-'0';
+					w=((char)(((w<<2)+w)<<1) + (char)ch - '0');
 					ch=*fmt++;
 					}
 				}
@@ -65,7 +67,7 @@ void printft(char *fmt, ...)
 					goto abort;
 				case 'u':
 				case 'd' :
-					num=va_arg(va, unsigned int);
+					num=(int)va_arg(va, int);
 					if (ch=='d' && (int)num<0) {
 						num = -(int)num;
 						out('-');
@@ -74,16 +76,16 @@ void printft(char *fmt, ...)
 					divOut(1000);
 					divOut(100);
 					divOut(10);
-					outDgt(num);
+					outDgt((char)num);
 					break;
 				case 'x':
 				case 'X' :
 				    uc= ch=='X';
-					num=va_arg(va, unsigned int);
+					num=va_arg(va, int);
 					divOut(0x1000);
 					divOut(0x100);
 					divOut(0x10);
-					outDgt(num);
+					outDgt((char)num);
 					break;
 				case 'c' :
 					out((char)(va_arg(va, int)));
@@ -101,9 +103,11 @@ void printft(char *fmt, ...)
 			while (*bf++ && w > 0)
 				w--;
 			while (w-- > 0)
-				putchar(lz ? '0' : ' ');
+//				putchar(lz ? '0' : ' ');
+                lcd_putchar(lz ? '0' : ' ');
 			while ((ch= *p++))
-				putchar(ch);
+//				putchar(ch);
+                lcd_putchar(ch);
 			}
 		}
 	abort:;

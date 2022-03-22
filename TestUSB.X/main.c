@@ -13,6 +13,8 @@
 #include "Tests/logger_test.h"
 #include "pwm.h"
 #include "converters.h"
+#include "lcd.h"
+#include "printft.h"
 
 #define MAIN_BUFFER_LENGTH 64
 /**
@@ -38,7 +40,6 @@ int USB_SendData(STREAM pUsbStream, const char* data, int pkgIndex, int totalPac
 	{
 		memset(buffer, 0, bufferLength);
 		WriteStream(pUsbStream, buffer, 0, bufferLength);
-//		pkgIndex = 0;
 	}
 
 	return pkgIndex;
@@ -160,11 +161,25 @@ void __interrupt(low_priority) low_isr(void)
 	// ;
 }
 
-char digits[2];
+char digits[3];
 
 void main(void) 
 {
-    getBCD(digits, 4, 179);
+    TRISB = 0;
+//    while(1) 
+//    {
+//        PORTB++;
+//        __delay_ms(500);
+//    }
+    InitLcd();
+    lcd_printft("Volt: %d V      ", 12);
+    lcd_printft("Amp: %d mA      ", 48);
+    __delay_ms(2000);
+    lcd_clear();
+    lcd_printft("Volt: %d V      ", 24);
+    lcd_printft("Amp: %d mA      ", 489);
+    
+//    getBCD(digits, 4, 179);
 //    TRISB = 0;
 //    PORTB = 0;
 //    usb_SetUsbAsHighPriority();

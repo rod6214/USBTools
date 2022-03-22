@@ -1,11 +1,11 @@
-#ifndef __PRINTFT__
+#if __PRINTFT__
 
-#define __PRINTFT__
+
 
 
 #include <stdarg.h>
 
-void printft(char *fmt, ...);
+extern void lcd_printft(char *fmt, ...);
 
 #endif
 
