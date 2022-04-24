@@ -15,6 +15,7 @@
 #include "converters.h"
 #include "lcd.h"
 #include "printft.h"
+#include "adc.h"
 
 #define MAIN_BUFFER_LENGTH 64
 /**
@@ -165,19 +166,64 @@ char digits[3];
 
 void main(void) 
 {
+    int xn[16];
+    int i = 0;
+    int ready = 0;
     TRISB = 0;
+    
+    pwm_setFreq(&pwmData, PWM_FREQ_50K);
+                            pwm_setCCPPort(&pwmData, PWM_RB3);
+                            pwm_turnOnCPPModules(&pwmData, PWM_CPP2);
+                            pwm_init(&pwmData);
+                            pwm_setPulse(&pwmData, 128);
 //    while(1) 
 //    {
 //        PORTB++;
 //        __delay_ms(500);
 //    }
-    InitLcd();
-    lcd_printft("Volt: %d V      ", 12);
-    lcd_printft("Amp: %d mA      ", 48);
+//    initAdc();
+//    initLcd();
+//    
+//    
+//    while(1) 
+//    {
+//        if (!ADCON0bits.GODONE) 
+//        {
+//            int volt = 0;
+//            if (ready) 
+//            {
+//                volt = getADCValue();
+//            }
+//            xn[i] = volt;
+//            if (i > 14) 
+//            {
+//                int y1 = xn[i - 15] + xn[i - 14] + xn[i - 13] + xn[i - 12] + xn[i - 11] + xn[i - 10] + xn[i - 9] + xn[i - 8]; 
+//                int y0 = xn[i - 7] + xn[i - 6] + xn[i - 5] + xn[i - 4] + xn[i - 3] + xn[i - 2] + xn[i - 1] + xn[i];
+//                
+//                volt = ((y1 + y0) >> 4);
+//                double r = (volt + 1)*5.22;
+//                int op = (int)(r - 4);
+//                int f = op/1000;
+//                int f2 = (op/100) - f*10;
+//                int f3 = (op/10) - f*100 - f2*10;
+////                lcd_printft("Volt: %d V      ", op);
+//                lcd_printft("Volt: %d.%d%d V      ", f, f2,f3);
+//                lcd_clear();
+//                i = 0;
+//                ready = 1;
+//            }
+//            i++;
+//            __delay_ms(10);
+//            ADCON0bits.GODONE = 1;
+//        }
+//        
+//    }
+//    lcd_printft("Volt: %d V      ", 0);
+//    lcd_printft("Amp: %d mA      ", 48);
     __delay_ms(2000);
-    lcd_clear();
-    lcd_printft("Volt: %d V      ", 24);
-    lcd_printft("Amp: %d mA      ", 489);
+//    lcd_clear();
+//    lcd_printft("Volt: %d V      ", 24);
+//    lcd_printft("Amp: %d mA      ", 489);
     
 //    getBCD(digits, 4, 179);
 //    TRISB = 0;

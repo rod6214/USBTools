@@ -16,10 +16,11 @@
 #if __LCD__
 volatile Stream_t stream;
 static int position = 0;
+static int sendPulse();
 
-void InitLcd()
+void initLcd()
 {
-    PORTAbits.RA0 = 0;
+    PORTAbits.RA1 = 0;
     PORTCbits.RC0 = 0;
     PORTCbits.RC1 = 0;
     PORTCbits.RC2 = 0;
@@ -28,11 +29,11 @@ void InitLcd()
     TRISCbits.RC1 = 0;
     TRISCbits.RC2 = 0;
     TRISCbits.RC6 = 0;
-    TRISAbits.RA0 = 0;
-
+    TRISAbits.RA1 = 0;
+    
     __delay_us(10);
-    PORTAbits.RA0 = 1;
-    __delay_ms(2);
+    PORTAbits.RA1 = 1;
+    __delay_ms(50);
     
     write_command(DISPLAY_ON_OFF | TURN_ON_DISPLAY);
     lcd_wait();
@@ -98,14 +99,11 @@ int lcd_write(char c)
 //
 void lcd_clear() 
 {
-    
-    __delay_ms(2);
-    write_command(CLEAR_DISPLAY);
-    lcd_wait();
-    __delay_ms(5);
-    write_command(RETURN_HOME);
-    lcd_wait();
-    __delay_ms(5);
+//    write_command(CLEAR_DISPLAY);
+//    lcd_wait();
+//    __delay_ms(5);
+//    write_command(RETURN_HOME);
+//    lcd_wait();
     lcd_rewind();
 }
 
@@ -127,12 +125,7 @@ int write_command(int command)
         PORTB = LOW_BYTE(command);
     }
     
-    PORTCbits.RC2 = true;
-    __delay_us(10);
-    result = PORTB & 127;
-    PORTCbits.RC2 = false;
-    __delay_us(10);
-    
+    result = sendPulse();
     return result;
 }
 
@@ -142,14 +135,21 @@ int lcd_wait()
     TRISB = 255;
     PORTCbits.RC0 = 0;
     PORTCbits.RC1 = 1;
-    PORTCbits.RC2 = true;
-    __delay_us(10);
-    address = PORTB & 127;
-    PORTCbits.RC2 = false;
-    __delay_us(10);
+    address = sendPulse();
     while(PORTBbits.RB7);
     PORTCbits.RC1 = 0;
     return address;
+}
+
+static int sendPulse() 
+{
+    int result = 0;
+    PORTCbits.RC2 = true;
+    __delay_us(10);
+    result = PORTB & 127;
+    PORTCbits.RC2 = false;
+    __delay_us(10);
+    return result;
 }
 
 

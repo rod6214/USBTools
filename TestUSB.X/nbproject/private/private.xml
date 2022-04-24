@@ -3,13 +3,18 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/printft.c</file>
             <file>file:/C:/Develop/USBTools/TestUSB.X/main.c</file>
-            <file>file:/C:/Develop/USBTools/TestUSB.X/converters.h</file>
             <file>file:/C:/Develop/USBTools/TestUSB.X/cstream.c</file>
-            <file>file:/C:/Develop/USBTools/TestUSB.X/usb.c</file>
-            <file>file:/C:/Develop/USBTools/TestUSB.X/configuration_bits.c</file>
-            <file>file:/C:/Develop/USBTools/TestUSB.X/converters.c</file>
-            <file>file:/C:/Develop/USBTools/TestUSB.X/constants.c</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/adc.c</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/kernel.c</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/pwm.c</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/lcd.h</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/logger.c</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/adc.h</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/prompt.c</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/lcd.c</file>
+            <file>file:/C:/Develop/USBTools/TestUSB.X/printft.h</file>
         </group>
     </open-files>
 </project-private>

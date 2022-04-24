@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=configuration_bits.c cstream.c kernel.c logger.c main.c pic-config.c printft.c usb.c prompt.c Tests/prompt_test.c constants.c Tests/logger_test.c pwm.c converters.c lcd.c
+SOURCEFILES_QUOTED_IF_SPACED=configuration_bits.c cstream.c kernel.c logger.c main.c pic-config.c printft.c usb.c prompt.c Tests/prompt_test.c constants.c Tests/logger_test.c pwm.c converters.c lcd.c adc.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/configuration_bits.p1 ${OBJECTDIR}/cstream.p1 ${OBJECTDIR}/kernel.p1 ${OBJECTDIR}/logger.p1 ${OBJECTDIR}/main.p1 ${OBJECTDIR}/pic-config.p1 ${OBJECTDIR}/printft.p1 ${OBJECTDIR}/usb.p1 ${OBJECTDIR}/prompt.p1 ${OBJECTDIR}/Tests/prompt_test.p1 ${OBJECTDIR}/constants.p1 ${OBJECTDIR}/Tests/logger_test.p1 ${OBJECTDIR}/pwm.p1 ${OBJECTDIR}/converters.p1 ${OBJECTDIR}/lcd.p1
-POSSIBLE_DEPFILES=${OBJECTDIR}/configuration_bits.p1.d ${OBJECTDIR}/cstream.p1.d ${OBJECTDIR}/kernel.p1.d ${OBJECTDIR}/logger.p1.d ${OBJECTDIR}/main.p1.d ${OBJECTDIR}/pic-config.p1.d ${OBJECTDIR}/printft.p1.d ${OBJECTDIR}/usb.p1.d ${OBJECTDIR}/prompt.p1.d ${OBJECTDIR}/Tests/prompt_test.p1.d ${OBJECTDIR}/constants.p1.d ${OBJECTDIR}/Tests/logger_test.p1.d ${OBJECTDIR}/pwm.p1.d ${OBJECTDIR}/converters.p1.d ${OBJECTDIR}/lcd.p1.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/configuration_bits.p1 ${OBJECTDIR}/cstream.p1 ${OBJECTDIR}/kernel.p1 ${OBJECTDIR}/logger.p1 ${OBJECTDIR}/main.p1 ${OBJECTDIR}/pic-config.p1 ${OBJECTDIR}/printft.p1 ${OBJECTDIR}/usb.p1 ${OBJECTDIR}/prompt.p1 ${OBJECTDIR}/Tests/prompt_test.p1 ${OBJECTDIR}/constants.p1 ${OBJECTDIR}/Tests/logger_test.p1 ${OBJECTDIR}/pwm.p1 ${OBJECTDIR}/converters.p1 ${OBJECTDIR}/lcd.p1 ${OBJECTDIR}/adc.p1
+POSSIBLE_DEPFILES=${OBJECTDIR}/configuration_bits.p1.d ${OBJECTDIR}/cstream.p1.d ${OBJECTDIR}/kernel.p1.d ${OBJECTDIR}/logger.p1.d ${OBJECTDIR}/main.p1.d ${OBJECTDIR}/pic-config.p1.d ${OBJECTDIR}/printft.p1.d ${OBJECTDIR}/usb.p1.d ${OBJECTDIR}/prompt.p1.d ${OBJECTDIR}/Tests/prompt_test.p1.d ${OBJECTDIR}/constants.p1.d ${OBJECTDIR}/Tests/logger_test.p1.d ${OBJECTDIR}/pwm.p1.d ${OBJECTDIR}/converters.p1.d ${OBJECTDIR}/lcd.p1.d ${OBJECTDIR}/adc.p1.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/configuration_bits.p1 ${OBJECTDIR}/cstream.p1 ${OBJECTDIR}/kernel.p1 ${OBJECTDIR}/logger.p1 ${OBJECTDIR}/main.p1 ${OBJECTDIR}/pic-config.p1 ${OBJECTDIR}/printft.p1 ${OBJECTDIR}/usb.p1 ${OBJECTDIR}/prompt.p1 ${OBJECTDIR}/Tests/prompt_test.p1 ${OBJECTDIR}/constants.p1 ${OBJECTDIR}/Tests/logger_test.p1 ${OBJECTDIR}/pwm.p1 ${OBJECTDIR}/converters.p1 ${OBJECTDIR}/lcd.p1
+OBJECTFILES=${OBJECTDIR}/configuration_bits.p1 ${OBJECTDIR}/cstream.p1 ${OBJECTDIR}/kernel.p1 ${OBJECTDIR}/logger.p1 ${OBJECTDIR}/main.p1 ${OBJECTDIR}/pic-config.p1 ${OBJECTDIR}/printft.p1 ${OBJECTDIR}/usb.p1 ${OBJECTDIR}/prompt.p1 ${OBJECTDIR}/Tests/prompt_test.p1 ${OBJECTDIR}/constants.p1 ${OBJECTDIR}/Tests/logger_test.p1 ${OBJECTDIR}/pwm.p1 ${OBJECTDIR}/converters.p1 ${OBJECTDIR}/lcd.p1 ${OBJECTDIR}/adc.p1
 
 # Source Files
-SOURCEFILES=configuration_bits.c cstream.c kernel.c logger.c main.c pic-config.c printft.c usb.c prompt.c Tests/prompt_test.c constants.c Tests/logger_test.c pwm.c converters.c lcd.c
+SOURCEFILES=configuration_bits.c cstream.c kernel.c logger.c main.c pic-config.c printft.c usb.c prompt.c Tests/prompt_test.c constants.c Tests/logger_test.c pwm.c converters.c lcd.c adc.c
 
 
 
@@ -214,6 +214,14 @@ ${OBJECTDIR}/lcd.p1: lcd.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/lcd.d ${OBJECTDIR}/lcd.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/lcd.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
+${OBJECTDIR}/adc.p1: adc.c  nbproject/Makefile-${CND_CONF}.mk 
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/adc.p1.d 
+	@${RM} ${OBJECTDIR}/adc.p1 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1  -mdebugger=pickit3   -mdfp="${DFP_DIR}/xc8"  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -D__DEVTOOL__ -D__KERNEL__ -D__STREAM__ -D__USB__ -D__LOGGER__ -D__CONSTANTS__ -D__PWM_DRIVER__ -D__LCD__ -D__PRINTFT__ -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx32 -Wl,--data-init -mno-keep-startup -mno-download -mdefault-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/adc.p1 adc.c 
+	@-${MV} ${OBJECTDIR}/adc.d ${OBJECTDIR}/adc.p1.d 
+	@${FIXDEPS} ${OBJECTDIR}/adc.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+	
 else
 ${OBJECTDIR}/configuration_bits.p1: configuration_bits.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
@@ -334,6 +342,14 @@ ${OBJECTDIR}/lcd.p1: lcd.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c   -mdfp="${DFP_DIR}/xc8"  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -D__DEVTOOL__ -D__KERNEL__ -D__STREAM__ -D__USB__ -D__LOGGER__ -D__CONSTANTS__ -D__PWM_DRIVER__ -D__LCD__ -D__PRINTFT__ -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx32 -Wl,--data-init -mno-keep-startup -mno-download -mdefault-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/lcd.p1 lcd.c 
 	@-${MV} ${OBJECTDIR}/lcd.d ${OBJECTDIR}/lcd.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/lcd.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+	
+${OBJECTDIR}/adc.p1: adc.c  nbproject/Makefile-${CND_CONF}.mk 
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/adc.p1.d 
+	@${RM} ${OBJECTDIR}/adc.p1 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c   -mdfp="${DFP_DIR}/xc8"  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -D__DEVTOOL__ -D__KERNEL__ -D__STREAM__ -D__USB__ -D__LOGGER__ -D__CONSTANTS__ -D__PWM_DRIVER__ -D__LCD__ -D__PRINTFT__ -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx32 -Wl,--data-init -mno-keep-startup -mno-download -mdefault-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/adc.p1 adc.c 
+	@-${MV} ${OBJECTDIR}/adc.d ${OBJECTDIR}/adc.p1.d 
+	@${FIXDEPS} ${OBJECTDIR}/adc.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
 endif
 

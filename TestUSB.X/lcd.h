@@ -44,7 +44,7 @@ extern "C" {
 
 extern int write_command(int command);
 extern int lcd_wait();
-extern void InitLcd();
+extern void initLcd();
 extern int lcd_putchar(char c);
 extern int lcd_write(char c);
 extern void lcd_clear();
