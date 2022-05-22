@@ -15,24 +15,30 @@
 
 // config statements should precede project file includes.
 #include <xc.inc>
- 
- pdata equ 0x0C
- RESET_STEP    equ 0
- MASK_INT_STEP equ 1
- SYNC_F	       equ 1
- READY	       equ 2
- RESET_F       equ 3
- NMI	       equ 4
- CYCLE	       equ 0xA0
- RESET_CYCLE  equ 4
- READY_CYCLE  equ 2
- NMI_CYCLE    equ 7
- ACUM	       equ 0x21
+
+RESET_STEP    equ 0
+MASK_INT_STEP equ 1
+SYNC_F	       equ 1
+READY	       equ 2
+RESET_F       equ 3
+NMI	       equ 4
+CYCLE	       equ 0xA0
+RESET_CYCLE  equ 4
+READY_CYCLE  equ 2
+NMI_CYCLE    equ 7
+ACUM	       equ 0x21
 CSTATUS	       equ 0x22
 ACUMB          equ 0x23
 ACUMC          equ 0x24
 STACK_LENGTH   equ 2
- 
+RESET_READY    equ 1
+Gie	       equ 7
+Inte	       equ 7
+Rp0	       equ 5
+Rp1	       equ 6
+Intedg	       equ 6	
+Z	       equ 2	       
+	       
 PSECT resetVec, class=CODE, delta=2
 resetVec:
     PAGESEL main
@@ -43,7 +49,10 @@ resetVec:
     
     org 0x04
 perifVec:
-    bcf INTCON, 7   ; Disable global interrupts
+    bcf INTCON, Gie   ; Disable global interrupts
+    btfsc CSTATUS, RESET_READY
+    goto app_interrupts
+startup_int:
     bcf INTCON, 1   ; Clear external interrupt flag
     rlf ACUMC, f
     btfsc ACUMC, 2 ; Skip if bit 2 is clear
@@ -53,7 +62,7 @@ perifVec:
     movf PORTB, w
     andlw 12
     sublw 12
-    btfss STATUS, 2 ; Check if bit2 and bit3 are loaded
+    btfss STATUS, Z ; Check if bit2 and bit3 are loaded
     goto exit_int
     btfss CSTATUS, 0 ; Check if sync is ready
     goto wait_sync ; If not then go to sync subroutine
@@ -67,35 +76,37 @@ wait_sync:
     goto wait_sync
     bsf CSTATUS, 0
 exit_int:
-    bsf INTCON, 7   ; Enable global interrupts
+    bsf INTCON, Gie   ; Enable global interrupts
     retfie
 complete_exit:
-    bcf CSTATUS, 0
+;    bcf CSTATUS, 0
+    bsf CSTATUS, RESET_READY ; Finish reset/startup sequence
     clrf ACUMC
-    incf ACUMC, f
-    bcf INTCON, 7   ; Disable global interrupts
+;    incf ACUMC, f
+    bcf INTCON, Gie   ; Disable global interrupts
+    retfie
+app_interrupts:
     retfie
 
 PSECT code, delta=2
- 
 main:
-    bcf STATUS, 6
-    bcf STATUS, 5   ; Used bank 0
+    bcf STATUS, Rp1
+    bcf STATUS, Rp0 ; Used bank 0
     clrf PORTA	    ; Reset PORTA
     clrf PORTB	    ; Reset PORTB
     clrf PORTC
-    bsf STATUS, 5   ; Used bank 1
+    bsf STATUS, Rp0 ; Used bank 1
     movlw 255	    ; Set all pin as input
     movwf PORTA	    ; Save working register into PORTA
     movlw 3
     movwf PORTB	    ; Set up PORTB for I/O
     clrf PORTC
     
-    bcf OPTION_REG, 6 ; Configure INT/PB0 as falling edge
-    bcf STATUS, 5   ; Used bank 0
+    bcf OPTION_REG, Intedg ; Configure INT/PB0 as falling edge
+    bcf STATUS, Rp0   ; Used bank 0
     bcf INTCON, 1   ; Clear external interrupt flag
-    bsf INTCON, 4   ; Enable external interrupt on port b
-    bsf INTCON, 7   ; Enable global interrupts
+    bsf INTCON, Inte   ; Enable external interrupt on port b
+    bsf INTCON, Gie   ; Enable global interrupts
     movlw CYCLE
     movwf FSR	    ; Point to data memory
     movlw STACK_LENGTH
@@ -109,7 +120,10 @@ clear_mem:
     movwf FSR
     movlw 1
     movwf ACUMC
-loop:
-    goto loop
+reset_loop:
+    btfss CSTATUS, RESET_READY
+    goto reset_loop
+app_loop:
+    goto app_loop
 goto $
     end resetVec
