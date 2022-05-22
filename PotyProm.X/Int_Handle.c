@@ -49,6 +49,13 @@ int USB_SendData(STREAM pUsbStream, const char* data, int pkgIndex, int totalPac
 	return pkgIndex;
 }
 
+char* readMemory()
+{
+    PORTB = 0;
+    TRISB = 255;
+    
+}
+
 void __interrupt(high_priority) high_isr(void) {
     struct USBHandler* usbPtr;
     
@@ -62,16 +69,16 @@ void __interrupt(high_priority) high_isr(void) {
 			case DATA_RECEIVED:
 			{
                 char* pCommand = getCommand();
-                int isRead = strncmp(command, "read", 8) == 0;
-                int isWrite = strncmp(command, "write", 8) == 0;
-                int isEmptyToken = strncmp(command, "", 8) == 0;
-                int isEnd = strncmp(command, "-", 8) == 0;
+                int isRead = strncmp(pCommand, "read", 8) == 0;
+//                int isWrite = strncmp(command, "write", 8) == 0;
+                int isEmptyToken = strncmp(pCommand, "", 8) == 0;
+                int isEnd = strncmp(pCommand, "-", 8) == 0;
                 
                 if (isRead) 
                 {
                     if (subCommandExists('d'))
                     {
-                        char* pValue = getSubCommandValue('d');
+//                        char* pValue = getSubCommandValue('d');
                         
                         // TODO: Send the data after read from rom
                         index = USB_SendData(pUsbStream, "SET HERE DATA FOR PC", index, 1, MAIN_BUFFER_LENGTH);
@@ -87,7 +94,7 @@ void __interrupt(high_priority) high_isr(void) {
                 }
                 else if (!isEnd)
                 {
-                    PORTB++;
+//                    PORTB++;
                     /**
                      * NOTE:
                      * If the command is empty and index is 0,

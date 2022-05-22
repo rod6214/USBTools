@@ -1,0 +1,6 @@
+build/default/production/main.o:21:: error: (514) illegal relocation type: DB
+build/default/production/main.o:21:: error: (514) illegal relocation type: DB
+build/default/production/main.o:21:: error: (510) complex relocation not supported for -R or -L options
+build/default/production/main.o:23:: error: (514) illegal relocation type: DB
+build/default/production/main.o:23:: error: (514) illegal relocation type: DB
+build/default/production/main.o:25:: error: (510) complex relocation not supported for -R or -L options
