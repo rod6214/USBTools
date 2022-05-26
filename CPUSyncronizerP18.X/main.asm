@@ -140,9 +140,16 @@ onecycle2:
     sublw 1
     bz exit_onecycle2 
     incf ACUMA, f, a
-    bsf PORTB, 2, a
+    bsf PORTB, Pin2, a ; We need to select this line in the future
     nop
     nop
+    ;movlw 5
+    ;movwf ACUMB, a
+;wait_tpcs:
+    ;nop
+    ;decfsz ACUMB, f, a
+    ;bra wait_tpcs
+    bra exit_onecycle2
     bcf INTCON, Intf, a   ; Clear external interrupt flag
     bsf INTCON, Gie, a   ; Enaable global interrupts
     retfie
@@ -151,7 +158,7 @@ exit_onecycle2:
     bcf INTCON, Intf, a   ; Clear external interrupt flag
     bcf INTCON, Inte, a ; Enable int/RB0
     clrf ACUMA, a
-    bcf PORTB, 2, a
+    bcf PORTB, Pin2, a ; We need to select this line in the future
     movf PORTB, f, a
     bcf INTCON, Rbif, a   ; Clear external interrupt flag
     bsf INTCON, Rbie, a
@@ -165,7 +172,7 @@ startup:
     movf ACUMA, w, a
     sublw 2
     btfsc STATUS, Z, a
-    bsf PORTB, Pin2, a
+    bcf PORTB, Pin2, a
     movf ACUMA, w, a
     sublw 4
     btfsc STATUS, Z, a
@@ -187,15 +194,32 @@ savePortValue:
 main:
     clrf PORTB, a ; Clear portb register
     clrf PORTC, a ; Clear portc register
+    ;movf PORTC, f, a
+    ;clrf LATB, a
     movlw 35 ; 00100011
     movwf TRISB, a ; Set port b I/O pins
+    ;clrf LATB, a
+    clrf PORTB, a ; Clear portb register
+    clrf PORTC, a ; Clear portc register
+    ;movf PORTC, f, a
     clrf TRISC, a ; Set port c as ouput
-    bsf INTCON, Inte, a ; Enable int/RB0
-    bcf INTCON2, Intedg, a
+;    bcf PORTB, Pin2, a
+;test:
+;    bra test
+    movlw 10
+    movwf ACUMA, a
+wait_s:
+    decfsz ACUMA, f, a
+    bra wait_s
     clrf PROG, a ; Clear program pointer
     clrf ACUMA, a ; Clear acumulator A
     clrf ACUMB, a ; Clear acumulator B
     clrf CSTATUS, a ; Clear cstatus
+    clrf PORTB, a
+    nop
+    nop
+    bsf INTCON, Inte, a ; Enable int/RB0
+    bcf INTCON2, Intedg, a
     bcf INTCON, Intf, a ; Clear int/RB0  flag
     bsf INTCON, Gie, a ; Enable global interrupts
 reset_loop:
