@@ -50,7 +50,8 @@ uint16_t offset = 0;
 void load_in_data() 
 {
     size_t len;
-    
+//    if (req_len < (requestPacket.wLength & 0xff))
+//        req_len = (requestPacket.wLength & 0xff);
     if (req_len > USB_BUFFER_CONTROL_SIZE)
         len = USB_BUFFER_CONTROL_SIZE;
     else
@@ -62,6 +63,7 @@ void load_in_data()
         pSrc++;
     
     BD0_in.BDSTAT &= ~(BC8| BC9);
+//    BD0_in.BDCNT = 18;
     BD0_in.BDCNT = len & 0xff;
     BD0_in.ADDR = (uint16_t)ptrData;
     
@@ -103,17 +105,27 @@ void Get_Descriptor()
     uint8_t descriptorType = (requestPacket.wValue >> 8) & 0xff;
     uint8_t index = (requestPacket.wValue) & 0xff;
     
+//    if (st == 0) 
+//        {
+//            PORTB = (requestPacket.wLength) & 0xff;
+//        }
+//        
+//        if (st < 10)st++;
+    
     switch(descriptorType) 
     {
         case DEVICE:
         {
+//            PORTB = (requestPacket.wLength) & 0xff;;
             pDescriptor = (void*)&device_descriptor;
             req_handled = TRUE;
+            
             req_len = *((uint8_t*)pDescriptor);
         }
         break;
         case CONFIGURATION:
         {
+            PORTB = 2;
             pDescriptor = (void*)&config_descriptor;
             req_handled = TRUE;
             req_len = config_descriptor.configDesc.wTotalLength;
@@ -121,10 +133,10 @@ void Get_Descriptor()
         break;
         case STRING:
         {
+            PORTB = 3;
             pDescriptor = (codePtr*)string_descriptors[index];
             req_handled = TRUE;
             req_len = string_descriptors[index][0] & 0xff;
-            PORTB=req_len & 0xff;
         }
         break;
         default:
@@ -137,6 +149,8 @@ void USB_process_control_transfer()
 {
     if (IS_OUT_EP0) // Control transfer 
     {
+        
+        
         BD0_out.BDSTAT &= ~UOWN;
 		BD0_in.BDSTAT &= ~UOWN;
         if (IS_SETUP(BD0_out)) 
