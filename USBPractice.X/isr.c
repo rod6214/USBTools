@@ -4,6 +4,8 @@
 
 volatile BD_t BD0_out __at(0x400);
 volatile BD_t BD0_in __at(0x404);
+volatile BD_t BD1_out __at(0x408);
+volatile BD_t BD1_in __at(0x40C);
 volatile TokenPacket_t requestPacket __at(0x500);
 uint8_t buffer_in[USB_EP_BUFFER_LEN] __at(0x508);
 uint8_t ep1_tx_buffer[USB_EP_BUFFER_LEN] __at(0x548);
@@ -95,10 +97,10 @@ void USB_prepare_ep_control()
     EP0INEN = 1;
     EP0OUTEN = 1;
     EP0HSHK = 1;
-    BD0_out.BDCNT = USB_BUFFER_CONTROL_SIZE;
-    BD0_out.ADDR = (uint16_t)&requestPacket;
-    BD0_out.BDSTAT = UOWN | DTSEN;
-    BD0_in.BDSTAT = 0;
+    BD1_out.BDCNT = USB_BUFFER_CONTROL_SIZE;
+    BD1_out.ADDR = (uint16_t)&requestPacket;
+    BD1_out.BDSTAT = UOWN | DTSEN;
+    BD1_in.BDSTAT = 0;
     PKTDIS = 0;
 }
 
