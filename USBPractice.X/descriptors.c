@@ -13,7 +13,7 @@ device_descriptor = { //
     0x00, // bDeviceProtocl
 	USB_BUFFER_CONTROL_SIZE, // bMaxPacketSize
     0x04D8, // idVendor lsb, idVendor msb
-    0x0052, // idProduct lsb, idProduct msb
+    0x0053, // idProduct lsb, idProduct msb
     0x0002, // bcdDevice lsb, bcdDevice msb
     0x01, // iManufacturer
 	0x02, // iProduct
