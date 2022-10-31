@@ -62,7 +62,10 @@ typedef unsigned char dataPtr;
 
 #define USB_EP_BUFFER_LEN 64
 #define USB_BUFFER_CONTROL_SIZE 8
-
+#define IS_IN_EPx(x) ((USTAT) & (x << 3) & (1 << 2)) == ((x << 3) & (1 << 2))
+#define IS_OUT_EPx(x) ((USTAT) & (x << 3)) == (x << 3)
+#define IS_OUT_EP1 IS_OUT_EPx(1)
+#define IS_IN_EP1 IS_IN_EPx(1)
 /* Configuration Attributes */
 #define _DEFAULT    0x01<<7         //Default Value (Bit 7 is set)
 #define _SELF       0x01<<6         //Self-powered (Supports if set)

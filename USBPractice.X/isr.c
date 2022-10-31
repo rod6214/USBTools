@@ -6,6 +6,8 @@ volatile BD_t BD0_out __at(0x400);
 volatile BD_t BD0_in __at(0x404);
 volatile TokenPacket_t requestPacket __at(0x500);
 uint8_t buffer_in[USB_EP_BUFFER_LEN] __at(0x508);
+uint8_t ep1_tx_buffer[USB_EP_BUFFER_LEN] __at(0x548);
+uint8_t ep1_rx_buffer[USB_EP_BUFFER_LEN] __at(0x588);
 size_t descriptorLength = 0;
 int usb_status = DEFAULT;
 int req_handled = FALSE;
@@ -15,7 +17,7 @@ int st = 0;
 //dataPtr* ptrData;
 codePtr *pDescriptor;
 int usb_device_status = DETACHED;
-
+BYTE current_configuration = 0;  
 void USB_prepare_ep_control(void);
 void USB_process_control_transfer(void);
 
@@ -34,7 +36,8 @@ void __interrupt(high_priority) high_isr()
         USB_prepare_ep_control();
         TRNIE = 1;
         URSTIF = 0;
-        usb_status = DEFAULT;
+        usb_device_status = DEFAULT;
+        current_configuration = 0; 
     }
     
     if (UIRbits.SOFIF && UIEbits.SOFIE) {
@@ -143,6 +146,30 @@ void Get_Descriptor()
     }
 }
 
+void set_configuration() 
+{
+    req_handled = 1;
+    current_configuration = requestPacket.wValue & 0xff;
+    // TBD: ensure the new configuration value is one that
+    // exists in the descriptor.
+    if (current_configuration == 0) {
+        // If configuration value is zero, device is put in
+        // address state (USB 2.0 - 9.4.7)
+        usb_device_status = ADDRESS;
+    } else {
+        // Set the configuration.
+        usb_device_status = CONFIGURED;
+        {
+            UEP1 = 0x1E;
+            BD0_out.BDCNT = USB_EP_BUFFER_LEN;
+            BD0_out.ADDR = (uint16_t) ep1_rx_buffer;
+            BD0_out.BDSTAT = UOWN | DTSEN;
+            BD0_in.ADDR = (uint16_t) ep1_tx_buffer;
+            BD0_in.BDSTAT = DTS;
+        }
+    }
+}
+
 void USB_process_control_transfer() 
 {
     if (IS_OUT_EP0) // Control transfer 
@@ -172,7 +199,7 @@ void USB_process_control_transfer()
                 break;
                 case SET_CONFIGURATION:
                 {
-                    PORTB = 9;
+                    set_configuration();
                 }
                 break;
                 case SET_INTERFACE: 
@@ -189,6 +216,8 @@ void USB_process_control_transfer()
             {
                 if (requestPacket.bmRequestType & 0x80) 
                 {
+                    if (requestPacket.wLength < req_len)//9.4.3, p.253
+                        req_len = requestPacket.wLength;
                     // Process Device > Host
                     usb_status = DATA_IN_STAGE;
                     load_in_data();
@@ -219,7 +248,11 @@ void USB_process_control_transfer()
         }
         else if (usb_status == DATA_OUT_STAGE) 
         {
-            
+            unsigned char bufferSize;
+				bufferSize = BD0_out.BDCNT;
+                
+				// Accumulate total number of unsigned chars read
+				req_len = req_len + bufferSize;
             if (BD0_out.BDSTAT & DTS)
                 BD0_out.BDSTAT = UOWN | DTSEN;
             else
@@ -253,6 +286,12 @@ void USB_process_control_transfer()
             USB_prepare_ep_control();
         }
     }
+//    else if (IS_IN_EP1) {
+////        PORTB++;
+////		if (ep_pending_data[EP1] == 0) {
+////			ep_pending_data[EP1]++;
+////		}
+//	}
 }
 
 void USB_init() 
