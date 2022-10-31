@@ -7,6 +7,18 @@
       <itemPath>global.h</itemPath>
       <itemPath>usbtypes.h</itemPath>
       <itemPath>descriptors.h</itemPath>
+      <itemPath>../../../microchip/mla/v2018_11_26/apps/usb/device/vendor_basic/firmware/demo_src/app_device_vendor_basic.h</itemPath>
+      <itemPath>fixed_address_memory.h</itemPath>
+      <itemPath>system.h</itemPath>
+      <itemPath>../../../microchip/mla/v2018_11_26/framework/usb/inc/usb.h</itemPath>
+      <itemPath>../../../microchip/mla/v2018_11_26/framework/usb/inc/usb_ch9.h</itemPath>
+      <itemPath>../../../microchip/mla/v2018_11_26/framework/usb/inc/usb_common.h</itemPath>
+      <itemPath>../../../microchip/mla/v2018_11_26/apps/usb/device/vendor_basic/firmware/demo_src/usb_config.h</itemPath>
+      <itemPath>../../../microchip/mla/v2018_11_26/framework/usb/inc/usb_device.h</itemPath>
+      <itemPath>../../../microchip/mla/v2018_11_26/framework/usb/inc/usb_device_generic.h</itemPath>
+      <itemPath>../../../microchip/mla/v2018_11_26/framework/usb/src/usb_device_local.h</itemPath>
+      <itemPath>../../../microchip/mla/v2018_11_26/framework/usb/inc/usb_hal.h</itemPath>
+      <itemPath>../../../microchip/mla/v2018_11_26/framework/usb/inc/usb_hal_pic18.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -26,6 +38,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">
@@ -36,7 +51,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC8</languageToolchain>
-        <languageToolchainVersion>2.31</languageToolchainVersion>
+        <languageToolchainVersion>2.36</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <packs>
@@ -75,9 +90,10 @@
         <property key="call-prologues" value="false"/>
         <property key="default-bitfield-type" value="true"/>
         <property key="default-char-type" value="true"/>
-        <property key="define-macros" value=""/>
+        <property key="define-macros" value="USB_INTERRUPT"/>
         <property key="disable-optimizations" value="true"/>
-        <property key="extra-include-directories" value=""/>
+        <property key="extra-include-directories"
+                  value="..\..\..\microchip\mla\v2018_11_26\framework\usb\inc;..\..\..\microchip\mla\v2018_11_26\apps\usb\device\vendor_basic\firmware\demo_src\inc"/>
         <property key="favor-optimization-for" value="-speed,+space"/>
         <property key="garbage-collect-data" value="true"/>
         <property key="garbage-collect-functions" value="true"/>
@@ -159,7 +175,6 @@
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
-        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
@@ -204,7 +219,6 @@
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
-        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>

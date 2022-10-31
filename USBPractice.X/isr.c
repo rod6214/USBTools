@@ -7,13 +7,14 @@ volatile BD_t BD0_in __at(0x404);
 volatile TokenPacket_t requestPacket __at(0x500);
 uint8_t buffer_in[USB_EP_BUFFER_LEN] __at(0x508);
 size_t descriptorLength = 0;
-int usb_status = DETACHED;
+int usb_status = DEFAULT;
 int req_handled = FALSE;
 size_t req_len = 0;
 uint16_t address = 0;
 int st = 0;
-dataPtr* ptrData;
+//dataPtr* ptrData;
 codePtr *pDescriptor;
+int usb_device_status = DETACHED;
 
 void USB_prepare_ep_control(void);
 void USB_process_control_transfer(void);
@@ -29,12 +30,30 @@ void __interrupt(high_priority) high_isr()
         while(TRNIF == 1)
             TRNIF = 0;
         UIR = 0;
-        
+        PKTDIS = 0;
         USB_prepare_ep_control();
         TRNIE = 1;
         URSTIF = 0;
         usb_status = DEFAULT;
     }
+    
+    if (UIRbits.SOFIF && UIEbits.SOFIE) {
+		UIRbits.SOFIF = 0;
+	}
+    
+    // stall processing
+	if (UIRbits.STALLIF && UIEbits.STALLIE) {
+		if (UEP0bits.EPSTALL == 1) {
+			// Prepare for the Setup stage of a control transfer
+			USB_prepare_ep_control();
+			UEP0bits.EPSTALL = 0;
+		}
+		UIRbits.STALLIF = 0;
+	}
+	if (UIRbits.UERRIF && UIEbits.UERRIE) {
+		// Clear errors
+		UIRbits.UERRIF = 0;
+	}
     
     if (TRNIE && TRNIF) 
     {
@@ -45,35 +64,26 @@ void __interrupt(high_priority) high_isr()
     ei();
 }
 
-uint16_t offset = 0;
-
 void load_in_data() 
 {
     size_t len;
-//    if (req_len < (requestPacket.wLength & 0xff))
-//        req_len = (requestPacket.wLength & 0xff);
-    if (req_len > USB_BUFFER_CONTROL_SIZE)
-        len = USB_BUFFER_CONTROL_SIZE;
-    else
+    if (req_len < USB_BUFFER_CONTROL_SIZE)
         len = req_len;
+    else
+        len = USB_BUFFER_CONTROL_SIZE;
     
-    codePtr* pSrc = pDescriptor;
-    
-    for (int i = 0; i < offset; i++)
-        pSrc++;
+    dataPtr *ptrData = (dataPtr*)&buffer_in[0];
     
     BD0_in.BDSTAT &= ~(BC8| BC9);
-//    BD0_in.BDCNT = 18;
     BD0_in.BDCNT = len & 0xff;
     BD0_in.ADDR = (uint16_t)ptrData;
     
+    req_len = req_len - len;
+    
     for (int i = 0; i < len; i++) 
     {
-        *(ptrData++) = *(pSrc++);
+        *(ptrData++) = *(pDescriptor++);
     }
-    
-    req_len -= len;
-    offset += len;
 }
 
 void USB_prepare_ep_control() 
@@ -91,7 +101,7 @@ void USB_prepare_ep_control()
 
 void Set_Address() 
 {
-    usb_status = ADDRESS;
+    usb_device_status = ADDRESS;
     address = requestPacket.wValue;
     req_handled = TRUE;
 }
@@ -100,32 +110,21 @@ void Get_Descriptor()
 {
     if (!(requestPacket.bmRequestType & 0x80)) 
         return;
-    ptrData = (dataPtr*)buffer_in;
-    offset = 0;
+
     uint8_t descriptorType = (requestPacket.wValue >> 8) & 0xff;
     uint8_t index = (requestPacket.wValue) & 0xff;
-    
-//    if (st == 0) 
-//        {
-//            PORTB = (requestPacket.wLength) & 0xff;
-//        }
-//        
-//        if (st < 10)st++;
     
     switch(descriptorType) 
     {
         case DEVICE:
         {
-//            PORTB = (requestPacket.wLength) & 0xff;;
             pDescriptor = (void*)&device_descriptor;
             req_handled = TRUE;
-            
             req_len = *((uint8_t*)pDescriptor);
         }
         break;
         case CONFIGURATION:
         {
-            PORTB = 2;
             pDescriptor = (void*)&config_descriptor;
             req_handled = TRUE;
             req_len = config_descriptor.configDesc.wTotalLength;
@@ -133,14 +132,13 @@ void Get_Descriptor()
         break;
         case STRING:
         {
-            PORTB = 3;
             pDescriptor = (codePtr*)string_descriptors[index];
             req_handled = TRUE;
             req_len = string_descriptors[index][0] & 0xff;
         }
         break;
         default:
-            
+            pDescriptor = 0;
             break;
     }
 }
@@ -149,12 +147,12 @@ void USB_process_control_transfer()
 {
     if (IS_OUT_EP0) // Control transfer 
     {
-        
-        
         BD0_out.BDSTAT &= ~UOWN;
 		BD0_in.BDSTAT &= ~UOWN;
         if (IS_SETUP(BD0_out)) 
         {
+            req_handled = FALSE;
+            pDescriptor = 0;
             switch(requestPacket.bRequest) 
             {
                 case SET_ADDRESS: 
@@ -211,7 +209,10 @@ void USB_process_control_transfer()
             }
             else 
             {
-                PORTB = 1;
+                BD0_out.BDCNT = USB_BUFFER_CONTROL_SIZE;
+				BD0_out.ADDR = (uint16_t) &requestPacket;
+				BD0_out.BDSTAT = UOWN | BSTALL;
+				BD0_in.BDSTAT = UOWN | BSTALL;
             }
             
             PKTDIS = 0;
@@ -231,11 +232,11 @@ void USB_process_control_transfer()
     }
     else if (IS_IN_EP0) // Control transfer
     {
-        if (usb_status == ADDRESS) 
+        if ((UADDR == 0) && (usb_device_status == ADDRESS))
         {
             UADDR = (uint8_t)address; 
             if (UADDR == 0) {
-				usb_status = DEFAULT;
+				usb_device_status = DEFAULT;
 			}
         }
         
@@ -276,6 +277,6 @@ void USB_init()
     USBIE = 1;
     // Attached USB port
     USBEN = 1;
-    usb_status = ATTACHED;
+    usb_device_status = ATTACHED;
     ei();
 }

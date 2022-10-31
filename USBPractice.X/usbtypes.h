@@ -209,8 +209,8 @@ typedef struct {
 #define BC9 (1 << BC9_bit)
 #define IS_LAST_OUT (DIR == 0)
 #define IS_CONTROL (((USTAT >> 3)&0xf)==0)
-#define IS_SETUP(x) (((x.BDSTAT >> 2)&0xf)==SETUP)
-#define IS_IN_EP0 (USTAT == 4)
+#define IS_SETUP(x) (((x.BDSTAT & 0x3C) >> 2) == SETUP)
+#define IS_IN_EP0 ((USTAT) & (1 << 2)) == (1 << 2)
 #define IS_OUT_EP0 (USTAT == 0)
 
 
