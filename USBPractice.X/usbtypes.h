@@ -215,7 +215,8 @@ typedef struct {
 #define IS_SETUP(x) (((x.BDSTAT & 0x3C) >> 2) == SETUP)
 #define IS_IN_EP0 ((USTAT) & (1 << 2)) == (1 << 2)
 #define IS_OUT_EP0 (USTAT == 0)
-
+//#define IS_OUT_EP1 (USTAT&8 == 8)
+//#define IS_IN_EP1 (USTAT&12 == 12)
 
 #define GET_STATUS 0
 #define CLEAR_FEATURE 1

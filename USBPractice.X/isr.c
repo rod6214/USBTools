@@ -23,7 +23,6 @@ BYTE current_configuration = 0;
 void USB_prepare_ep_control(void);
 void USB_process_control_transfer(void);
 
-
 void __interrupt(high_priority) high_isr() 
 {
     di();
@@ -69,6 +68,19 @@ void __interrupt(high_priority) high_isr()
     ei();
 }
 
+void usb_read(int ep_addr) {
+    switch(ep_addr) 
+    {
+        case 1:
+        {
+            FLUSH(BD1_out);
+        }
+        break;
+        default:
+            break;
+    }
+}
+
 void load_in_data() 
 {
     size_t len;
@@ -97,10 +109,10 @@ void USB_prepare_ep_control()
     EP0INEN = 1;
     EP0OUTEN = 1;
     EP0HSHK = 1;
-    BD1_out.BDCNT = USB_BUFFER_CONTROL_SIZE;
-    BD1_out.ADDR = (uint16_t)&requestPacket;
-    BD1_out.BDSTAT = UOWN | DTSEN;
-    BD1_in.BDSTAT = 0;
+    BD0_out.BDCNT = USB_BUFFER_CONTROL_SIZE;
+    BD0_out.ADDR = (uint16_t)&requestPacket;
+    BD0_out.BDSTAT = UOWN | DTSEN;
+    BD0_in.BDSTAT = 0;
     PKTDIS = 0;
 }
 
@@ -288,12 +300,16 @@ void USB_process_control_transfer()
             USB_prepare_ep_control();
         }
     }
-//    else if (IS_IN_EP1) {
-////        PORTB++;
-////		if (ep_pending_data[EP1] == 0) {
-////			ep_pending_data[EP1]++;
-////		}
-//	}
+    else if (IS_OUT_EP1) {
+        usb_read(1);
+        PORTB++;
+    }
+//    else if (IS_IN_EP1) 
+//    {
+////        usb_read(1);
+//        PORTB=6;
+//    }
+    
 }
 
 void USB_init() 

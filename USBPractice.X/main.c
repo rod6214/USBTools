@@ -11,6 +11,8 @@ void main ()
     PORTB = 0;
     TRISB = 0;
     USB_init();
+    USB_WAIT();
+    FLUSH(BD1_out);
     while(1);
 }
 

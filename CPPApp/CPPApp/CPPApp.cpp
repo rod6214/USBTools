@@ -76,7 +76,7 @@ int main()
 
             result = WinUsb_QueryInterfaceSettings(interfaceHandle, 0, &InterfaceDescriptor);
 
-            result = WinUsb_QueryPipe(interfaceHandle, 0, 2, &Pipe);
+            result = WinUsb_QueryPipe(interfaceHandle, 0, 1, &Pipe);
 
             unsigned char buffer[66] = {0};
             unsigned long written = 0;
