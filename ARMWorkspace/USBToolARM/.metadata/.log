@@ -1,0 +1,64 @@
+!SESSION 2022-11-09 08:22:04.321 -----------------------------------------------
+eclipse.buildId=Version 1.10.1
+java.version=11.0.14.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  C:\Develop\USBTools\USBToolARM\.project
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 C:\Develop\USBTools\USBToolARM\.project
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-11-09 08:22:49.452
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-11-09 08:22:49.609
+!MESSAGE Log4j initialized with config file C:\Develop\USBTools\USBToolARM\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-11-09 08:22:59.959
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2022-11-09 08:23:14.311 -----------------------------------------------
+eclipse.buildId=Version 1.10.1
+java.version=11.0.14.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  C:\Develop\USBTools\USBToolARM\.cproject
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 C:\Develop\USBTools\USBToolARM\.cproject
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-11-09 08:23:20.315
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-11-09 08:23:20.353
+!MESSAGE Log4j initialized with config file C:\Develop\USBTools\USBToolARM\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-11-09 08:23:22.708
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2022-11-09 08:24:18.124 -----------------------------------------------
+eclipse.buildId=Version 1.10.1
+java.version=11.0.14.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  C:\Develop\USBTools\USBToolARM\.cproject
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 C:\Develop\USBTools\USBToolARM\.cproject
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-11-09 08:24:26.724
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-11-09 08:24:26.763
+!MESSAGE Log4j initialized with config file C:\Develop\USBTools\USBToolARM\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-11-09 08:24:28.697
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2022-11-09 08:25:54.288 -----------------------------------------------
+eclipse.buildId=Version 1.10.1
+java.version=11.0.14.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  C:\Develop\USBTools\USBToolARM\.cproject
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\Develop\USBTools\USBToolARM C:\Develop\USBTools\USBToolARM\.cproject
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-11-09 08:25:56.981
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-11-09 08:25:57.023
+!MESSAGE Log4j initialized with config file C:\Develop\USBTools\USBToolARM\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-11-09 08:25:58.887
+!MESSAGE Started RMI Server, listening on port 41337
