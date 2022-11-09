@@ -23,7 +23,7 @@ int main()
     void *pDeviceHandle;
     WINUSB_INTERFACE_HANDLE interfaceHandle;
 
-    if (USB::Find_Device(0x04d8, 0x0053, &pDeviceHandle)) {
+    if (USB::Find_Device(0x04d8, 0x0052, &pDeviceHandle)) {
 
         //GetDeviceHandle
 
@@ -117,7 +117,7 @@ int main()
                     printf("");
                 }
                 ss = GetLastError();*/
-                if (WinUsb_WritePipe(interfaceHandle, 1, buffer, 3, &written, NULL)) {
+                if (WinUsb_WritePipe(interfaceHandle, 1, buffer, 16, &written, NULL)) {
                     std::cout << "Sent" << std::endl;
                 }
             }
