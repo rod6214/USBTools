@@ -12,7 +12,6 @@
 #include "usbc.h"
 
 uint8_t buffer_out[65];
-uint8_t buffer_in[65];
 
 
 static uint8_t  USBD_CUSTOM_Init(USBD_HandleTypeDef *pdev,
@@ -232,7 +231,6 @@ static uint8_t  USBD_DataOut(USBD_HandleTypeDef *pdev,
   be caused by  a new transfer before the end of the previous transfer */
   ((USBD_CUSTOM_HandleTypeDef *)pdev->pClassData)->state = CUSTOM_IDLE;
   HAL_PCD_EP_Receive(pdev->pData, CUSTOM_EPOUT_ADDR & 0xFU, &buffer_out[64], 0);
-//  HAL_PCD_EP_Transmit(hpcd, ep_addr, pBuf, len)
   return USBD_OK;
 }
 
