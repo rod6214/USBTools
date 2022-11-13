@@ -77,6 +77,7 @@ extern "C" {
 			std::unique_ptr<ThreadStatus>& ptr_sts;
 			std::unique_ptr<std::thread> ptr_thread;
 			WINUSB_INTERFACE_HANDLE interfaceHandle;
+			void* pDeviceHandle;
 			bool Find_Device(USB_IDs_t& config);
 			/*bool Find_Device(
 				GUID guid,
@@ -93,7 +94,14 @@ extern "C" {
 		public:
 			Cstring();
 			Cstring(std::string& value);
+			Cstring(const char* value);
 			std::vector<Cstring> split(char delimiter);
+		};
+
+		class Directory 
+		{
+		public:
+			static UTILS::Cstring GetAppDirectory();
 		};
 
 		class Converter 

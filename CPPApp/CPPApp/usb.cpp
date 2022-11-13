@@ -1,8 +1,5 @@
 #include "usb.h"
 
-
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -10,7 +7,8 @@ extern "C" {
 	USB::USB(std::unique_ptr<USBConfig>& configs)
 		: ptr_fns(configs), 
 		ptr_sts(configs->GetStatus()), 
-		interfaceHandle(nullptr)
+		interfaceHandle(nullptr),
+		pDeviceHandle(nullptr)
 	{}
 
 	bool USB::Find_Device(USB_IDs_t& config)
@@ -18,7 +16,7 @@ extern "C" {
 		GUID guid = config.guid;
 		unsigned short p_VendorID = config.p_VendorID;
 		unsigned short p_PoductID = config.p_PoductID;
-		void** pDeviceHandle = &this->interfaceHandle;
+		void** pDeviceHandle = &this->pDeviceHandle;
 		
 		SP_DEVICE_INTERFACE_DATA myDeviceInterfaceData = {0};
 
@@ -52,7 +50,7 @@ extern "C" {
 						std::transform(pid.begin(), pid.end(), pid.begin(), ::tolower);
 
 						if ((int)devicePath.find(pid) >= 0) {
-							std::cout << "Device found! :)\n" << std::endl;
+							//std::cout << "Device found! :)\n" << std::endl;
 
 							*pDeviceHandle = CreateFile(devicePath.data(),
 													GENERIC_READ | GENERIC_WRITE,
@@ -98,7 +96,7 @@ extern "C" {
 		UTILS::Cstring _guid = str_guid;
 
 		unsigned short vid = static_cast<unsigned short>(UTILS::Converter::ParseToHex(_vid));
-		unsigned short pid = static_cast<unsigned short>(UTILS::Converter::ParseToHex(_vid));
+		unsigned short pid = static_cast<unsigned short>(UTILS::Converter::ParseToHex(_pid));
 		GUID guid = UTILS::Converter::ParseToGUID(_guid);
 
 		USB_IDs_t ids = {
@@ -109,21 +107,27 @@ extern "C" {
 
 		if (Find_Device(ids)) 
 		{
-			void** pDeviceHandle = &this->interfaceHandle;
+			void* pDeviceHandle = this->pDeviceHandle;
+
 			if (pDeviceHandle == INVALID_HANDLE_VALUE)
 			{
 				return FALSE;
 			}
 
-			USB_INTERFACE_DESCRIPTOR InterfaceDescriptor;
-			ZeroMemory(&InterfaceDescriptor, sizeof(USB_INTERFACE_DESCRIPTOR));
+			PWINUSB_INTERFACE_HANDLE pinterfaceHandle = &this->interfaceHandle;
 
-			WINUSB_PIPE_INFORMATION  Pipe;
-			ZeroMemory(&Pipe, sizeof(WINUSB_PIPE_INFORMATION));
+			if (WinUsb_Initialize(pDeviceHandle, pinterfaceHandle))
+			{
+				USB_INTERFACE_DESCRIPTOR InterfaceDescriptor;
+				ZeroMemory(&InterfaceDescriptor, sizeof(USB_INTERFACE_DESCRIPTOR));
 
-			result = WinUsb_QueryInterfaceSettings(pDeviceHandle, 0, &InterfaceDescriptor);
+				WINUSB_PIPE_INFORMATION Pipe;
+				ZeroMemory(&Pipe, sizeof(WINUSB_PIPE_INFORMATION));
 
-			result = WinUsb_QueryPipe(pDeviceHandle, 0, 1, &Pipe);
+				result = WinUsb_QueryInterfaceSettings(*pinterfaceHandle, 0, &InterfaceDescriptor);
+
+				result = WinUsb_QueryPipe(*pinterfaceHandle, 0, 1, &Pipe);
+			}
 		}
 
 		return result;
@@ -184,15 +188,8 @@ extern "C" {
 	{
 		Json::Value root;
 		std::string path(this->GetPath());
-		//char* buffer = _getcwd(NULL, 0);
-		//std::string path(buffer == NULL ? "" : buffer);
-		//path.append("\\config.json");
 		std::ifstream file(path, std::ifstream::binary);
-
 		file >> root;
-
-		std::string my_encoding = root.get("guid", "UTF-32").asString();
-		UTILS::Cstring str = my_encoding;
 		return root;
 	}
 

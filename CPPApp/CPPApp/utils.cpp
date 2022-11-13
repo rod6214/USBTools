@@ -9,6 +9,11 @@ UTILS::Cstring::Cstring(std::string& value)
 	this->assign(value);
 }
 
+UTILS::Cstring::Cstring(const char* value)
+{
+    this->assign(value);
+}
+
 std::vector<UTILS::Cstring> UTILS::Cstring::split(char delimiter)
 {
     std::vector<UTILS::Cstring> strings;
@@ -74,4 +79,11 @@ GUID UTILS::Converter::ParseToGUID(UTILS::Cstring& value)
     }
 
     return guid;
+}
+
+UTILS::Cstring UTILS::Directory::GetAppDirectory()
+{
+    char* buffer = _getcwd(NULL, 0);
+    UTILS::Cstring path(buffer == NULL ? "" : buffer);
+    return path;
 }
