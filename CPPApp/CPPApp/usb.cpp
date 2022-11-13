@@ -115,8 +115,6 @@ extern "C" {
 				return FALSE;
 			}
 
-			BOOL bResult = TRUE;
-
 			USB_INTERFACE_DESCRIPTOR InterfaceDescriptor;
 			ZeroMemory(&InterfaceDescriptor, sizeof(USB_INTERFACE_DESCRIPTOR));
 
@@ -128,6 +126,15 @@ extern "C" {
 			result = WinUsb_QueryPipe(pDeviceHandle, 0, 1, &Pipe);
 		}
 
+		return result;
+	}
+
+	bool CONNECT::USB::Write( 
+		unsigned char* buffer, 
+		unsigned long buffer_len, 
+		unsigned long* written)
+	{
+		auto result = WinUsb_WritePipe(interfaceHandle, 1, buffer, 16, written, NULL);
 		return result;
 	}
 
@@ -176,9 +183,10 @@ extern "C" {
 	Json::Value CONNECT::USBConfig::GetConfig()
 	{
 		Json::Value root;
-		char* buffer = _getcwd(NULL, 0);
-		std::string path(buffer == NULL ? "" : buffer);
-		path.append("\\config.json");
+		std::string path(this->GetPath());
+		//char* buffer = _getcwd(NULL, 0);
+		//std::string path(buffer == NULL ? "" : buffer);
+		//path.append("\\config.json");
 		std::ifstream file(path, std::ifstream::binary);
 
 		file >> root;

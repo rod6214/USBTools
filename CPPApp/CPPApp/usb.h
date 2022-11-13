@@ -66,6 +66,11 @@ extern "C" {
 			void BeginRead();
 			void EndRead();
 			void Wait();
+			bool USB_Init();
+			bool Write(
+				unsigned char* buffer, 
+				unsigned long buffer_len,
+				unsigned long* written);
 			~USB();
 		private:
 			std::unique_ptr<USBConfig>& ptr_fns;
@@ -73,7 +78,6 @@ extern "C" {
 			std::unique_ptr<std::thread> ptr_thread;
 			WINUSB_INTERFACE_HANDLE interfaceHandle;
 			bool Find_Device(USB_IDs_t& config);
-			bool USB_Init();
 			/*bool Find_Device(
 				GUID guid,
 				unsigned short p_VendorID,
