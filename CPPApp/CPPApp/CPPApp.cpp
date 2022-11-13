@@ -3,9 +3,16 @@
 
 #include <iostream>
 #include "usb.h"
-#include <Windows.h>
-#include <winusb.h>
-#include <future>
+//#include <Windows.h>
+//#include <winusb.h>
+//#include <future>
+////#include <json/json.h>
+//#include <stdlib.h>
+//#include <string>
+//#include <direct.h>
+//#include <fstream>
+
+
 
 #define GET_STATUS         0
 #define CLEAR_FEATURE      1
@@ -22,7 +29,36 @@
 
 int main()
 {
-    auto sts = std::unique_ptr<ThreadStatus>(new ThreadStatus());
+    Json::Value root;
+    char* buffer = _getcwd(NULL, 0);
+    std::string path(buffer == NULL ? "" : buffer);
+    path.append("\\config.json");
+    std::ifstream file(path, std::ifstream::binary);
+
+    file >> root;
+
+    std::string my_encoding = root.get("guid", "UTF-32").asString();
+    
+    UTILS::Cstring str = my_encoding;
+
+    auto vid = root.get("vid", "UTF-32").asString();
+    UTILS::Cstring tt = vid;
+
+    auto ff = UTILS::Converter::ParseToHex(tt);
+    
+    //UTILS::Cstring str = root.get("guid", "UTF-32").asString();
+    //root.get("guid", "UTF-32").asString()
+    /*auto strings = str.split('-');
+
+    auto result = UTILS::Converter::ParseToHex(strings[0]);
+
+    GUID guid = UTILS::Converter::ParseToGUID(str);*/
+    //for_sequence()
+    //char* values = std::strtok(my_encoding.data(), ",");
+
+    //std::cout << root["test"] << std::endl;
+    //std::string my_encoding = root.get("my-encoding", "UTF-32").asString();
+    /*auto sts = std::unique_ptr<ThreadStatus>(new ThreadStatus());
     auto fns = std::unique_ptr<InternalFunctions>(new InternalFunctions(sts));
     auto test = std::unique_ptr<USB>(new USB(fns));
     test->BeginRead();
@@ -34,7 +70,7 @@ int main()
 
     test->EndRead();
     test->Wait();
-    test.release();
+    test.release();*/
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

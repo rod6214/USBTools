@@ -1,31 +1,26 @@
 #include "usb.h"
-#include <combaseapi.h>
-#include <SetupAPI.h>
-#include <iostream>
-#include <regex>
-#include <memory>
-#include <thread>
+
+
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
+	using namespace CONNECT;
+	USB::USB(std::unique_ptr<USBConfig>& configs)
+		: ptr_fns(configs), 
+		ptr_sts(configs->GetStatus()), 
+		interfaceHandle(nullptr)
+	{}
 
-	USB::USB(std::unique_ptr<InternalFunctions>& functions)
-		: ptr_fns(functions), ptr_sts(functions->GetStatus())
+	bool USB::Find_Device(USB_IDs_t& config)
 	{
-	}
-
-	bool USB::Find_Device(unsigned short p_VendorID,
-							unsigned short p_PoductID,
-							void** pDeviceHandle) 
-	{
-		//{1e680b0e-a57d-4f57-9941-02e013e3f4e5}
-		//GUID guid = { 0x58D07210, 0x27C1, 0x11DD, 0xBD, 0x0B, 0x08, 0x00, 0x20, 0x0C, 0x9A, 0x66 };
-		//GUID guid = { 0xB3B0ED3C, 0x4DAE, 0x4878, 0x89, 0x6C, 0x80, 0x02, 0x0E, 0x17, 0x4E, 0x80 };
-		GUID guid = { 0x1e680b0e, 0xa57d, 0x4f57, 0x99, 0x41, 0x02, 0xe0, 0x13, 0xe3, 0xf4, 0xe5 };
+		GUID guid = config.guid;
+		unsigned short p_VendorID = config.p_VendorID;
+		unsigned short p_PoductID = config.p_PoductID;
+		void** pDeviceHandle = &this->interfaceHandle;
+		
 		SP_DEVICE_INTERFACE_DATA myDeviceInterfaceData = {0};
-		//HANDLE pTempDeviceHandle;
 
 		HDEVINFO deviceInfoSet = SetupDiGetClassDevs(&guid, NULL, 0, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
 
@@ -89,6 +84,53 @@ extern "C" {
 		return false;
 	}
 
+	bool CONNECT::USB::USB_Init()
+	{
+		bool result = false;
+		auto config = ptr_fns->GetConfig();
+
+		std::string str_guid = config.get("guid", "UTF-32").asString();
+		auto str_vid = config.get("vid", "UTF-32").asString();
+		auto str_pid = config.get("pid", "UTF-32").asString();
+
+		UTILS::Cstring _vid = str_vid;
+		UTILS::Cstring _pid = str_pid;
+		UTILS::Cstring _guid = str_guid;
+
+		unsigned short vid = static_cast<unsigned short>(UTILS::Converter::ParseToHex(_vid));
+		unsigned short pid = static_cast<unsigned short>(UTILS::Converter::ParseToHex(_vid));
+		GUID guid = UTILS::Converter::ParseToGUID(_guid);
+
+		USB_IDs_t ids = {
+			guid,
+			vid,
+			pid
+		};
+
+		if (Find_Device(ids)) 
+		{
+			void** pDeviceHandle = &this->interfaceHandle;
+			if (pDeviceHandle == INVALID_HANDLE_VALUE)
+			{
+				return FALSE;
+			}
+
+			BOOL bResult = TRUE;
+
+			USB_INTERFACE_DESCRIPTOR InterfaceDescriptor;
+			ZeroMemory(&InterfaceDescriptor, sizeof(USB_INTERFACE_DESCRIPTOR));
+
+			WINUSB_PIPE_INFORMATION  Pipe;
+			ZeroMemory(&Pipe, sizeof(WINUSB_PIPE_INFORMATION));
+
+			result = WinUsb_QueryInterfaceSettings(pDeviceHandle, 0, &InterfaceDescriptor);
+
+			result = WinUsb_QueryPipe(pDeviceHandle, 0, 1, &Pipe);
+		}
+
+		return result;
+	}
+
 	USB::~USB()
 	{
 		this->ptr_fns.release();
@@ -99,7 +141,7 @@ extern "C" {
 	void USB::BeginRead() 
 	{
 		this->ptr_thread = std::unique_ptr<std::thread>(
-			new std::thread(&InternalFunctions::thread_callback, &(*ptr_fns)));
+			new std::thread(&USBConfig::thread_callback, &(*ptr_fns)));
 		this->ptr_sts->SetEndProcess(false);
 	}
 
@@ -113,10 +155,11 @@ extern "C" {
 		this->ptr_thread->join();
 	}
 
-	InternalFunctions::InternalFunctions(std::unique_ptr<ThreadStatus> &pstatus):ptr_sts(pstatus)
+	USBConfig::USBConfig(std::unique_ptr<ThreadStatus> &pstatus, std::string& path) 
+		: ptr_sts(pstatus), file_path(path)
 	{}
 
-	void InternalFunctions::thread_callback()
+	void USBConfig::thread_callback()
 	{
 		while(!this->ptr_sts->GetEndProcess()) 
 		{
@@ -125,7 +168,27 @@ extern "C" {
 		}
 	}
 
-	std::unique_ptr<ThreadStatus>& InternalFunctions::GetStatus() 
+	std::string& USBConfig::GetPath()
+	{
+		return this->file_path;
+	}
+
+	Json::Value CONNECT::USBConfig::GetConfig()
+	{
+		Json::Value root;
+		char* buffer = _getcwd(NULL, 0);
+		std::string path(buffer == NULL ? "" : buffer);
+		path.append("\\config.json");
+		std::ifstream file(path, std::ifstream::binary);
+
+		file >> root;
+
+		std::string my_encoding = root.get("guid", "UTF-32").asString();
+		UTILS::Cstring str = my_encoding;
+		return root;
+	}
+
+	std::unique_ptr<ThreadStatus>& USBConfig::GetStatus()
 	{
 		return this->ptr_sts;
 	}
