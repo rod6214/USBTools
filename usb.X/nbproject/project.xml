@@ -4,7 +4,7 @@
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
             <name>usb</name>
-            <creation-uuid>09c1273b-380a-479c-bdae-a5cd7bff7d15</creation-uuid>
+            <creation-uuid>09c784dd-c366-49d7-ac1d-dc87cbcf597d</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>
             <cpp-extensions/>
@@ -12,11 +12,13 @@
             <asminc-extensions/>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>
-            <sourceRootList/>
+            <sourceRootList>
+                <sourceRootElem>.</sourceRootElem>
+            </sourceRootList>
             <confList>
                 <confElem>
                     <name>default</name>
-                    <type>3</type>
+                    <type>2</type>
                 </confElem>
             </confList>
             <formatting>

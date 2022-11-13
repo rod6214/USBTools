@@ -10,9 +10,9 @@ CND_CONF=default
 CND_DISTDIR=dist
 TMPDIR=build/${CND_CONF}/${IMAGE_TYPE}/tmp-packaging
 TMPDIRNAME=tmp-packaging
-OUTPUT_PATH=dist/${CND_CONF}/${IMAGE_TYPE}/usb.X.${OUTPUT_SUFFIX}
-OUTPUT_BASENAME=usb.X.${OUTPUT_SUFFIX}
-PACKAGE_TOP_DIR=usb.X/
+OUTPUT_PATH=dist/${CND_CONF}/${IMAGE_TYPE}/usb.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+OUTPUT_BASENAME=usb.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+PACKAGE_TOP_DIR=usb.x/
 
 # Functions
 function checkReturnCode
@@ -57,15 +57,15 @@ mkdir -p ${TMPDIR}
 
 # Copy files and create directories and links
 cd "${TOP}"
-makeDirectory ${TMPDIR}/usb.X/lib
-copyFileToTmpDir "${OUTPUT_PATH}" "${TMPDIR}/${PACKAGE_TOP_DIR}lib/${OUTPUT_BASENAME}" 0644
+makeDirectory ${TMPDIR}/usb.x/bin
+copyFileToTmpDir "${OUTPUT_PATH}" "${TMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}" 0755
 
 
 # Generate tar file
 cd "${TOP}"
-rm -f ${CND_DISTDIR}/${CND_CONF}/package/usb.X.tar
+rm -f ${CND_DISTDIR}/${CND_CONF}/package/usb.x.tar
 cd ${TMPDIR}
-tar -vcf ../../../../${CND_DISTDIR}/${CND_CONF}/package/usb.X.tar *
+tar -vcf ../../../../${CND_DISTDIR}/${CND_CONF}/package/usb.x.tar *
 checkReturnCode
 
 # Cleanup

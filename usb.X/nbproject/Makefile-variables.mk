@@ -6,8 +6,5 @@
 CND_BASEDIR=`pwd`
 # default configuration
 CND_ARTIFACT_DIR_default=dist/default/production
-CND_ARTIFACT_NAME_default=usb.X.a
-CND_ARTIFACT_PATH_default=dist/default/production/usb.X.a
-CND_PACKAGE_DIR_default=${CND_DISTDIR}/default/package
-CND_PACKAGE_NAME_default=usb.X.tar
-CND_PACKAGE_PATH_default=${CND_DISTDIR}/default/package/usb.X.tar
+CND_ARTIFACT_NAME_default=usb.X.production.hex
+CND_ARTIFACT_PATH_default=dist/default/production/usb.X.production.hex
