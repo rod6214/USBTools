@@ -23,7 +23,7 @@ MainConfig_t usb_config();
 
 int main()
 {
-    auto config = usb_config();
+    /*auto config = usb_config();
     auto usb_conf = std::unique_ptr<CONNECT::USBConfig>(new CONNECT::USBConfig(config.sts, config.path));
     auto usb = std::unique_ptr<CONNECT::USB>(new CONNECT::USB(usb_conf));
 
@@ -33,7 +33,7 @@ int main()
     }
     
     usb->~USB();
-    usb.release();
+    usb.release();*/
     while(1){}
 }
 
