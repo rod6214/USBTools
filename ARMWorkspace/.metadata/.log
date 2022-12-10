@@ -168,3 +168,13 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-11-10 09:30:05.097
 !MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.core.resources 4 77 2022-11-13 14:00:44.251
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-11-13 14:00:44.314
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-11-13 14:00:44.314
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-11-13 14:00:44.370
+!MESSAGE Project is null

@@ -114,9 +114,7 @@ extern "C" {
 				return FALSE;
 			}
 
-			PWINUSB_INTERFACE_HANDLE pinterfaceHandle = &this->interfaceHandle;
-
-			if (WinUsb_Initialize(pDeviceHandle, pinterfaceHandle))
+			if (WinUsb_Initialize(pDeviceHandle, &this->interfaceHandle))
 			{
 				USB_INTERFACE_DESCRIPTOR InterfaceDescriptor;
 				ZeroMemory(&InterfaceDescriptor, sizeof(USB_INTERFACE_DESCRIPTOR));
@@ -124,9 +122,9 @@ extern "C" {
 				WINUSB_PIPE_INFORMATION Pipe;
 				ZeroMemory(&Pipe, sizeof(WINUSB_PIPE_INFORMATION));
 
-				result = WinUsb_QueryInterfaceSettings(*pinterfaceHandle, 0, &InterfaceDescriptor);
+				result = WinUsb_QueryInterfaceSettings(interfaceHandle, 0, &InterfaceDescriptor);
 
-				result = WinUsb_QueryPipe(*pinterfaceHandle, 0, 1, &Pipe);
+				result = WinUsb_QueryPipe(interfaceHandle, 0, 1, &Pipe);
 			}
 		}
 

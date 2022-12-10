@@ -41,34 +41,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := USBTool
+BUILD_ARTIFACT_NAME := USBToolARM
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-USBTool.elf \
+USBToolARM.elf \
 
 MAP_FILES += \
-USBTool.map \
+USBToolARM.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-USBTool.list \
+USBToolARM.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: USBTool.elf secondary-outputs
+main-build: USBToolARM.elf secondary-outputs
 
 # Tool invocations
-USBTool.elf USBTool.map: $(OBJS) $(USER_OBJS) C:\Users\Nelson\STM32CubeIDE\workspace_1.10.1\USBTool\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "USBTool.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\Nelson\STM32CubeIDE\workspace_1.10.1\USBTool\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="USBTool.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+USBToolARM.elf USBToolARM.map: $(OBJS) $(USER_OBJS) C:\Develop\USBTools\ARMWorkspace\USBToolARM\STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "USBToolARM.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Develop\USBTools\ARMWorkspace\USBToolARM\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="USBToolARM.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -77,14 +77,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-USBTool.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "USBTool.list"
+USBToolARM.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "USBToolARM.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) USBTool.elf USBTool.list USBTool.map default.size.stdout
+	-$(RM) USBToolARM.elf USBToolARM.list USBToolARM.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
