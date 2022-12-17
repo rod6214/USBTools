@@ -23,17 +23,20 @@ MainConfig_t usb_config();
 
 int main()
 {
-    /*auto config = usb_config();
+    auto config = usb_config();
     auto usb_conf = std::unique_ptr<CONNECT::USBConfig>(new CONNECT::USBConfig(config.sts, config.path));
     auto usb = std::unique_ptr<CONNECT::USB>(new CONNECT::USB(usb_conf));
 
     if (usb->USB_Init()) 
     {
         std::cout << "USB initialized" << std::endl;
+        unsigned char buffer[66] = {0};
+        unsigned long written = 0;
+        usb->Write(buffer, 16, &written);
     }
     
     usb->~USB();
-    usb.release();*/
+    usb.release();
     while(1){}
 }
 
