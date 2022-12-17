@@ -12,11 +12,18 @@
 extern "C"
 {
 #endif
-	//DLLIMPORT void test();
 
 	namespace CONNECT
 	{
-		typedef struct DLLIMPORT _USB_DATA
+		typedef struct _USB_BODY 
+		{
+			unsigned char* buffer;
+			unsigned long buffer_len;
+			unsigned long* pCount;
+			unsigned char endpoint;
+		} USB_Data_t;
+
+		typedef struct _USB_DATA
 		{
 			GUID guid;
 			unsigned short p_VendorID;
@@ -54,10 +61,8 @@ extern "C"
 			void EndRead();
 			void Wait();
 			bool USB_Init();
-			bool Write(
-				unsigned char* buffer,
-				unsigned long buffer_len,
-				unsigned long* written);
+			bool Write(USB_Data_t& data);
+			bool Read(USB_Data_t& data);
 			~USB();
 		private:
 #pragma warning(push)

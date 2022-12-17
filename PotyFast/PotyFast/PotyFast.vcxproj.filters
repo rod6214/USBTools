@@ -21,12 +21,24 @@
     <ClInclude Include="core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="z80Interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ICPUConnector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ICPUConnector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="z80Interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

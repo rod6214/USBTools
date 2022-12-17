@@ -157,10 +157,14 @@
   <ItemGroup>
     <ClInclude Include="core.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="ICPUConnector.h" />
+    <ClInclude Include="z80Interface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="ICPUConnector.cpp" />
+    <ClCompile Include="z80Interface.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

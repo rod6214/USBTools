@@ -1,4 +1,5 @@
 #include "Generic.h"
+#include <streambuf>
 
 typedef struct _CONFIG_STEP
 {
@@ -11,8 +12,15 @@ MainConfig_t usb_config();
 int main()
 {
 	//test();
+    //std::streambuf my;
     auto config = usb_config();
     auto usb_conf = std::unique_ptr<CONNECT::USBConfig>(new CONNECT::USBConfig(config.sts, config.path));
+    Z80_CONNECT::Z80Connector z80card(usb_conf);
+
+    z80card.SendCommand(0xaa, "Hello world!!!", 14);
+
+    
+    /*auto usb_conf = std::unique_ptr<CONNECT::USBConfig>(new CONNECT::USBConfig(config.sts, config.path));
     auto usb = std::unique_ptr<CONNECT::USB>(new CONNECT::USB(usb_conf));
 
     if (usb->USB_Init())
@@ -25,7 +33,7 @@ int main()
     }
 
     usb->~USB();
-    usb.release();
+    usb.release();*/
     while (1) {}
 	return 0;
 }

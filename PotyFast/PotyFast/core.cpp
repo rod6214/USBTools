@@ -136,13 +136,18 @@ namespace CONNECT
 		return result;
 	}
 
-	bool USB::Write(
-		unsigned char* buffer,
-		unsigned long buffer_len,
-		unsigned long* written)
+	bool USB::Write(USB_Data_t& data)
 	{
-		auto result = WinUsb_WritePipe(interfaceHandle, 1, buffer, 16, written, NULL);
+		auto result = WinUsb_WritePipe(interfaceHandle, 
+			data.endpoint, data.buffer, data.buffer_len, NULL, NULL);
 		return result;
+	}
+
+	bool USB::Read(USB_Data_t& data)
+	{
+		auto result = WinUsb_ReadPipe(interfaceHandle, 128 | data.endpoint, 
+			data.buffer, data.buffer_len, data.pCount, NULL);
+		return false;
 	}
 
 	USB::~USB()
