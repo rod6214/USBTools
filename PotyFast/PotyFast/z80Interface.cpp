@@ -40,7 +40,7 @@ void Z80_CONNECT::Z80Connector::Run()
 
 void Z80_CONNECT::Z80Connector::SendCommand(unsigned char command, const char* buffer, int bytes)
 {
-    unsigned char internal_buffer[64];
+    unsigned char internal_buffer[66];
     if (bytes <= 48) 
     {
         internal_buffer[0] = command;
@@ -55,7 +55,7 @@ void Z80_CONNECT::Z80Connector::SendCommand(unsigned char command, const char* b
 
         CONNECT::USB_Data_t usb_data = {
             internal_buffer,
-            64,
+            bytes,
             NULL,
             1
         };

@@ -31,6 +31,8 @@ int main()
     {
         std::cout << "USB initialized" << std::endl;
         unsigned char buffer[66] = {0};
+        buffer[0] = 'n';
+        buffer[1] = 'S';
         unsigned long written = 0;
         usb->Write(buffer, 16, &written);
     }

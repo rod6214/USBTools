@@ -138,13 +138,25 @@ namespace CONNECT
 
 	bool USB::Write(USB_Data_t& data)
 	{
+		if (data.buffer_len > 64)
+		{
+			const char* error = "Error: More than 64 bytes are not permitted.";
+			throw error;
+		}
+		unsigned long written = 0;
+		//unsigned char buffer[66] = {0};
 		auto result = WinUsb_WritePipe(interfaceHandle, 
-			data.endpoint, data.buffer, data.buffer_len, NULL, NULL);
+			1, data.buffer, 63, &written, NULL);
 		return result;
 	}
 
 	bool USB::Read(USB_Data_t& data)
 	{
+		if (data.buffer_len > 64)
+		{
+			const char* error = "Error: More than 64 bytes are not permitted.";
+			throw error;
+		}
 		auto result = WinUsb_ReadPipe(interfaceHandle, 128 | data.endpoint, 
 			data.buffer, data.buffer_len, data.pCount, NULL);
 		return false;

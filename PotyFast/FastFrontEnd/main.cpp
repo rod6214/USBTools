@@ -17,7 +17,12 @@ int main()
     auto usb_conf = std::unique_ptr<CONNECT::USBConfig>(new CONNECT::USBConfig(config.sts, config.path));
     Z80_CONNECT::Z80Connector z80card(usb_conf);
 
-    z80card.SendCommand(0xaa, "Hello world!!!", 14);
+    try {
+        z80card.SendCommand(0xaa, "Hello world yeah!!!", 14);
+    }
+    catch (const char* err) {
+        std::cout << err << std::endl;
+    }
 
     
     /*auto usb_conf = std::unique_ptr<CONNECT::USBConfig>(new CONNECT::USBConfig(config.sts, config.path));
