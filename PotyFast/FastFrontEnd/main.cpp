@@ -18,7 +18,11 @@ int main()
     Z80_CONNECT::Z80Connector z80card(usb_conf);
 
     try {
-        z80card.SendCommand(0xaa, "Hello world yeah!!!", 14);
+        /*auto total = z80card.SendCommand(0xaa, "Test USB pepepep!!!", 48);
+        std::cout << total << std::endl;
+        unsigned char* buffer = new unsigned char[64];
+        total = z80card.GetResponse(buffer, 48);
+        std::cout << total << std::endl;*/
     }
     catch (const char* err) {
         std::cout << err << std::endl;

@@ -38,7 +38,7 @@ void Z80_CONNECT::Z80Connector::Run()
 {
 }
 
-void Z80_CONNECT::Z80Connector::SendCommand(unsigned char command, const char* buffer, int bytes)
+int Z80_CONNECT::Z80Connector::SendCommand(unsigned char command, const char* buffer, int bytes)
 {
     unsigned char internal_buffer[66];
     if (bytes <= 48) 
@@ -55,11 +55,32 @@ void Z80_CONNECT::Z80Connector::SendCommand(unsigned char command, const char* b
 
         CONNECT::USB_Data_t usb_data = {
             internal_buffer,
-            bytes,
-            NULL,
+            bytes + 16,
+            0,
             1
         };
 
         (*usb)->Write(usb_data);
+        return usb_data.pCount;
     }
+
+    return -1;
 }
+
+int Z80_CONNECT::Z80Connector::GetResponse(unsigned char* buffer, int bytes)
+{
+    if (bytes <= 48) 
+    {
+        CONNECT::USB_Data_t usb_data = {
+            buffer,
+            bytes + 16,
+            0,
+            1
+        };
+
+        (*usb)->Read(usb_data);
+    }
+    return 0;
+}
+
+

@@ -143,10 +143,9 @@ namespace CONNECT
 			const char* error = "Error: More than 64 bytes are not permitted.";
 			throw error;
 		}
-		unsigned long written = 0;
-		//unsigned char buffer[66] = {0};
+
 		auto result = WinUsb_WritePipe(interfaceHandle, 
-			1, data.buffer, 63, &written, NULL);
+			data.endpoint, data.buffer, data.buffer_len, &data.pCount, NULL);
 		return result;
 	}
 
@@ -158,7 +157,7 @@ namespace CONNECT
 			throw error;
 		}
 		auto result = WinUsb_ReadPipe(interfaceHandle, 128 | data.endpoint, 
-			data.buffer, data.buffer_len, data.pCount, NULL);
+			data.buffer, data.buffer_len, &data.pCount, NULL);
 		return false;
 	}
 

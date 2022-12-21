@@ -232,11 +232,7 @@ static uint8_t  USBD_DataOut(USBD_HandleTypeDef *pdev,
   be caused by  a new transfer before the end of the previous transfer */
   ((USBD_CUSTOM_HandleTypeDef *)pdev->pClassData)->state = CUSTOM_IDLE;
   HAL_PCD_EP_Receive(pdev->pData, CUSTOM_EPOUT_ADDR & 0xFU, &buffer_out[0], 64);
-  buffer_in[0] = 'c';
-  buffer_in[1] = 'o';
-  buffer_in[2] = 'o';
-  buffer_in[3] = 'l';
-  HAL_PCD_EP_Transmit(pdev->pData, CUSTOM_EPIN_ADDR & 0xFFU, &buffer_in[0], 64);
+//  HAL_PCD_EP_Transmit(hpcd, ep_addr, pBuf, len)
   return USBD_OK;
 }
 

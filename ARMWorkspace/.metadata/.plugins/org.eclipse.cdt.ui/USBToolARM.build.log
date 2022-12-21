@@ -1,10 +1,10 @@
-11:06:26 **** Incremental Build of configuration Debug for project USBToolARM ****
+20:28:41 **** Incremental Build of configuration Debug for project USBToolARM ****
 make -j12 all 
 arm-none-eabi-size   USBToolARM.elf 
    text	   data	    bss	    dec	    hex	filename
-  29432	    188	   4724	  34344	   8628	USBToolARM.elf
+  29476	    188	   4788	  34452	   8694	USBToolARM.elf
 Finished building: default.size.stdout
  
 
-11:06:26 Build Finished. 0 errors, 0 warnings. (took 849ms)
+20:28:41 Build Finished. 0 errors, 0 warnings. (took 237ms)
 

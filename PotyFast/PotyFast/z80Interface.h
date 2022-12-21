@@ -15,8 +15,9 @@ namespace Z80_CONNECT
 		virtual void WriteMemory(const char* buffer, int bytes) override;
 		virtual void ReadMemory(const char* buffer, int bytes) override;
 		virtual void Run() override;
-	//protected:
-		virtual void SendCommand(unsigned char command, const char* buffer, int bytes) override;
+	protected:
+		virtual int SendCommand(unsigned char command, const char* buffer, int bytes) override;
+		virtual int GetResponse(unsigned char* buffer, int bytes) override;
 	private:
 		std::unique_ptr<CONNECT::USB>* usb;
 	};

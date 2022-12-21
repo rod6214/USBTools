@@ -647,3 +647,175 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-18 11:06:26.043
 !MESSAGE Project is null
+!SESSION 2022-12-19 22:13:24.427 -----------------------------------------------
+eclipse.buildId=Version 1.10.1
+java.version=11.0.14.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.core.resources 2 10035 2022-12-19 22:13:33.161
+!MESSAGE The workspace exited with unsaved changes in the previous session; refreshing workspace to recover changes.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-12-19 22:13:45.858
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-12-19 22:13:46.034
+!MESSAGE Log4j initialized with config file C:\Develop\USBTools\ARMWorkspace\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-12-19 22:13:56.949
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-19 22:14:31.142
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-19 22:14:31.142
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-19 22:14:31.142
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-19 22:14:31.142
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-19 22:14:38.803
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-19 22:14:38.803
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-19 22:14:38.803
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-19 22:14:38.803
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-19 22:21:52.922
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-19 22:21:52.922
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-19 22:21:52.922
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-19 22:21:52.922
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-19 22:21:55.011
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-19 22:21:55.011
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-19 22:21:55.011
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-19 22:21:55.011
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-20 09:11:02.657
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-20 09:11:02.658
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-20 09:11:02.658
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-20 09:11:02.659
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-20 09:11:02.855
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-20 09:11:02.855
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-20 09:11:02.855
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-20 09:11:02.855
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-20 18:50:54.205
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-20 18:50:54.205
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-20 18:50:54.205
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-20 18:50:54.205
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-20 18:50:54.323
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-20 18:50:54.323
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-20 18:50:54.323
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-20 18:50:54.324
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-20 18:51:53.245
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-20 18:51:53.245
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-20 18:51:53.245
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-20 18:51:53.245
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-20 18:51:53.307
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-20 18:51:53.307
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-20 18:51:53.307
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-20 18:51:53.308
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-20 20:23:50.574
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-20 20:23:50.574
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-20 20:23:50.575
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-20 20:23:50.587
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-20 20:23:50.779
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-20 20:23:50.779
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-20 20:23:50.779
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-20 20:23:50.779
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.jobs 4 2 2022-12-20 20:28:02.663
+!MESSAGE An internal error occurred during: "Suspend monitor job.".
+!STACK 0
+java.util.concurrent.RejectedExecutionException: Task java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask@603b5f04[Not completed, task = java.util.concurrent.Executors$RunnableAdapter@182b96e3[Wrapped task = org.eclipse.cdt.dsf.gdb.service.GDBRunControl_7_12$MonitorSuspendJob$2@1ba83c8]] rejected from org.eclipse.cdt.dsf.concurrent.DefaultDsfExecutor@1851c4f0[Terminated, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 2444]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:2055)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.reject(ThreadPoolExecutor.java:825)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor.delayedExecute(ScheduledThreadPoolExecutor.java:340)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor.schedule(ScheduledThreadPoolExecutor.java:562)
+	at org.eclipse.cdt.dsf.concurrent.DefaultDsfExecutor.schedule(DefaultDsfExecutor.java:450)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor.submit(ScheduledThreadPoolExecutor.java:715)
+	at org.eclipse.cdt.dsf.concurrent.DefaultDsfExecutor.submit(DefaultDsfExecutor.java:482)
+	at org.eclipse.cdt.dsf.gdb.service.GDBRunControl_7_12$MonitorSuspendJob.run(GDBRunControl_7_12.java:358)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-20 20:28:40.967
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-20 20:28:40.967
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-20 20:28:40.967
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-20 20:28:40.968
+!MESSAGE Project is null
+
+!ENTRY org.eclipse.core.resources 4 77 2022-12-20 20:28:41.046
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-12-20 20:28:41.046
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-12-20 20:28:41.046
+!MESSAGE C:\Develop\USBTools\ARMWorkspace\USBToolARM overlaps the location of another project: 'USBToolARM'
+
+!ENTRY com.st.stm32cube.common.projectcreation 4 0 2022-12-20 20:28:41.047
+!MESSAGE Project is null

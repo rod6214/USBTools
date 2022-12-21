@@ -19,7 +19,7 @@ extern "C"
 		{
 			unsigned char* buffer;
 			unsigned long buffer_len;
-			unsigned long* pCount;
+			unsigned long pCount;
 			unsigned char endpoint;
 		} USB_Data_t;
 

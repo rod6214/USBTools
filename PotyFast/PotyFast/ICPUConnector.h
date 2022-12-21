@@ -23,6 +23,7 @@ namespace Z80_CONNECT
 		virtual void ReadMemory(const char* buffer, int bytes) = 0;
 		virtual void Run() = 0;
 	protected:
-		virtual void SendCommand(unsigned char command, const char* buffer, int bytes) = 0;
+		virtual int SendCommand(unsigned char command, const char* buffer, int bytes) = 0;
+		virtual int GetResponse(unsigned char* buffer, int bytes) = 0;
 	};
 }
