@@ -40,14 +40,12 @@ _estack = ORIGIN(RAM) + LENGTH(RAM); /* end of "RAM" Ram type memory */
 
 _Min_Heap_Size = 0x200 ; /* required amount of heap */
 _Min_Stack_Size = 0x400 ; /* required amount of stack */
-_Min_Usb_Size = 0x400 ; /* required amount of usb ram */
-_Min_BD_Size = 0x40;
+
 /* Memories definition */
 MEMORY
 {
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 20K
   FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 64K
-  USB_RAM	(xrw)	: ORIGIN = 0x40006000,   LENGTH = 2k
 }
 
 /* Sections */
@@ -174,18 +172,6 @@ SECTIONS
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
   } >RAM
-  
-  ._usb_buffer_ram : 
-  {
-	. = ALIGN(8);
-	_bd = .;
-	*(.ep_bd);
-	. = _Min_BD_Size;
-  	_usb = .;
-  	*(.ep_ram);
-  	. = _Min_Usb_Size;
-  	. = ALIGN(8);
-  } >USB_RAM
 
   /* Remove information from the compiler libraries */
   /DISCARD/ :

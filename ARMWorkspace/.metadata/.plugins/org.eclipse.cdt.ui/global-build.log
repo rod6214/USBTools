@@ -1,6 +1,6 @@
-18:13:40 **** Incremental Build of configuration Debug for project USBToolARM ****
+19:37:01 **** Incremental Build of configuration Debug for project USBToolARM ****
 make -j12 all 
-arm-none-eabi-gcc "../CustomClass/Class/Src/usbc.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../CustomClass/Class/Inc -I../USB_DEVICE/App -I../USB_DEVICE/Target -I../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"CustomClass/Class/Src/usbc.d" -MT"CustomClass/Class/Src/usbc.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "CustomClass/Class/Src/usbc.o"
+arm-none-eabi-gcc "../CustomClass/Class/Src/usbc.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../USB_DEVICE/App -I../USB_DEVICE/Target -I../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc -I"C:/Develop/USBTools/ARMWorkspace/USBToolARM/CustomClass/Class/Inc" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"CustomClass/Class/Src/usbc.d" -MT"CustomClass/Class/Src/usbc.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "CustomClass/Class/Src/usbc.o"
 ../CustomClass/Class/Src/usbc.c: In function 'USBD_DataOut':
 ../CustomClass/Class/Src/usbc.c:272:9: warning: unused variable 'offset' [-Wunused-variable]
   272 |     int offset = ((int)buffer_in[3] << 8) | (buffer_in[4]);
@@ -11,26 +11,15 @@ Finished building target: USBToolARM.elf
 arm-none-eabi-size   USBToolARM.elf 
 arm-none-eabi-objdump -h -S  USBToolARM.elf  > "USBToolARM.list"
    text	   data	    bss	    dec	    hex	filename
-  30040	    188	   4836	  35064	   88f8	USBToolARM.elf
+  29136	    188	   3756	  33080	   8138	USBToolARM.elf
 Finished building: default.size.stdout
  
 Finished building: USBToolARM.list
  
-18:15:01 **** Incremental Build of configuration Debug for project USBToolARM ****
+19:39:38 **** Incremental Build of configuration Debug for project USBToolARM ****
 make -j12 all 
-arm-none-eabi-gcc "../CustomClass/Class/Src/usbc.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../CustomClass/Class/Inc -I../USB_DEVICE/App -I../USB_DEVICE/Target -I../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"CustomClass/Class/Src/usbc.d" -MT"CustomClass/Class/Src/usbc.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "CustomClass/Class/Src/usbc.o"
-../CustomClass/Class/Src/usbc.c: In function 'USBD_DataOut':
-../CustomClass/Class/Src/usbc.c:272:9: warning: unused variable 'offset' [-Wunused-variable]
-  272 |     int offset = ((int)buffer_in[3] << 8) | (buffer_in[4]);
-      |         ^~~~~~
-arm-none-eabi-gcc -o "USBToolARM.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Develop\USBTools\ARMWorkspace\USBToolARM\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="USBToolARM.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: USBToolARM.elf
- 
 arm-none-eabi-size   USBToolARM.elf 
-arm-none-eabi-objdump -h -S  USBToolARM.elf  > "USBToolARM.list"
    text	   data	    bss	    dec	    hex	filename
-  30040	    188	   4836	  35064	   88f8	USBToolARM.elf
+  29136	    188	   3756	  33080	   8138	USBToolARM.elf
 Finished building: default.size.stdout
- 
-Finished building: USBToolARM.list
  

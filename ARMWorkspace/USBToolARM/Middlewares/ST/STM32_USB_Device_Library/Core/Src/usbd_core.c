@@ -301,6 +301,7 @@ USBD_StatusTypeDef USBD_LL_DataOutStage(USBD_HandleTypeDef *pdev,
                                         uint8_t epnum, uint8_t *pdata)
 {
   USBD_EndpointTypeDef *pep;
+
   if (epnum == 0U)
   {
     pep = &pdev->ep_out[0];
