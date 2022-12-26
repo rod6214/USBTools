@@ -16,14 +16,14 @@ namespace Z80_CONNECT
 	class ICPUConnector
 	{
 	public:
-		virtual void Reset() = 0;
-		virtual void OneStep() = 0;
-		virtual void ProgramMode() = 0;
-		virtual void WriteMemory(const char* buffer, int bytes) = 0;
-		virtual void ReadMemory(const char* buffer, int bytes) = 0;
-		virtual void Run() = 0;
+		virtual bool Reset() = 0;
+		virtual bool OneStep() = 0;
+		virtual bool ProgramMode() = 0;
+		virtual int WriteMemory(const char* buffer, int offset, int bytes) = 0;
+		virtual int ReadMemory(const char* buffer, int offset, int bytes) = 0;
+		virtual bool Run() = 0;
 	protected:
-		virtual int SendCommand(unsigned char command, const char* buffer, int bytes) = 0;
+		virtual int SendCommand(unsigned char command, const char* buffer, int offset, int bytes) = 0;
 		virtual int GetResponse(unsigned char* buffer, int bytes) = 0;
 	};
 }

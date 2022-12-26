@@ -158,7 +158,7 @@ namespace CONNECT
 		}
 		auto result = WinUsb_ReadPipe(interfaceHandle, 128 | data.endpoint, 
 			data.buffer, data.buffer_len, &data.pCount, NULL);
-		return false;
+		return result;
 	}
 
 	USB::~USB()

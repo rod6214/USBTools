@@ -1,6 +1,6 @@
-../CustomClass/Class/Src/usbc.c:114:17:USBD_CUSTOM_Init	24	static
-../CustomClass/Class/Src/usbc.c:146:17:USBD_CUSTOM_DeInit	16	static
-../CustomClass/Class/Src/usbc.c:168:10:USBD_GetPollingInterval	24	static
-../CustomClass/Class/Src/usbc.c:197:18:USBD_GetFSCfgDesc	16	static
-../CustomClass/Class/Src/usbc.c:211:17:USBD_DataIn	16	static
-../CustomClass/Class/Src/usbc.c:228:17:USBD_DataOut	16	static
+../CustomClass/Class/Src/usbc.c:116:17:USBD_CUSTOM_Init	24	static
+../CustomClass/Class/Src/usbc.c:148:17:USBD_CUSTOM_DeInit	16	static
+../CustomClass/Class/Src/usbc.c:170:10:USBD_GetPollingInterval	24	static
+../CustomClass/Class/Src/usbc.c:199:18:USBD_GetFSCfgDesc	16	static
+../CustomClass/Class/Src/usbc.c:213:17:USBD_DataIn	16	static
+../CustomClass/Class/Src/usbc.c:230:17:USBD_DataOut	160	static

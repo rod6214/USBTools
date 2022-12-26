@@ -14,31 +14,67 @@ Z80_CONNECT::Z80Connector::Z80Connector(std::unique_ptr<CONNECT::USBConfig>& usb
     }
 }
 
-void Z80_CONNECT::Z80Connector::Reset()
+bool Z80_CONNECT::Z80Connector::Reset()
 {
+    unsigned char result[64];
+    char str[64];
+    SendCommand(RESET, "", 0, 0);
+    int res = GetResponse(result, 0);
+    
+    if (res < 0)
+        return false;
+
+    memcpy(str, result, res);
+    
+    str[63] = '\0';
+
+    if (strcmp(str, "RESET") == 0)
+        return true;
+    
+    return false;
 }
 
-void Z80_CONNECT::Z80Connector::OneStep()
+bool Z80_CONNECT::Z80Connector::OneStep()
 {
+    unsigned char result[64];
+    char str[64];
+    SendCommand(ONE_STEP, "", 0, 0);
+    int res = GetResponse(result, 0);
+
+    if (res < 0)
+        return false;
+
+    memcpy(str, result, res);
+
+    str[63] = '\0';
+
+    if (strcmp(str, "ONE_STEP") == 0)
+        return true;
+
+    return false;
 }
 
-void Z80_CONNECT::Z80Connector::ProgramMode()
+bool Z80_CONNECT::Z80Connector::ProgramMode()
 {
+    return false;
 }
 
-void Z80_CONNECT::Z80Connector::WriteMemory(const char* buffer, int bytes)
+int Z80_CONNECT::Z80Connector::WriteMemory(const char* buffer, int offset, int bytes)
 {
+    return 0;
 }
 
-void Z80_CONNECT::Z80Connector::ReadMemory(const char* buffer, int bytes)
+int Z80_CONNECT::Z80Connector::ReadMemory(const char* buffer, int offset, int bytes)
 {
+    return 0;
 }
 
-void Z80_CONNECT::Z80Connector::Run()
+bool Z80_CONNECT::Z80Connector::Run()
 {
+    return false;
 }
 
-int Z80_CONNECT::Z80Connector::SendCommand(unsigned char command, const char* buffer, int bytes)
+int Z80_CONNECT::Z80Connector::SendCommand(unsigned char command, const char* buffer, int offset, int bytes)
 {
     unsigned char internal_buffer[66];
     if (bytes <= 48) 
@@ -46,6 +82,8 @@ int Z80_CONNECT::Z80Connector::SendCommand(unsigned char command, const char* bu
         internal_buffer[0] = command;
         internal_buffer[1] = (unsigned char)((bytes & 0xff00) >> 8);
         internal_buffer[2] = (unsigned char)(bytes & 0x00ff);
+        internal_buffer[3] = (unsigned char)((offset & 0xff00) >> 8);
+        internal_buffer[4] = (unsigned char)(offset & 0x00ff);
         unsigned char* pData = &internal_buffer[16];
         const char* src = buffer;
         for (int i = 0; i < bytes; i++) 
@@ -55,7 +93,7 @@ int Z80_CONNECT::Z80Connector::SendCommand(unsigned char command, const char* bu
 
         CONNECT::USB_Data_t usb_data = {
             internal_buffer,
-            bytes + 16,
+            64,
             0,
             1
         };
@@ -73,14 +111,15 @@ int Z80_CONNECT::Z80Connector::GetResponse(unsigned char* buffer, int bytes)
     {
         CONNECT::USB_Data_t usb_data = {
             buffer,
-            bytes + 16,
+            64,
             0,
             1
         };
 
         (*usb)->Read(usb_data);
+        return usb_data.pCount;
     }
-    return 0;
+    return -1;
 }
 
 

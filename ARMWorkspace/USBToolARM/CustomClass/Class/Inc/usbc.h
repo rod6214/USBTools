@@ -20,6 +20,8 @@
 #define USB_CUSTOM_CONFIG_DESC_SIZ       34U
 #define USB_CUSTOM_DESC_SIZ              9U
 
+
+
 typedef enum
 {
   CUSTOM_IDLE = 0,

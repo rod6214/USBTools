@@ -10,6 +10,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbc.h"
+#include "Z80Service.h"
+#include <memory.h>
 
 uint8_t buffer_out[65];
 uint8_t buffer_in[65];
@@ -232,10 +234,64 @@ static uint8_t  USBD_DataOut(USBD_HandleTypeDef *pdev,
   be caused by  a new transfer before the end of the previous transfer */
   ((USBD_CUSTOM_HandleTypeDef *)pdev->pClassData)->state = CUSTOM_IDLE;
   HAL_PCD_EP_Receive(pdev->pData, CUSTOM_EPOUT_ADDR & 0xFU, &buffer_out[0], 64);
-  buffer_in[0] = 'c';
-  buffer_in[1] = 'o';
-  buffer_in[2] = 'o';
-  buffer_in[3] = 'l';
+
+  switch(buffer_out[0])
+  {
+	  case CRESET:
+	  {
+		  const char resetMsg[] = "RESET";
+		  memcpy(buffer_in, resetMsg, 64);
+		  Z80_Reset();
+	  }
+	  break;
+	  case ONE_STEP:
+	  {
+		  const char resetMsg[] = "ONE_STEP";
+		  memcpy(buffer_in, resetMsg, 64);
+		  Z80_OneStep();
+	  }
+	  break;
+	  case PROGRAM_MODE:
+	  {
+		  const char resetMsg[] = "PROGRAM_MODE";
+		  memcpy(buffer_in, resetMsg, 64);
+		  Z80_ProgramMode();
+	  }
+	  break;
+	  case RUN_CPU:
+	  {
+		  const char resetMsg[] = "RUN_CPU";
+		  memcpy(buffer_in, resetMsg, 64);
+		  Z80_Run();
+	  }
+	  break;
+	  case READ_DATA:
+	  {
+		  const char resetMsg[] = "READ_DATA";
+		  memcpy(buffer_in, resetMsg, 64);
+		  int offset = ((int)buffer_in[3] << 8) | (buffer_in[4]);
+		  int len = ((int)buffer_out[1] << 8) | (buffer_out[2]);
+		  if (len <= 48)
+		  {
+//			  Z80_ReadMemory(offset, bytes);
+		  }
+	  }
+	  break;
+	  case WRITE_DATA:
+	  {
+		  const char resetMsg[] = "WRITE_DATA";
+		  memcpy(buffer_in, resetMsg, 64);
+		  char writeBuffer[48];
+		  int offset = ((int)buffer_out[3] << 8) | (buffer_out[4]);
+		  int len = ((int)buffer_out[1] << 8) | (buffer_out[2]);
+		  if (len <= 48)
+		  {
+			  memcpy(writeBuffer, &buffer_out[16], len);
+			  Z80_WriteMemory(writeBuffer, offset, len);
+		  }
+	  }
+	  break;
+  }
   HAL_PCD_EP_Transmit(pdev->pData, CUSTOM_EPIN_ADDR & 0xFFU, &buffer_in[0], 64);
   return USBD_OK;
 }

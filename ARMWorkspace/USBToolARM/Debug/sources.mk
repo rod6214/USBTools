@@ -21,8 +21,8 @@ C_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-Core/Src/gpio \
 Core/Src \
+Core/Src/gpio \
 Core/Src/usb \
 Core/Startup \
 CustomClass/Class/Src \
