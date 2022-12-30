@@ -13,17 +13,32 @@ ActionResult_t results[6];
 
 ActionResult_t* Z80_Reset()
 {
+	results[3].bytes = 0;
+	Port_ResetCPU();
 	return &results[0];
 }
 
 ActionResult_t* Z80_OneStep()
 {
+	results[3].bytes = 0;
+	Port_Reset();
+	Port_OnStep();
 	return &results[1];
 }
 
 ActionResult_t* Z80_ProgramMode()
 {
+	results[3].bytes = 0;
+	Port_ProgramCPU();
 	return &results[2];
+}
+
+ActionResult_t* Z80_Run()
+{
+	results[3].bytes = 0;
+	Port_Reset();
+	Port_RunCPU();
+	return &results[5];
 }
 
 ActionResult_t* Z80_WriteMemory(char* buffer, int offset, int bytes)
@@ -48,9 +63,4 @@ ActionResult_t* Z80_ReadMemory(int offset, int bytes)
 		memcpy(results[4].buffer, buffer, bytes);
 	}
 	return &results[4];
-}
-
-ActionResult_t* Z80_Run()
-{
-	return &results[5];
 }

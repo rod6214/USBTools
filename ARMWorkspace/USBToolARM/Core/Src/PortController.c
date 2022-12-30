@@ -17,8 +17,8 @@
 #define READY_SIGNAL GPIO_PIN_13
 #define RESET_CPU GPIO_PIN_12
 #define PROGRAM_CPU GPIO_PIN_13
-#define ONE_STEP0 GPIO_PIN_14
-#define ONE_STEP1 GPIO_PIN_15
+#define ONE_STEP GPIO_PIN_14
+#define RUN_CPU GPIO_PIN_15
 
 static void set_address(int value);
 
@@ -36,29 +36,25 @@ void Port_ResetCPU()
 	}
 }
 
-void Port_ProgramCPU(int value)
+void Port_ProgramCPU()
 {
-	if (value)
-	{
-		HAL_GPIO_WritePin(GPIOB, PROGRAM_CPU, GPIO_PIN_SET);
-	}
-	else
-	{
-		HAL_GPIO_WritePin(GPIOB, PROGRAM_CPU, GPIO_PIN_RESET);
-	}
+	HAL_GPIO_WritePin(GPIOB, RUN_CPU, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, ONE_STEP, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, PROGRAM_CPU, GPIO_PIN_SET);
 }
 
-void Port_OnStep(enum ONE_STEP_MODE mode)
+void Port_RunCPU()
 {
-	switch(mode)
-	{
-	case ACTIVATED:
-		break;
-	case DEACTIVATED:
-		break;
-	case CLOCK_OFF:
-		break;
-	}
+	HAL_GPIO_WritePin(GPIOB, PROGRAM_CPU, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, ONE_STEP, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, RUN_CPU, GPIO_PIN_SET);
+}
+
+void Port_OnStep()
+{
+	HAL_GPIO_WritePin(GPIOB, PROGRAM_CPU, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, RUN_CPU, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, ONE_STEP, GPIO_PIN_SET);
 }
 
 void Port_Write(char* buffer, int offset, int bytes)

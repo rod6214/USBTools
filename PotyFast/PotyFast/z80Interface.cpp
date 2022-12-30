@@ -6,11 +6,11 @@ Z80_CONNECT::Z80Connector::Z80Connector(std::unique_ptr<CONNECT::USBConfig>& usb
     
     if ((*usb)->USB_Init())
     {
-        std::cout << "USB initialized" << std::endl;
+        std::cout << "USB initialized." << std::endl;
     }
     else
     {
-        std::cout << "USB error" << std::endl;
+        throw "USB error or divice is not connected.";
     }
 }
 
@@ -18,7 +18,7 @@ bool Z80_CONNECT::Z80Connector::Reset()
 {
     char result[64];
     char str[64];
-    SendCommand(RESET, "", 0, 0);
+    SendCommand(RESET, NULL, 0, 0);
     int res = GetResponse(result, 0);
     
     if (res < 0)
@@ -38,7 +38,7 @@ bool Z80_CONNECT::Z80Connector::OneStep()
 {
     char result[64];
     char str[64];
-    SendCommand(ONE_STEP, "", 0, 0);
+    SendCommand(ONE_STEP, NULL, 0, 0);
     int res = GetResponse(result, 0);
 
     if (res < 0)
@@ -56,6 +56,14 @@ bool Z80_CONNECT::Z80Connector::OneStep()
 
 bool Z80_CONNECT::Z80Connector::ProgramMode()
 {
+    char result[64];
+    char* str = new char[64];
+    SendCommand(PROGRAM_MODE, NULL, 0, 0);
+    int res = GetResponse(result, 0);
+    if (res != 0)
+    {
+        return true;
+    }
     return false;
 }
 
@@ -101,6 +109,14 @@ Z80_CONNECT::CPUResponse Z80_CONNECT::Z80Connector::ReadMemory(int offset, int b
 
 bool Z80_CONNECT::Z80Connector::Run()
 {
+    char result[64];
+    char* str = new char[64];
+    SendCommand(RUN_CPU, NULL, 0, 0);
+    int res = GetResponse(result, 0);
+    if (res != 0)
+    {
+        return true;
+    }
     return false;
 }
 

@@ -21,9 +21,12 @@ int main()
         //const char* request = "FROM VISUAL STUDIO";
         //char request[4] = { 1, 2, 4, 8};
         //auto  value = z80card.WriteMemory(request, 0, 3);
-        auto value = z80card.ReadMemory(0, 3);
-
-        std::cout << value.bytes << std::endl;
+        //auto value = z80card.ReadMemory(0, 3);
+        z80card.OneStep();
+        z80card.ProgramMode();
+        z80card.Reset();
+        z80card.Run();
+        //std::cout << value.bytes << std::endl;
         /*auto total = z80card.SendCommand(0xaa, "Test USB pepepep!!!", 48);
         std::cout << total << std::endl;
         unsigned char* buffer = new unsigned char[64];

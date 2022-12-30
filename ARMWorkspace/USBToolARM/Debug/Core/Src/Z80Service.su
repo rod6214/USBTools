@@ -1,6 +1,6 @@
-../Core/Src/Z80Service.c:14:17:Z80_Reset	4	static
-../Core/Src/Z80Service.c:19:17:Z80_OneStep	4	static
-../Core/Src/Z80Service.c:24:17:Z80_ProgramMode	4	static
-../Core/Src/Z80Service.c:29:17:Z80_WriteMemory	32	static
-../Core/Src/Z80Service.c:41:17:Z80_ReadMemory	64	static
-../Core/Src/Z80Service.c:53:17:Z80_Run	4	static
+../Core/Src/Z80Service.c:14:17:Z80_Reset	8	static
+../Core/Src/Z80Service.c:21:17:Z80_OneStep	8	static
+../Core/Src/Z80Service.c:29:17:Z80_ProgramMode	8	static
+../Core/Src/Z80Service.c:36:17:Z80_Run	8	static
+../Core/Src/Z80Service.c:44:17:Z80_WriteMemory	32	static
+../Core/Src/Z80Service.c:56:17:Z80_ReadMemory	64	static

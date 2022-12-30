@@ -1,17 +1,10 @@
-23:09:04 **** Incremental Build of configuration Debug for project USBToolARM ****
+00:21:01 **** Incremental Build of configuration Debug for project USBToolARM ****
 make -j12 all 
-arm-none-eabi-gcc "../Core/Src/Z80Service.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../USB_DEVICE/App -I../USB_DEVICE/Target -I../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Inc -I"C:/Develop/USBTools/ARMWorkspace/USBToolARM/CustomClass/Class/Inc" -I../CustomDevice/Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/Z80Service.d" -MT"Core/Src/Z80Service.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/Z80Service.o"
-arm-none-eabi-gcc -o "USBToolARM.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Develop\USBTools\ARMWorkspace\USBToolARM\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="USBToolARM.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: USBToolARM.elf
- 
 arm-none-eabi-size   USBToolARM.elf 
-arm-none-eabi-objdump -h -S  USBToolARM.elf  > "USBToolARM.list"
    text	   data	    bss	    dec	    hex	filename
-  32784	    188	   4092	  37064	   90c8	USBToolARM.elf
+  33092	    188	   4092	  37372	   91fc	USBToolARM.elf
 Finished building: default.size.stdout
  
-Finished building: USBToolARM.list
- 
 
-23:09:05 Build Finished. 0 errors, 0 warnings. (took 818ms)
+00:21:01 Build Finished. 0 errors, 0 warnings. (took 227ms)
 

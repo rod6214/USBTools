@@ -22,8 +22,9 @@ extern void Port_Reset();
 extern void Port_Set();
 extern void Port_AsInput();
 extern void Port_AsOutput();
-extern void Port_ProgramCPU(int value);
-extern void Port_OnStep(enum ONE_STEP_MODE mode);
+extern void Port_ProgramCPU();
+extern void Port_OnStep();
 extern void Port_ResetCPU();
+extern void Port_RunCPU();
 
 #endif /* INC_PORTCONTROLLER_H_ */
