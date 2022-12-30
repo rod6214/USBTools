@@ -27,7 +27,7 @@
 #include "usbd_custom_hid_if.h"
 
 /* USER CODE BEGIN Includes */
-#include "usbc.h"
+
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN PV */
