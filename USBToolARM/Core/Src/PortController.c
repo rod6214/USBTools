@@ -79,6 +79,7 @@ void Port_init()
 	HAL_Delay(1);
 	HAL_GPIO_WritePin(GPIOC, READY_SIGNAL, GPIO_PIN_RESET);
 	HAL_Delay(1);
+	Port_Reset();
 }
 
 void Port_Read(char* buffer, int offset, int bytes)
