@@ -15,12 +15,14 @@
 #define OUTPUT_DATA_H GPIO_PIN_5
 #define OUTPUT_DATA_L GPIO_PIN_6
 #define READY_SIGNAL GPIO_PIN_13
+#define WRITE_ENABLE GPIO_PIN_11
 #define RESET_CPU GPIO_PIN_12
 #define PROGRAM_CPU GPIO_PIN_13
 #define ONE_STEP GPIO_PIN_14
 #define RUN_CPU GPIO_PIN_15
 
 static void set_address(int value);
+static void write_enable();
 
 void Port_ResetCPU()
 {
@@ -65,6 +67,7 @@ void Port_Write(char* buffer, int offset, int bytes)
 	{
 		set_address(i);
 		GPIOA->ODR = buffer[i - offset];
+		write_enable();
 	}
 }
 
@@ -171,4 +174,21 @@ static void set_address(int value)
 	}
 }
 
+static void write_enable()
+{
+	int k = 0;
 
+	GPIO_PinState high_state = HAL_GPIO_ReadPin(GPIOB, WRITE_ENABLE);
+
+	if (!high_state)
+	{
+		HAL_GPIO_TogglePin(GPIOB, WRITE_ENABLE);
+	}
+
+	while (k < 2)
+	{
+		HAL_GPIO_TogglePin(GPIOB, WRITE_ENABLE);
+		delay_us(1);
+		k++;
+	}
+}

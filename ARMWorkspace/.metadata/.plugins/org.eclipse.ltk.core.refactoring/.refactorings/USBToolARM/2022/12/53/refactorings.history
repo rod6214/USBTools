@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;USBToolARM/Core/Src/timer.c&apos; to &apos;timers.c&apos;" description="Rename resource &apos;timer.c&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Core/Src/timer.c" name="timers.c" stamp="1672174587558" updateReferences="true"/>
-</session>
