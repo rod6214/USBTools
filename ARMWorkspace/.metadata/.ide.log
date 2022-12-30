@@ -2734,3 +2734,131 @@
 2022-12-28 17:37:34,262 [INFO] ProjectBuilder:4285 - Time for Generating toolchain IDE Files: 894mS.
 2022-12-28 17:37:34,262 [INFO] ProjectBuilder:2790 - Time for Copy CMSIS : 0mS.
 2022-12-28 17:37:34,268 [INFO] ProjectBuilder:2790 - Time for Copy CMSIS : 0mS.
+2022-12-29 23:59:56,491 [INFO] Gpio:272 - dependency for GPIO [RCC, USB]
+2022-12-30 00:00:00,997 [INFO] Gpio:272 - dependency for GPIO [RCC, USB]
+2022-12-30 00:00:04,200 [INFO] Gpio:272 - dependency for GPIO [RCC, USB]
+2022-12-30 00:00:06,984 [INFO] Gpio:272 - dependency for GPIO [RCC, USB]
+2022-12-30 00:00:21,354 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 346500232 Bytes (856686592)
+2022-12-30 00:00:22,589 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 288314488 Bytes (856686592)
+2022-12-30 00:00:23,795 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 345430896 Bytes (856686592)
+2022-12-30 00:00:24,078 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: NVIC
+2022-12-30 00:00:24,078 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: TIM1_8F1
+2022-12-30 00:00:24,078 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: USB_DEVICE
+2022-12-30 00:00:24,078 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: USB
+2022-12-30 00:00:24,078 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: GPIO
+2022-12-30 00:00:24,078 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: RCC
+2022-12-30 00:00:24,079 [INFO] CodeGenerator:690 - code generatio: config db path: C:\ST\STM32CubeIDE_1.10.1\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_6.6.1.202207061420\\db\
+2022-12-30 00:00:24,388 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\license.tmp_save
+2022-12-30 00:00:24,435 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\license.tmp
+2022-12-30 00:00:24,609 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\gpio.tmp_save
+2022-12-30 00:00:24,672 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\gpio.tmp
+2022-12-30 00:00:24,781 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_vars.tmp_save
+2022-12-30 00:00:24,827 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_vars.tmp
+2022-12-30 00:00:24,835 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_inc.tmp_save
+2022-12-30 00:00:24,898 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_inc.tmp
+2022-12-30 00:00:25,055 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_HalInit.tmp_save
+2022-12-30 00:00:25,123 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_HalInit.tmp
+2022-12-30 00:00:25,143 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_Msp.tmp_save
+2022-12-30 00:00:25,219 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_Msp.tmp
+2022-12-30 00:00:25,319 [INFO] Middleware:1435 - No code input for Bsp Dependency
+2022-12-30 00:00:25,320 [INFO] Middleware:1435 - No code input for Bsp Dependency
+2022-12-30 00:00:25,344 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usb_device.c_save
+2022-12-30 00:00:25,409 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usb_device.c
+2022-12-30 00:00:25,448 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usb_device.h_save
+2022-12-30 00:00:25,518 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usb_device.h
+2022-12-30 00:00:25,570 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\Target\usbd_conf.h_save
+2022-12-30 00:00:25,637 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\Target\usbd_conf.h
+2022-12-30 00:00:25,666 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\Target\usbd_conf.c_save
+2022-12-30 00:00:25,727 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\Target\usbd_conf.c
+2022-12-30 00:00:25,744 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_desc.h_save
+2022-12-30 00:00:25,812 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_desc.h
+2022-12-30 00:00:25,841 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_desc.c_save
+2022-12-30 00:00:25,900 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_desc.c
+2022-12-30 00:00:25,940 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_custom_hid_if.h_save
+2022-12-30 00:00:26,003 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_custom_hid_if.h
+2022-12-30 00:00:26,017 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_custom_hid_if.c_save
+2022-12-30 00:00:26,127 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_custom_hid_if.c
+2022-12-30 00:00:26,321 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\stm32f1xx_it.c_save
+2022-12-30 00:00:26,423 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\stm32f1xx_it.c
+2022-12-30 00:00:26,451 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\stm32f1xx_it.h_save
+2022-12-30 00:00:26,519 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\stm32f1xx_it.h
+2022-12-30 00:00:26,657 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\stm32f1xx_hal_msp.c_save
+2022-12-30 00:00:26,721 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\stm32f1xx_hal_msp.c
+2022-12-30 00:00:26,754 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\system.tmp_save
+2022-12-30 00:00:26,796 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\system.tmp
+2022-12-30 00:00:26,835 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\stm32f1xx_hal_conf.h_save
+2022-12-30 00:00:26,895 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\stm32f1xx_hal_conf.h
+2022-12-30 00:00:26,903 [WARN] IPConfigManager:3348 - IP not found : TIM
+2022-12-30 00:00:26,904 [WARN] CodeGenerator:3567 - IP not found : null
+2022-12-30 00:00:26,922 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\main.h_save
+2022-12-30 00:00:26,975 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\main.h
+2022-12-30 00:00:26,999 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\main.c_save
+2022-12-30 00:00:27,071 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\main.c
+2022-12-30 00:00:33,061 [INFO] ProjectBuilder:2919 - Time for Copy HAL[1] : 5512mS.
+2022-12-30 00:00:33,065 [INFO] ProjectBuilder:4117 - Project Generator version: 3.17.1
+2022-12-30 00:00:33,366 [INFO] ConfigFileManager:1394 - The Die is : DIE410
+2022-12-30 00:00:35,028 [INFO] ProjectBuilder:4285 - Time for Generating toolchain IDE Files: 1963mS.
+2022-12-30 00:00:35,029 [INFO] ProjectBuilder:2790 - Time for Copy CMSIS : 0mS.
+2022-12-30 00:00:35,039 [INFO] ProjectBuilder:2790 - Time for Copy CMSIS : 0mS.
+2022-12-30 00:17:05,504 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 419066640 Bytes (856686592)
+2022-12-30 00:17:06,870 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 443729624 Bytes (856686592)
+2022-12-30 00:17:07,949 [INFO] UtilMem:74 - End SaveConfig() Used Memory: 511384848 Bytes (856686592)
+2022-12-30 00:17:08,167 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: NVIC
+2022-12-30 00:17:08,168 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: TIM1_8F1
+2022-12-30 00:17:08,168 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: USB_DEVICE
+2022-12-30 00:17:08,168 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: USB
+2022-12-30 00:17:08,168 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: GPIO
+2022-12-30 00:17:08,168 [INFO] BlockDiagram:2753 - set Specific Code input for plugin: RCC
+2022-12-30 00:17:08,169 [INFO] CodeGenerator:690 - code generatio: config db path: C:\ST\STM32CubeIDE_1.10.1\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_6.6.1.202207061420\\db\
+2022-12-30 00:17:08,330 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\license.tmp_save
+2022-12-30 00:17:08,376 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\license.tmp
+2022-12-30 00:17:08,431 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\gpio.tmp_save
+2022-12-30 00:17:08,484 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\gpio.tmp
+2022-12-30 00:17:08,545 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_vars.tmp_save
+2022-12-30 00:17:08,631 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_vars.tmp
+2022-12-30 00:17:08,661 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_inc.tmp_save
+2022-12-30 00:17:08,705 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_inc.tmp
+2022-12-30 00:17:08,746 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_HalInit.tmp_save
+2022-12-30 00:17:08,804 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_HalInit.tmp
+2022-12-30 00:17:08,825 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_Msp.tmp_save
+2022-12-30 00:17:08,882 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\usb_Msp.tmp
+2022-12-30 00:17:08,988 [INFO] Middleware:1435 - No code input for Bsp Dependency
+2022-12-30 00:17:08,991 [INFO] Middleware:1435 - No code input for Bsp Dependency
+2022-12-30 00:17:09,018 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usb_device.c_save
+2022-12-30 00:17:09,103 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usb_device.c
+2022-12-30 00:17:09,139 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usb_device.h_save
+2022-12-30 00:17:09,204 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usb_device.h
+2022-12-30 00:17:09,222 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\Target\usbd_conf.h_save
+2022-12-30 00:17:09,278 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\Target\usbd_conf.h
+2022-12-30 00:17:09,305 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\Target\usbd_conf.c_save
+2022-12-30 00:17:09,367 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\Target\usbd_conf.c
+2022-12-30 00:17:09,393 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_desc.h_save
+2022-12-30 00:17:09,445 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_desc.h
+2022-12-30 00:17:09,472 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_desc.c_save
+2022-12-30 00:17:09,535 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_desc.c
+2022-12-30 00:17:09,554 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_custom_hid_if.h_save
+2022-12-30 00:17:09,604 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_custom_hid_if.h
+2022-12-30 00:17:09,624 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_custom_hid_if.c_save
+2022-12-30 00:17:09,676 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\USB_DEVICE\App\usbd_custom_hid_if.c
+2022-12-30 00:17:09,703 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\stm32f1xx_it.c_save
+2022-12-30 00:17:09,758 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\stm32f1xx_it.c
+2022-12-30 00:17:09,771 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\stm32f1xx_it.h_save
+2022-12-30 00:17:09,821 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\stm32f1xx_it.h
+2022-12-30 00:17:09,872 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\stm32f1xx_hal_msp.c_save
+2022-12-30 00:17:09,937 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\stm32f1xx_hal_msp.c
+2022-12-30 00:17:09,959 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\system.tmp_save
+2022-12-30 00:17:10,008 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\MXTmpFiles\system.tmp
+2022-12-30 00:17:10,033 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\stm32f1xx_hal_conf.h_save
+2022-12-30 00:17:10,094 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\stm32f1xx_hal_conf.h
+2022-12-30 00:17:10,103 [WARN] IPConfigManager:3348 - IP not found : TIM
+2022-12-30 00:17:10,104 [WARN] CodeGenerator:3567 - IP not found : null
+2022-12-30 00:17:10,123 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\main.h_save
+2022-12-30 00:17:10,184 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Inc\main.h
+2022-12-30 00:17:10,213 [INFO] CodeEngine:245 - oldGeneratedFile, C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\main.c_save
+2022-12-30 00:17:10,289 [INFO] CodeEngine:269 - Generated code: C:\Develop\USBTools\ARMWorkspace\USBToolARM\Core\Src\main.c
+2022-12-30 00:17:10,937 [INFO] ProjectBuilder:2919 - Time for Copy HAL[1] : 237mS.
+2022-12-30 00:17:10,941 [INFO] ProjectBuilder:4117 - Project Generator version: 3.17.1
+2022-12-30 00:17:11,130 [INFO] ConfigFileManager:1394 - The Die is : DIE410
+2022-12-30 00:17:12,491 [INFO] ProjectBuilder:4285 - Time for Generating toolchain IDE Files: 1550mS.
+2022-12-30 00:17:12,491 [INFO] ProjectBuilder:2790 - Time for Copy CMSIS : 0mS.
+2022-12-30 00:17:12,497 [INFO] ProjectBuilder:2790 - Time for Copy CMSIS : 0mS.
