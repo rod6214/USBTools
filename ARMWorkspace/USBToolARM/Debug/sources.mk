@@ -24,6 +24,7 @@ SUBDIRS := \
 Core/Src \
 Core/Startup \
 CustomClass/Class/Src \
+CustomDevice/Src \
 Drivers/STM32F1xx_HAL_Driver/Src \
 Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src \
 Middlewares/ST/STM32_USB_Device_Library/Core/Src \

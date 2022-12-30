@@ -1,0 +1,22 @@
+/*
+ * PortController.c
+ *
+ *  Created on: Dec 27, 2022
+ *      Author: Nelson
+ */
+
+#include "PortController.h"
+#include "stm32f1xx_hal.h"
+
+#define SHIFT_CLOCK GPIO_PIN_0
+#define RESET GPIO_PIN_1
+#define LATCH_CLOCK GPIO_PIN_3
+
+void Port_Write(char* buffer, int offset, int bytes) {}
+
+void Port_Read(char** pBuffer, int offset, int bytes) {}
+
+static set_address(char value)
+{
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0 | GPIO_PIN_1, GPIO_PIN_SET);
+}

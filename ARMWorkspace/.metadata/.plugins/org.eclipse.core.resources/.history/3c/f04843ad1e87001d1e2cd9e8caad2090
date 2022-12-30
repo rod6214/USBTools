@@ -1,0 +1,13 @@
+/*
+ * cusb_device.h
+ *
+ *  Created on: Dec 28, 2022
+ *      Author: Nelson
+ */
+
+#ifndef INC_CUSB_DEVICE_H_
+#define INC_CUSB_DEVICE_H_
+
+
+
+#endif /* INC_CUSB_DEVICE_H_ */

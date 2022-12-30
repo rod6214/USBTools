@@ -145,7 +145,7 @@ namespace CONNECT
 		}
 
 		auto result = WinUsb_WritePipe(interfaceHandle, 
-			data.endpoint, data.buffer, data.buffer_len, &data.pCount, NULL);
+			data.endpoint, (PUCHAR)data.buffer, data.buffer_len, &data.pCount, NULL);
 		return result;
 	}
 
@@ -157,7 +157,7 @@ namespace CONNECT
 			throw error;
 		}
 		auto result = WinUsb_ReadPipe(interfaceHandle, 128 | data.endpoint, 
-			data.buffer, data.buffer_len, &data.pCount, NULL);
+			(PUCHAR)data.buffer, data.buffer_len, &data.pCount, NULL);
 		return result;
 	}
 

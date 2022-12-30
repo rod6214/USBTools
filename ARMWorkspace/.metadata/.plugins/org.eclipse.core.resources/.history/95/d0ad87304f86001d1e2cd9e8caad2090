@@ -1,0 +1,67 @@
+/*
+ * PortController.c
+ *
+ *  Created on: Dec 27, 2022
+ *      Author: Nelson
+ */
+
+#include "PortController.h"
+#include "timers.h"
+
+#define SHIFT_CLOCK GPIO_PIN_0
+#define RESET GPIO_PIN_1
+#define LATCH_CLOCK GPIO_PIN_3
+#define OUTPUT_ENABLE GPIO_PIN_4
+#define OUTPUT_DATA GPIO_PIN_5
+
+static set_address(char value);
+
+void Port_Write(char* buffer, int offset, int bytes) {}
+
+void Port_Read(char** pBuffer, int offset, int bytes) {}
+
+void Port_Reset() {}
+
+void Port_HighZ() {}
+
+void Port_AsOutput() {}
+
+static set_address(char value)
+{
+	char address = value;
+
+	HAL_GPIO_WritePin(GPIOB, SHIFT_CLOCK, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, LATCH_CLOCK, GPIO_PIN_RESET);
+
+	for (int i = 0; i < 8; i++)
+	{
+		if ((128 & address) == 128)
+		{
+			HAL_GPIO_WritePin(GPIOB, OUTPUT_DATA, GPIO_PIN_SET);
+		}
+		else
+		{
+			HAL_GPIO_WritePin(GPIOB, OUTPUT_DATA, GPIO_PIN_RESET);
+		}
+
+		int j = 0;
+
+		while (j < 2)
+		{
+			HAL_GPIO_TogglePin(GPIOB, SHIFT_CLOCK);
+			delay_us(1);
+			j++;
+		}
+	}
+
+	int k = 0;
+
+	while (k < 2)
+	{
+		HAL_GPIO_TogglePin(GPIOB, LATCH_CLOCK);
+		delay_us(1);
+		k++;
+	}
+}
+
+

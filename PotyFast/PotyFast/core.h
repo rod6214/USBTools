@@ -17,7 +17,7 @@ extern "C"
 	{
 		typedef struct _USB_BODY 
 		{
-			unsigned char* buffer;
+			char* buffer;
 			unsigned long buffer_len;
 			unsigned long pCount;
 			unsigned char endpoint;
