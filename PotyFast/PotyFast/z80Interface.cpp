@@ -103,40 +103,34 @@ Z80_CONNECT::CPUResponse Z80_CONNECT::Z80Connector::WriteMemory(const char* buff
 Z80_CONNECT::CPUResponse Z80_CONNECT::Z80Connector::ReadMemory(int offset, int bytes)
 {
     char result[64];
-    int row = bytes / USB_LIMIT_DATA;
+    int row = bytes <= USB_LIMIT_DATA ? 1 : (bytes / USB_LIMIT_DATA + 1);
     int totalBytes = bytes;
     char* ptr = mem;
     int k = offset;
     
     for (int i = 0; i < row; i++)
     {
-        int tempBytes;
+        int z = 0, res = 0;
 
-        if (totalBytes > 48)
+        while (z < 2) 
         {
-            tempBytes = 48;
-            totalBytes -= 48;
-        }
-        else 
-        {
-            tempBytes = totalBytes;
-        }
+            SendCommand(READ_DATA, NULL, k, 32);
+            res = GetResponse(result, 0);
 
-        SendCommand(READ_DATA, NULL, k, tempBytes);
-        int res = GetResponse(result, 0);
-        k += tempBytes;
-
-        if (res != 0)
-        {
-            for (int j = 0; j < tempBytes; j++)
+            if (res != 0)
             {
-                *(ptr++) = result[j + 16];
+                for (int j = 0; j < 32; j++)
+                {
+                    *(ptr++) = result[j + 16];
+                }
+
+                if (strcmp(result, "READ_DATA") != 0)
+                    throw "Bad response from device.";
             }
 
-            if (strcmp(result, "READ_DATA") != 0)
-                throw "Bad response from device.";
+            k += 32;
+            z++;
         }
-        //Sleep(6);
     }
 
     return { bytes, mem };
