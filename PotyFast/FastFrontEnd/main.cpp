@@ -62,13 +62,12 @@ int main(int args, const char* argv[])
                 
                 char* binary = new char[mainArgs.bytes];
                 char* ptr = binary;
-                int val = 0;
+                int val = 0, len = 0;
 
-                while (val != -1)
-                {
-                    val = file.get();
-                    if (val != -1)
-                        *(ptr++) = 0xff & val;
+                while (!file.eof() && (len < mainArgs.bytes))
+                {                    
+                    *(ptr++) = 0xff & file.get();
+                    len++;
                 }
 
                 file.close();
@@ -91,7 +90,6 @@ int main(int args, const char* argv[])
                             data_mesh << "     -----------------------------------------------" << std::endl;
                         else
                             data_mesh << std::endl;
-                        //int realrow = row + 16;
 
                         if (row < 0x10)
                             data_mesh << "000" << std::hex << row;
@@ -121,33 +119,6 @@ int main(int args, const char* argv[])
             std::cout << err << std::endl;
         }
     }
-    
-
-
- //   try {
- //       /*z80card.Reset();
- //       z80card.OneStep();*/
- //       //const char* request = "FROM VISUAL STUDIO";
- //       /*char request[4] = { 255, 255, 255, 255};
- //       auto  value1 = z80card.WriteMemory(request, 0, 4);*/
- //       auto value = z80card.ReadMemory(0, 4);
- //       /*z80card.OneStep();
- //       z80card.ProgramMode();
- //       z80card.Reset();
- //       z80card.Run();*/
- //       std::cout << value.bytes << std::endl;
- //       /*auto total = z80card.SendCommand(0xaa, "Test USB pepepep!!!", 48);
- //       std::cout << total << std::endl;
- //       unsigned char* buffer = new unsigned char[64];
- //       total = z80card.GetResponse(buffer, 48);
- //       std::cout << total << std::endl;*/
- //   }
- //   catch (const char* err) {
- //       std::cout << err << std::endl;
- //   }
-
- //   while (1) {}
-	//return 0;
 }
 
 MainConfig_t usb_config()
