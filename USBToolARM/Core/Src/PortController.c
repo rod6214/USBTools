@@ -23,6 +23,7 @@
 
 static void set_address(int value);
 static void write_enable();
+static void write_long_enable();
 
 void Port_ResetCPU()
 {
@@ -63,12 +64,18 @@ void Port_Write(char* buffer, int offset, int bytes)
 {
 	Port_Set();
 	Port_AsOutput();
+	HAL_GPIO_WritePin(GPIOA, OUTPUT_ENABLE, GPIO_PIN_SET);
 	for (int i = offset; i < (offset + bytes); i++)
 	{
 		set_address(i);
-		GPIOA->ODR = buffer[i - offset];
-		write_enable();
+		int temp = 0xffffff00 & (GPIOA->ODR);
+		GPIOA->ODR = temp | buffer[i - offset];
+		if ((i - offset) < 63)
+			write_enable();
+		else
+			write_long_enable();
 	}
+	HAL_GPIO_WritePin(GPIOA, OUTPUT_ENABLE, GPIO_PIN_RESET);
 }
 
 void Port_init()
@@ -171,6 +178,33 @@ static void set_address(int value)
 	{
 		HAL_GPIO_TogglePin(GPIOB, LATCH_CLOCK);
 		delay_us(1);
+		k++;
+	}
+}
+
+static void write_long_enable()
+{
+	int k = 0;
+
+	GPIO_PinState high_state = HAL_GPIO_ReadPin(GPIOB, WRITE_ENABLE);
+
+	if (!high_state)
+	{
+		HAL_GPIO_TogglePin(GPIOB, WRITE_ENABLE);
+	}
+
+	while (k < 2)
+	{
+		HAL_GPIO_TogglePin(GPIOB, WRITE_ENABLE);
+		delay_us(500);
+		delay_us(500);
+		delay_us(500);
+		delay_us(500);
+		delay_us(500);
+		delay_us(500);
+		delay_us(500);
+		delay_us(500);
+		delay_us(500);
 		k++;
 	}
 }

@@ -20,8 +20,10 @@ enum CARD_COMMANDS
 
 typedef struct Z80_ACTION_RESULT
 {
-	char buffer[48];
+	char buffer[64];
 	int bytes;
+	char inputBuffer[64];
+	int started;
 } ActionResult_t;
 
 extern ActionResult_t* Z80_Reset();

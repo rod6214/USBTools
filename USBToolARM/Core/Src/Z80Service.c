@@ -8,7 +8,8 @@
 #include <memory.h>
 #include "PortController.h"
 
-ActionResult_t results[6];
+ActionResult_t results[6] = {0};
+const int CMAX_PACKET_SIZE = 64;
 
 
 ActionResult_t* Z80_Reset()
@@ -41,15 +42,32 @@ ActionResult_t* Z80_Run()
 	return &results[5];
 }
 
+char* ptr;
+
 ActionResult_t* Z80_WriteMemory(char* buffer, int offset, int bytes)
 {
-	if (bytes <= 48)
+	if (!results[3].started)
+		ptr = results[3].inputBuffer;
+
+	for (int i = 0; i < bytes; i++)
 	{
-		const char* response = "TEST WRITE";
-		results[3].bytes = strlen(response);
-		Port_Write(buffer, offset, bytes);
-		strcpy(results[3].buffer, response);
+		*(ptr++) = buffer[i];
 	}
+
+	if (results[3].started)
+	{
+		const char* response = "NEXT";
+		results[3].started = 0;
+		strcpy(results[3].buffer, response);
+		Port_Write(results[3].inputBuffer, offset, 64);
+	}
+	else
+	{
+		const char* response = "FIRST";
+		strcpy(results[3].buffer, response);
+		results[3].started++;
+	}
+
 	return &results[3];
 };
 

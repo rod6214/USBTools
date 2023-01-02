@@ -3,6 +3,8 @@
 Z80_CONNECT::Z80Connector::Z80Connector(std::unique_ptr<CONNECT::USBConfig>& usb_ptr)
 {
     usb = new std::unique_ptr<CONNECT::USB>(new CONNECT::USB(usb_ptr));
+    mem = new char[65536];
+    //buffer = new std::unique_ptr<std::stringbuf>(new std::stringbuf());
     
     if ((*usb)->USB_Init())
     {
@@ -70,41 +72,74 @@ bool Z80_CONNECT::Z80Connector::ProgramMode()
 Z80_CONNECT::CPUResponse Z80_CONNECT::Z80Connector::WriteMemory(const char* buffer, int offset, int bytes)
 {
     char result[64];
-    char* str = new char[64];
-    SendCommand(WRITE_DATA, buffer, offset, bytes);
-    int res = GetResponse(result, 0);
+    int row = bytes < USB_LIMIT_DATA ?  1 : bytes / USB_LIMIT_DATA;
+    int totalBytes = bytes;
+    int z = offset;
 
-    if (res != 0) 
+    for (int i = 0; i < row; i++)
     {
-        memcpy(str, &result[16], 48);
+        int j = 0, res = 0;
 
-        str[63] = '\0';
+        while (j < 2) 
+        {
+            int k = j * 32;
+            SendCommand(WRITE_DATA, &buffer[k], offset, 32);
+            res = GetResponse(result, 0);
+            z += 32;
+            j++;
+        }
 
-        if (strcmp(result, "WRITE_DATA") == 0)
-            return { result[15],  str };
+        if (res != 0)
+        {
+            if (strcmp(result, "WRITE_DATA") != 0)
+                throw "Bad response from device.";
+        }
+        //Sleep(6);
     }
 
-    return {0};
+    return { bytes };
 }
 
 Z80_CONNECT::CPUResponse Z80_CONNECT::Z80Connector::ReadMemory(int offset, int bytes)
 {
     char result[64];
-    char* str = new char[64];
-    SendCommand(READ_DATA, NULL, offset, bytes);
-    int res = GetResponse(result, 0);
-
-    if (res != 0)
+    int row = bytes / USB_LIMIT_DATA;
+    int totalBytes = bytes;
+    char* ptr = mem;
+    int k = offset;
+    
+    for (int i = 0; i < row; i++)
     {
-        memcpy(str, &result[16], 48);
+        int tempBytes;
 
-        str[63] = '\0';
+        if (totalBytes > 48)
+        {
+            tempBytes = 48;
+            totalBytes -= 48;
+        }
+        else 
+        {
+            tempBytes = totalBytes;
+        }
 
-        if (strcmp(result, "READ_DATA") == 0)
-            return { result[15],  str };
+        SendCommand(READ_DATA, NULL, k, tempBytes);
+        int res = GetResponse(result, 0);
+        k += tempBytes;
+
+        if (res != 0)
+        {
+            for (int j = 0; j < tempBytes; j++)
+            {
+                *(ptr++) = result[j + 16];
+            }
+
+            if (strcmp(result, "READ_DATA") != 0)
+                throw "Bad response from device.";
+        }
+        //Sleep(6);
     }
 
-    return { 0 };
+    return { bytes, mem };
 }
 
 bool Z80_CONNECT::Z80Connector::Run()

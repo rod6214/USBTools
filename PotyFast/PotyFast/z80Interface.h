@@ -15,10 +15,12 @@ namespace Z80_CONNECT
 		virtual CPUResponse WriteMemory(const char* buffer, int offset, int bytes) override;
 		virtual CPUResponse ReadMemory(int offset, int bytes) override;
 		virtual bool Run() override;
+		const int USB_LIMIT_DATA = 64;
 	protected:
 		virtual int SendCommand(unsigned char command, const char* buffer, int offset, int bytes) override;
 		virtual int GetResponse(char* buffer, int bytes) override;
 	private:
 		std::unique_ptr<CONNECT::USB>* usb;
+		char* mem;
 	};
 }
