@@ -69,7 +69,38 @@ bool Z80_CONNECT::Z80Connector::ProgramMode()
     return false;
 }
 
-Z80_CONNECT::CPUResponse Z80_CONNECT::Z80Connector::WriteMemory(const char* buffer, int offset, int bytes)
+Z80_CONNECT::CPUResponse Z80_CONNECT::Z80Connector::WriteMemory(const char* buffer, int offset, int bytes) 
+{
+    char result[64];
+    int row = bytes <= 48 ? 1 : (bytes / 48) + 1;
+    int totalBytes = bytes;
+
+    for (int i = 0; i < row; i++) 
+    {
+        if (bytes <= 48) 
+        {
+            SendCommand(WRITE_DATA, buffer, offset, totalBytes);
+        }
+        else 
+        {
+            int k = i * 48;
+            SendCommand(WRITE_DATA, &buffer[k], (offset + k), 48);
+            totalBytes -= 48;
+        }
+
+        int res = GetResponse(result, 0);
+
+        if (res != 0)
+        {
+            if (strcmp(result, "WRITE_DATA") != 0)
+                throw "Bad response from device.";
+        }
+    }
+
+    return { bytes };
+}
+
+Z80_CONNECT::CPUResponse Z80_CONNECT::Z80Connector::WriteMemoryPackage(const char* buffer, int offset, int bytes)
 {
     char result[64];
     int row = bytes < USB_LIMIT_DATA ?  1 : bytes / USB_LIMIT_DATA;
@@ -83,7 +114,7 @@ Z80_CONNECT::CPUResponse Z80_CONNECT::Z80Connector::WriteMemory(const char* buff
         while (j < 2) 
         {
             int k = j * 32;
-            SendCommand(WRITE_DATA, &buffer[k], offset, 32);
+            SendCommand(WRITE_PACKAGE, &buffer[k], offset, 32);
             res = GetResponse(result, 0);
             z += 32;
             j++;
@@ -91,10 +122,9 @@ Z80_CONNECT::CPUResponse Z80_CONNECT::Z80Connector::WriteMemory(const char* buff
 
         if (res != 0)
         {
-            if (strcmp(result, "WRITE_DATA") != 0)
+            if (strcmp(result, "WRITE_PACKAGE") != 0)
                 throw "Bad response from device.";
         }
-        //Sleep(6);
     }
 
     return { bytes };

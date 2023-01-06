@@ -278,6 +278,20 @@ static uint8_t  USBD_DataOut(USBD_HandleTypeDef *pdev,
 		  }
 	  }
 	  break;
+	  case WRITE_PACKAGE:
+	  {
+		  const char resetMsg[] = "WRITE_PACKAGE";
+		  memcpy(buffer_in, resetMsg, 12);
+		  char writeBuffer[48];
+		  int offset = ((int)buffer_out[3] << 8) | (buffer_out[4]);
+		  int len = ((int)buffer_out[1] << 8) | (buffer_out[2]);
+		  if (len <= 48)
+		  {
+			  memcpy(writeBuffer, &buffer_out[16], len);
+			  result = Z80_WriteMemoryPackage(writeBuffer, offset, len);
+		  }
+	  }
+	  break;
 	  case WRITE_DATA:
 	  {
 		  const char resetMsg[] = "WRITE_DATA";
@@ -287,8 +301,8 @@ static uint8_t  USBD_DataOut(USBD_HandleTypeDef *pdev,
 		  int len = ((int)buffer_out[1] << 8) | (buffer_out[2]);
 		  if (len <= 48)
 		  {
-			  memcpy(writeBuffer, &buffer_out[16], len);
-			  result = Z80_WriteMemory(writeBuffer, offset, len);
+			memcpy(writeBuffer, &buffer_out[16], len);
+			result = Z80_WriteMemory(writeBuffer, offset, len);
 		  }
 	  }
 	  break;

@@ -11,6 +11,7 @@
 enum CARD_COMMANDS
 	{
 		WRITE_DATA = 0x78,
+		WRITE_PACKAGE = 0x79,
 		READ_DATA = 0x12,
 		PROGRAM_MODE = 0x33,
 		ONE_STEP = 0x73,
@@ -30,6 +31,7 @@ extern ActionResult_t* Z80_Reset();
 extern ActionResult_t* Z80_OneStep();
 extern ActionResult_t* Z80_ProgramMode();
 extern ActionResult_t* Z80_WriteMemory(char* buffer, int offset, int bytes);
+extern ActionResult_t* Z80_WriteMemoryPackage(char* buffer, int offset, int bytes);
 extern ActionResult_t* Z80_ReadMemory(int offset, int bytes);
 extern ActionResult_t* Z80_Run();
 

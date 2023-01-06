@@ -6,6 +6,7 @@ namespace Z80_CONNECT
 	enum CARD_COMMANDS
 	{
 		WRITE_DATA = 0x78,
+		WRITE_PACKAGE = 0x79,
 		READ_DATA = 0x12,
 		PROGRAM_MODE = 0x33,
 		ONE_STEP = 0x73,
@@ -25,6 +26,7 @@ namespace Z80_CONNECT
 		virtual bool Reset() = 0;
 		virtual bool OneStep() = 0;
 		virtual bool ProgramMode() = 0;
+		virtual CPUResponse WriteMemoryPackage(const char* buffer, int offset, int bytes) = 0;
 		virtual CPUResponse WriteMemory(const char* buffer, int offset, int bytes) = 0;
 		virtual CPUResponse ReadMemory(int offset, int bytes) = 0;
 		virtual bool Run() = 0;

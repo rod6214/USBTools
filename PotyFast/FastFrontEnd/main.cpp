@@ -18,6 +18,9 @@ typedef struct _MAIN_ARGS
     bool isFile;
     const char* path;
     int fileOffset;
+    bool isRam;
+    bool isRom;
+    int value;
 } MainArgs_t;
 
 MainConfig_t usb_config();
@@ -49,14 +52,20 @@ int main(int args, const char* argv[])
             Z80_CONNECT::Z80Connector z80card(usb_conf);
             std::stringstream data_mesh;
 
-            if (mainArgs.isWrite)
+            if (mainArgs.isWrite && mainArgs.isRam && (mainArgs.value >= 0))
+            {
+                char data[1];
+                data[0] = 0xff & mainArgs.value;
+                z80card.WriteMemory(data, mainArgs.offset, 1);
+            }
+            else if (mainArgs.isWrite)
             {       
-                if ((mainArgs.bytes % 64) != 0)
+                if (((mainArgs.bytes % 64) != 0) && mainArgs.isRom)
                 {
                     throw "Number of bytes should be multiple of 64.";
                 }
 
-                if ((mainArgs.offset % 64) != 0)
+                if (((mainArgs.offset % 64) != 0) && mainArgs.isRom)
                 {
                     throw "Offset should be multiple of 64 or 0.";
                 }
@@ -78,7 +87,11 @@ int main(int args, const char* argv[])
 
                 file.close();
 
-                z80card.WriteMemory(binary, mainArgs.offset, mainArgs.bytes);
+                if (mainArgs.isRom)
+                    z80card.WriteMemoryPackage(binary, mainArgs.offset, mainArgs.bytes);
+
+                if (mainArgs.isRam)
+                    z80card.WriteMemory(binary, mainArgs.offset, mainArgs.bytes);
 
                 delete[] binary;
             }
@@ -118,7 +131,7 @@ int main(int args, const char* argv[])
                 data_mesh << std::endl;
             }
 
-            std::cout << data_mesh.str() << std::endl;
+            std::cout << data_mesh.str() << "\0" << std::endl;
         }
         catch (const char* err) 
         {
@@ -144,10 +157,10 @@ MainConfig_t usb_config()
 
 MainArgs_t process_args(int args, const char* argv[]) 
 {
-    int bytes = 0, offset = 0, fileOffset = 0;
+    int bytes = 0, offset = 0, fileOffset = 0, value = -1;
     bool isWrite = false, isFile = false;
     const char* path = "";
-    bool hasBytes = false;
+    bool hasBytes = false, isRam = false, isRom = false;
 
     for (int i = 0; i < args; i++)
     {
@@ -164,7 +177,8 @@ MainArgs_t process_args(int args, const char* argv[])
                 temp >> offset;
             }
         }
-        else if (strcmp(argv[i], "-b") == 0)
+
+        if (strcmp(argv[i], "-b") == 0)
         {
             hasBytes = true;
             std::stringstream temp;
@@ -178,19 +192,42 @@ MainArgs_t process_args(int args, const char* argv[])
                 temp >> bytes;
             }
         }
-        else if (strcmp(argv[i], "-w") == 0) 
+
+        if (strcmp(argv[i], "-w") == 0) 
         {
             isWrite = true;
         }
-        else if (strcmp(argv[i], "-f") == 0) 
+
+        if (strcmp(argv[i], "--ram") == 0)
         {
-            isFile = true;
+            isRam = true;
+        }
+
+        if (strcmp(argv[i], "--rom") == 0)
+        {
+            isRom = true;
+        }
+
+        if (strcmp(argv[i], "-v") == 0)
+        {
+            std::stringstream temp;
+            temp << argv[i + 1];
+            temp >> value;
+
+            if (value == 0)
+            {
+                temp.str("");
+                temp << std::hex << argv[i + 1];
+                temp >> value;
+            }
         }
         else if (strcmp(argv[i], "-p") == 0)
         {
             path = argv[i + 1];
+            isFile = true;
         }
-        else if (strcmp(argv[i], "-fo") == 0)
+
+        if (strcmp(argv[i], "-fo") == 0)
         {
             std::stringstream temp;
             temp << argv[i + 1];
@@ -203,11 +240,24 @@ MainArgs_t process_args(int args, const char* argv[])
                 temp >> fileOffset;
             }
         }
+
         
-        if (!hasBytes) 
-        {
-            bytes = 64;
-        }
     }
-    return { offset, bytes, isWrite, isFile, path, fileOffset };
+
+    if (isRam && isRom && isWrite)
+    {
+        throw "Only one type of memory is permitted.";
+    }
+
+    if ((!isRam && !isRom) && isWrite)
+    {
+        throw "You need to give a type of memory.";
+    }
+
+    if (!hasBytes && isWrite)
+    {
+        bytes = 64;
+    }
+
+    return { offset, bytes, isWrite, isFile, path, fileOffset, isRam, isRom, value };
 }

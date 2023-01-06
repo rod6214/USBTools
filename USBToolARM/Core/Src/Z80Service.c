@@ -44,7 +44,7 @@ ActionResult_t* Z80_Run()
 
 char* ptr;
 
-ActionResult_t* Z80_WriteMemory(char* buffer, int offset, int bytes)
+ActionResult_t* Z80_WriteMemoryPackage(char* buffer, int offset, int bytes)
 {
 	if (!results[3].started)
 		ptr = results[3].inputBuffer;
@@ -81,4 +81,12 @@ ActionResult_t* Z80_ReadMemory(int offset, int bytes)
 		memcpy(results[4].buffer, buffer, bytes);
 	}
 	return &results[4];
+}
+
+ActionResult_t* Z80_WriteMemory(char* buffer, int offset, int bytes)
+{
+	const char* response = "DONE";
+	strcpy(results[3].buffer, response);
+	Port_Write(buffer, offset, bytes);
+	return &results[3];
 }
