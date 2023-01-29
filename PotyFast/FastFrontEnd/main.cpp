@@ -21,6 +21,12 @@ typedef struct _MAIN_ARGS
     bool isRam;
     bool isRom;
     int value;
+    bool isOneStep;
+    bool isBusRequested;
+    bool cpuRunning;
+    bool oneClock;
+    bool isRead;
+    bool isReset;
 } MainArgs_t;
 
 MainConfig_t usb_config();
@@ -43,100 +49,131 @@ int main(int args, const char* argv[])
         throw "There was an overflow, please check your parameters.";
     }
 
-    if (mainArgs.bytes > 0)
+    try
     {
-        try 
+        auto config = usb_config();
+        auto usb_conf = std::unique_ptr<CONNECT::USBConfig>(new CONNECT::USBConfig(config.sts, config.path));
+        Z80_CONNECT::Z80Connector z80card(usb_conf);
+        std::stringstream data_mesh;
+
+        auto status = z80card.Status();
+
+        if (mainArgs.isReset) 
         {
-            auto config = usb_config();
-            auto usb_conf = std::unique_ptr<CONNECT::USBConfig>(new CONNECT::USBConfig(config.sts, config.path));
-            Z80_CONNECT::Z80Connector z80card(usb_conf);
-            std::stringstream data_mesh;
-
-            if (mainArgs.isWrite && mainArgs.isRam && (mainArgs.value >= 0))
+            z80card.Reset();
+        }
+        else if (mainArgs.isBusRequested)
+        {
+            z80card.ProgramMode();
+        }
+        else if (mainArgs.isOneStep)
+        {
+            z80card.OneStep();
+        }
+        else if (mainArgs.oneClock)
+        {
+            if (!status.cpuModeOneStep)
+                throw "One step mode is not activated";
+            z80card.OneStepClock();
+        }
+        else if (mainArgs.cpuRunning)
+        {
+            z80card.Run();
+        }
+        else if (mainArgs.isWrite && mainArgs.isRam && (mainArgs.value >= 0) && (mainArgs.bytes > 0))
+        {
+            if (!status.busRequested)
+                throw "Bus is busy.";
+            char data[1];
+            data[0] = 0xff & mainArgs.value;
+            z80card.WriteMemory(data, mainArgs.offset, 1);
+        }
+        else if (mainArgs.isWrite && mainArgs.bytes > 0)
+        {
+            if (!status.busRequested)
+                throw "Bus is busy.";
+            if (((mainArgs.bytes % 64) != 0) && mainArgs.isRom)
             {
-                char data[1];
-                data[0] = 0xff & mainArgs.value;
-                z80card.WriteMemory(data, mainArgs.offset, 1);
+                throw "Number of bytes should be multiple of 64.";
             }
-            else if (mainArgs.isWrite)
-            {       
-                if (((mainArgs.bytes % 64) != 0) && mainArgs.isRom)
-                {
-                    throw "Number of bytes should be multiple of 64.";
-                }
 
-                if (((mainArgs.offset % 64) != 0) && mainArgs.isRom)
-                {
-                    throw "Offset should be multiple of 64 or 0.";
-                }
-
-                std::fstream file;
-                file.open(mainArgs.path, std::ios::binary | std::ios::in);
-
-                char* binary = new char[mainArgs.bytes];
-                char* ptr = binary;
-                int val = 0, len = 0;
-
-                if (mainArgs.fileOffset > 0) 
-                {
-                    int index = mainArgs.fileOffset;
-                    file.seekg(index);
-                }
-
-                file.read(binary, mainArgs.bytes);
-
-                file.close();
-
-                if (mainArgs.isRom)
-                    z80card.WriteMemoryPackage(binary, mainArgs.offset, mainArgs.bytes);
-
-                if (mainArgs.isRam)
-                    z80card.WriteMemory(binary, mainArgs.offset, mainArgs.bytes);
-
-                delete[] binary;
-            }
-            else
+            if (((mainArgs.offset % 64) != 0) && mainArgs.isRom)
             {
-                auto value = z80card.ReadMemory(mainArgs.offset, mainArgs.bytes);
-                int row = mainArgs.offset;
-                data_mesh << "     00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F" << std::endl;
-                for (int i = 0; i < value.bytes; i++) 
+                throw "Offset should be multiple of 64 or 0.";
+            }
+
+            std::fstream file;
+            file.open(mainArgs.path, std::ios::binary | std::ios::in);
+
+            char* binary = new char[mainArgs.bytes];
+            char* ptr = binary;
+            int val = 0, len = 0;
+
+            if (mainArgs.fileOffset > 0)
+            {
+                int index = mainArgs.fileOffset;
+                file.seekg(index);
+            }
+
+            file.read(binary, mainArgs.bytes);
+
+            file.close();
+
+            if (mainArgs.isRom)
+                z80card.WriteMemoryPackage(binary, mainArgs.offset, mainArgs.bytes);
+
+            if (mainArgs.isRam)
+                z80card.WriteMemory(binary, mainArgs.offset, mainArgs.bytes);
+
+            delete[] binary;
+        }
+        else if (mainArgs.isRead && mainArgs.bytes > 0)
+        {
+            if (!status.busRequested)
+                throw "Bus is busy.";
+            auto value = z80card.ReadMemory(mainArgs.offset, mainArgs.bytes);
+            int row = mainArgs.offset;
+            data_mesh << "     00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F" << std::endl;
+            for (int i = 0; i < value.bytes; i++)
+            {
+                int cell = 0xff & value.buffer[i];
+                if ((i % 16) == 0)
                 {
-                    int cell = 0xff & value.buffer[i];
-                    if ((i % 16) == 0) 
-                    {
-                        if (i == 0)
-                            data_mesh << "     -----------------------------------------------" << std::endl;
-                        else
-                            data_mesh << std::endl;
-
-                        if (row < 0x10)
-                            data_mesh << "000" << std::hex << row;
-                        else if (row < 0x100)
-                            data_mesh << "00" << std::hex << row;
-                        else if (row < 0x1000)
-                            data_mesh << "0" << std::hex << row;
-                        else
-                            data_mesh << std::hex << row;
-                        data_mesh << " ";
-                        row+=16;
-                    }
-
-                    if (cell < 0x10)
-                        data_mesh << "0" << std::hex << (0xff & (int)value.buffer[i]) << " ";
+                    if (i == 0)
+                        data_mesh << "     -----------------------------------------------" << std::endl;
                     else
-                        data_mesh << std::hex << (0xff & (int)value.buffer[i]) << " ";
+                        data_mesh << std::endl;
+
+                    if (row < 0x10)
+                        data_mesh << "000" << std::hex << row;
+                    else if (row < 0x100)
+                        data_mesh << "00" << std::hex << row;
+                    else if (row < 0x1000)
+                        data_mesh << "0" << std::hex << row;
+                    else
+                        data_mesh << std::hex << row;
+                    data_mesh << " ";
+                    row += 16;
                 }
 
-                data_mesh << std::endl;
+                if (cell < 0x10)
+                    data_mesh << "0" << std::hex << (0xff & (int)value.buffer[i]) << " ";
+                else
+                    data_mesh << std::hex << (0xff & (int)value.buffer[i]) << " ";
             }
 
-            std::cout << data_mesh.str() << "\0" << std::endl;
-        }
-        catch (const char* err) 
+            data_mesh << std::endl;
+        } 
+        else 
         {
-            std::cout << err << std::endl;
+            throw "Unknown command.";
         }
+
+        std::cout << data_mesh.str() << "\0" << std::endl;
+    }
+    catch (const char* err)
+    {
+        std::cout << err << std::endl;
     }
 }
 
@@ -160,7 +197,9 @@ MainArgs_t process_args(int args, const char* argv[])
     int bytes = 0, offset = 0, fileOffset = 0, value = -1;
     bool isWrite = false, isFile = false;
     const char* path = "";
-    bool hasBytes = false, isRam = false, isRom = false;
+    bool hasBytes = false, isRam = false, isRom = false, 
+        isOneStep = false, isBusRequested = false, cpuRunning = false, 
+        oneClock = false, isRead = false, isReset = false;
 
     for (int i = 0; i < args; i++)
     {
@@ -193,9 +232,39 @@ MainArgs_t process_args(int args, const char* argv[])
             }
         }
 
+        if (strcmp(argv[i], "--reset") == 0)
+        {
+            isReset = true;
+        }
+
+        if (strcmp(argv[i], "--rbus") == 0)
+        {
+            isBusRequested = true;
+        }
+
+        if (strcmp(argv[i], "--onestep") == 0)
+        {
+            isOneStep = true;
+        }
+
+        if (strcmp(argv[i], "--run") == 0)
+        {
+            cpuRunning = true;
+        }
+
+        if (strcmp(argv[i], "--step") == 0)
+        {
+            oneClock = true;
+        }
+
         if (strcmp(argv[i], "-w") == 0) 
         {
             isWrite = true;
+        }
+
+        if (strcmp(argv[i], "-r") == 0)
+        {
+            isRead = true;
         }
 
         if (strcmp(argv[i], "--ram") == 0)
@@ -240,8 +309,6 @@ MainArgs_t process_args(int args, const char* argv[])
                 temp >> fileOffset;
             }
         }
-
-        
     }
 
     if (isRam && isRom && isWrite)
@@ -259,5 +326,6 @@ MainArgs_t process_args(int args, const char* argv[])
         bytes = 64;
     }
 
-    return { offset, bytes, isWrite, isFile, path, fileOffset, isRam, isRom, value };
+    return { offset, bytes, isWrite, isFile, path, fileOffset, 
+        isRam, isRom, value, isOneStep, isBusRequested, cpuRunning, oneClock, isRead, isReset };
 }

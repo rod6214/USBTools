@@ -15,6 +15,8 @@ namespace Z80_CONNECT
 		virtual bool Reset() override;
 		virtual bool OneStep() override;
 		virtual bool ProgramMode() override;
+		virtual bool OneStepClock() override;
+		virtual CPU_STATUS_t Status() override;
 		virtual CPUResponse WriteMemoryPackage(const char* buffer, int offset, int bytes) override;
 		virtual CPUResponse ReadMemory(int offset, int bytes) override;
 		virtual CPUResponse WriteMemory(const char* buffer, int offset, int bytes) override;

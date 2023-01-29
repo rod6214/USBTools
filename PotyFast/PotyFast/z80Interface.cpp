@@ -69,6 +69,44 @@ bool Z80_CONNECT::Z80Connector::ProgramMode()
     return false;
 }
 
+bool Z80_CONNECT::Z80Connector::OneStepClock()
+{
+    char result[64];
+    char* str = new char[64];
+    SendCommand(ONE_STEP_CLOCK, NULL, 0, 0);
+    int res = GetResponse(result, 0);
+    memcpy(str, result, res);
+    if (res != 0)
+    {
+        if (strcmp(str, "ONE_STEP_CLOCK") == 0)
+            return true;
+    }
+    return false;
+}
+
+Z80_CONNECT::CPU_STATUS_t Z80_CONNECT::Z80Connector::Status()
+{
+    char result[64];
+    SendCommand(STATUS_PORT, NULL, 0, 3);
+    int res = GetResponse(result, 0);
+    if (res != 0)
+    {
+        if (strcmp(result, "STATUS_PORT") == 0)
+        {
+            bool busRequested = false;
+            bool cpuModeRun = false;
+            bool cpuModeOneStep = false;
+
+            if (!result[16]) busRequested = true;
+            if (result[17]) cpuModeOneStep = true;
+            if (result[18]) cpuModeRun = true;
+
+            return { busRequested, cpuModeRun, cpuModeOneStep };
+        }
+    }
+    throw "Bad response from device.";
+}
+
 Z80_CONNECT::CPUResponse Z80_CONNECT::Z80Connector::WriteMemory(const char* buffer, int offset, int bytes) 
 {
     char result[64];

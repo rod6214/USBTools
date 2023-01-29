@@ -281,7 +281,7 @@ static uint8_t  USBD_DataOut(USBD_HandleTypeDef *pdev,
 	  case WRITE_PACKAGE:
 	  {
 		  const char resetMsg[] = "WRITE_PACKAGE";
-		  memcpy(buffer_in, resetMsg, 12);
+		  memcpy(buffer_in, resetMsg, 13);
 		  char writeBuffer[48];
 		  int offset = ((int)buffer_out[3] << 8) | (buffer_out[4]);
 		  int len = ((int)buffer_out[1] << 8) | (buffer_out[2]);
@@ -304,6 +304,26 @@ static uint8_t  USBD_DataOut(USBD_HandleTypeDef *pdev,
 			memcpy(writeBuffer, &buffer_out[16], len);
 			result = Z80_WriteMemory(writeBuffer, offset, len);
 		  }
+	  }
+	  break;
+	  case ONE_STEP_CLOCK:
+	  {
+		  const char resetMsg[] = "ONE_STEP_CLOCK";
+		  memcpy(buffer_in, resetMsg, 15);
+		  result = Z80_OneStepPulse();
+	  }
+	  break;
+	  case STATUS_PORT:
+	  {
+		  const char resetMsg[] = "STATUS_PORT";
+		  memcpy(buffer_in, resetMsg, 12);
+		  result = Z80_Status();
+	  }
+	  break;
+	  default:
+	  {
+		  const char resetMsg[] = "ERROR";
+		  memcpy(buffer_in, resetMsg, 12);
 	  }
 	  break;
   }

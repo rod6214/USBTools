@@ -9,8 +9,9 @@
         
         static void Main(string[] args)
         {
+            Console.WriteLine(Environment.CurrentDirectory);
             //readExample();
-            writeExample();
+            //writeExample();
         }
 
         static void readExample()

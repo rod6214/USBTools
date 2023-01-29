@@ -17,8 +17,11 @@
 #define READY_SIGNAL GPIO_PIN_13
 #define WRITE_ENABLE GPIO_PIN_11
 #define RESET_CPU GPIO_PIN_12
-#define PROGRAM_CPU GPIO_PIN_13
+//#define PROGRAM_CPU GPIO_PIN_13
+#define BUS_REQUEST GPIO_PIN_13
 #define ONE_STEP GPIO_PIN_14
+#define ONE_STEP_CLOCK GPIO_PIN_9
+#define BUS_CPU_ACK GPIO_PIN_10
 #define RUN_CPU GPIO_PIN_15
 
 static void set_address(int value);
@@ -27,37 +30,53 @@ static void write_long_enable();
 
 void Port_ResetCPU()
 {
-	int k = 0;
-
+	HAL_GPIO_WritePin(GPIOB, RESET_CPU, GPIO_PIN_RESET);
+	delay_us(1);
 	HAL_GPIO_WritePin(GPIOB, RESET_CPU, GPIO_PIN_SET);
-
-	while (k < 2)
-	{
-		HAL_GPIO_TogglePin(GPIOB, RESET_CPU);
-		delay_us(1);
-		k++;
-	}
+	delay_us(1);
 }
 
 void Port_ProgramCPU()
 {
-	HAL_GPIO_WritePin(GPIOB, RUN_CPU, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(GPIOB, ONE_STEP, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOB, PROGRAM_CPU, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, BUS_REQUEST, GPIO_PIN_RESET);
+	// Wait until ack is received
+	while(HAL_GPIO_ReadPin(GPIOA, BUS_CPU_ACK));
+	Port_ActivateControl();
+}
+
+void Port_Status(char* buffer)
+{
+	buffer[0] = 0xff & HAL_GPIO_ReadPin(GPIOB, BUS_REQUEST);
+	buffer[1] = 0xff & HAL_GPIO_ReadPin(GPIOB, ONE_STEP);
+	buffer[2] = 0xff & HAL_GPIO_ReadPin(GPIOB, RUN_CPU);
 }
 
 void Port_RunCPU()
 {
-	HAL_GPIO_WritePin(GPIOB, PROGRAM_CPU, GPIO_PIN_RESET);
+	Port_Reset();
+	HAL_GPIO_WritePin(GPIOB, BUS_REQUEST, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, RESET_CPU, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOB, ONE_STEP, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, RESET_CPU, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOB, RUN_CPU, GPIO_PIN_SET);
 }
 
-void Port_OnStep()
+void Port_OneStep()
 {
-	HAL_GPIO_WritePin(GPIOB, PROGRAM_CPU, GPIO_PIN_RESET);
+	Port_Reset();
+	HAL_GPIO_WritePin(GPIOB, BUS_REQUEST, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, RESET_CPU, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOB, RUN_CPU, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, RESET_CPU, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOB, ONE_STEP, GPIO_PIN_SET);
+}
+
+void Port_OneStepClock()
+{
+	HAL_GPIO_WritePin(GPIOA, ONE_STEP_CLOCK, GPIO_PIN_SET);
+	delay_us(1);
+	HAL_GPIO_WritePin(GPIOA, ONE_STEP_CLOCK, GPIO_PIN_RESET);
+	delay_us(1);
 }
 
 void Port_Write(char* buffer, int offset, int bytes)
@@ -75,11 +94,11 @@ void Port_Write(char* buffer, int offset, int bytes)
 		else
 			write_long_enable();
 	}
-	HAL_GPIO_WritePin(GPIOA, OUTPUT_ENABLE, GPIO_PIN_RESET);
 }
 
 void Port_init()
 {
+	HAL_GPIO_WritePin(GPIOA, ONE_STEP_CLOCK, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOC, READY_SIGNAL, GPIO_PIN_SET);
 	HAL_Delay(1);
 	Port_Reset();
@@ -93,11 +112,13 @@ void Port_Read(char* buffer, int offset, int bytes)
 {
 	Port_Set();
 	Port_AsInput();
+	HAL_GPIO_WritePin(GPIOA, OUTPUT_ENABLE, GPIO_PIN_RESET);
 	for (int i = offset; i < (offset + bytes); i++)
 	{
 		set_address(i);
 		buffer[i - offset] = (0xff) & (GPIOA->IDR);
 	}
+	HAL_GPIO_WritePin(GPIOA, OUTPUT_ENABLE, GPIO_PIN_SET);
 }
 
 void Port_Set()
@@ -108,9 +129,24 @@ void Port_Set()
 
 void Port_Reset()
 {
+	Port_AsInput();
+	HAL_GPIO_WritePin(GPIOB, RUN_CPU, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOB, OUTPUT_ENABLE, GPIO_PIN_SET);
+	Port_DeactivateControl();
 	HAL_GPIO_WritePin(GPIOB, SHIFT_CLOCK | LATCH_CLOCK | PORT_RESET
 			| OUTPUT_DATA_H | OUTPUT_DATA_L, GPIO_PIN_RESET);
+}
+
+void Port_DeactivateControl()
+{
+//	SET_AS_INPUT(WRITE_ENABLE, GPIOB);
+	SET_AS_INPUT(OUTPUT_ENABLE, GPIOA);
+}
+
+void Port_ActivateControl()
+{
+//	SET_AS_OUTPUT(WRITE_ENABLE, GPIOB);
+	SET_AS_OUTPUT(OUTPUT_ENABLE, GPIOA);
 }
 
 void Port_AsOutput()

@@ -11,7 +11,9 @@ namespace Z80_CONNECT
 		PROGRAM_MODE = 0x33,
 		ONE_STEP = 0x73,
 		RESET = 0x92,
-		RUN_CPU = 0x65
+		RUN_CPU = 0x65,
+		ONE_STEP_CLOCK = 0x74,
+		STATUS_PORT = 0x75
 	};
 
 	typedef struct _RESPONSE 
@@ -20,12 +22,21 @@ namespace Z80_CONNECT
 		char* buffer;
 	} CPUResponse;
 
+	typedef struct _STATUS 
+	{
+		bool busRequested;
+		bool cpuModeRun;
+		bool cpuModeOneStep;
+	} CPU_STATUS_t;
+
 	class ICPUConnector
 	{
 	public:
 		virtual bool Reset() = 0;
 		virtual bool OneStep() = 0;
 		virtual bool ProgramMode() = 0;
+		virtual bool OneStepClock() = 0;
+		virtual CPU_STATUS_t Status() = 0;
 		virtual CPUResponse WriteMemoryPackage(const char* buffer, int offset, int bytes) = 0;
 		virtual CPUResponse WriteMemory(const char* buffer, int offset, int bytes) = 0;
 		virtual CPUResponse ReadMemory(int offset, int bytes) = 0;

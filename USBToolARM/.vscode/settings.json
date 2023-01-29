@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "usbc.h": "c",
+        "z80service.h": "c"
+    }
+}

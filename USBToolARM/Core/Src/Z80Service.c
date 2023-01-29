@@ -14,32 +14,44 @@ const int CMAX_PACKET_SIZE = 64;
 
 ActionResult_t* Z80_Reset()
 {
-	results[3].bytes = 0;
+	results[0].bytes = 0;
 	Port_ResetCPU();
 	return &results[0];
 }
 
 ActionResult_t* Z80_OneStep()
 {
-	results[3].bytes = 0;
-	Port_Reset();
-	Port_OnStep();
+	results[1].bytes = 0;
+	Port_OneStep();
 	return &results[1];
 }
 
 ActionResult_t* Z80_ProgramMode()
 {
-	results[3].bytes = 0;
+	results[2].bytes = 0;
 	Port_ProgramCPU();
+	return &results[2];
+}
+
+ActionResult_t* Z80_Status()
+{
+	results[2].bytes = 3;
+	Port_Status(results[2].buffer);
+	return &results[2];
+}
+
+ActionResult_t* Z80_OneStepPulse() 
+{
+	results[2].bytes = 0;
+	Port_OneStepClock();
 	return &results[2];
 }
 
 ActionResult_t* Z80_Run()
 {
 	results[3].bytes = 0;
-	Port_Reset();
 	Port_RunCPU();
-	return &results[5];
+	return &results[3];
 }
 
 char* ptr;
@@ -67,7 +79,6 @@ ActionResult_t* Z80_WriteMemoryPackage(char* buffer, int offset, int bytes)
 		strcpy(results[3].buffer, response);
 		results[3].started++;
 	}
-
 	return &results[3];
 };
 
