@@ -10,7 +10,7 @@
         static void Main(string[] args)
         {
             Console.WriteLine(Environment.CurrentDirectory);
-            //readExample();
+            readExample();
             //writeExample();
         }
 
