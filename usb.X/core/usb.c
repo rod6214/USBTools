@@ -29,6 +29,19 @@ volatile setup_packet_struct setup_packet __at(USB_TX0_REG);
 volatile BYTE ep0_in_buffer[USB_BUFFER_CONTROL_SIZE] __at(USB_RX0_REG);
 volatile BYTE ep1_tx_buffer[USB_EP_BUFFER_LEN] __at(USB_TX1_REG);
 volatile BYTE ep1_rx_buffer[USB_EP_BUFFER_LEN] __at(USB_RX1_REG);
+BYTE ep_pending_data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static BYTE temp[64];
+
+#define flush_data(epx_bd) do {\
+if (epx_bd.STAT & DTS)\
+		epx_bd.STAT = UOWN | DTSEN;\
+	else\
+		epx_bd.STAT = UOWN | DTS | DTSEN;\
+} while(0)
+
+static void __flush_ep(int epid, int dir, int bytes);
+static BYTE* __get_epx_buffer(int epid, int dir);
+static void __wait(int epid, int dir);
 
 //endpoints
 volatile BDT ep0_o __at (0x0400+0*8);
@@ -113,6 +126,75 @@ static void usb_read_buffer() {
 		ep1_o.STAT = UOWN | DTS | DTSEN;
 }
 
+static void __wait(int epid, int dir) {
+	
+	switch (epid)
+	{
+		case EP1:
+		{
+			if (dir) {
+				while ((ep1_i.STAT & UOWN)!=0);
+				return;
+			}
+			while ((ep1_o.STAT & UOWN)!=0);
+		}
+		break;
+	}
+}
+
+static BYTE* __get_epx_buffer(int epid, int dir) {
+	switch (epid)
+	{
+		case EP1:
+		{
+			if (dir) {
+				return (BYTE*)ep1_tx_buffer;
+			}
+			return (BYTE*)ep1_rx_buffer;
+		}
+		default:
+			return 0;
+	}
+}
+
+static void __flush_ep(int epid, int dir, int bytes) {
+    __wait(epid, dir);
+	switch (epid)
+	{
+		case EP1:
+		{
+			if (dir) {
+				ep1_i.CNT = bytes;
+				flush_data(ep1_i);
+			} else {
+				flush_data(ep1_o);
+			}
+		}
+		break;
+	}
+}
+
+int usb_read(int epid, BYTE* buffer, int bytes) {
+	while(ep_pending_data[epid] == 0);
+    for (int c = 0; c < bytes;c++)
+	{
+		buffer[c] = temp[c];
+	}
+	ep_pending_data[epid]--;
+	return bytes;
+}
+
+int usb_write(int epid, BYTE* buffer, int bytes) {
+	int idx = 0;
+	__wait(epid, 1);
+	for (; idx < bytes; idx++) {
+		BYTE *tmp = &(__get_epx_buffer(epid, 1)[idx]);
+		*tmp = buffer[idx];
+	}
+	__flush_ep(epid, 1, bytes);
+	return idx++;
+}
+
 static void prepare_for_setup_stage() {
 	control_stage = SETUP_STAGE;
 	ep0_o.CNT = USB_BUFFER_CONTROL_SIZE;
@@ -146,18 +228,6 @@ static void in_data_stage() {
 	//	for (idx = 0; idx < bufferSize; idx++)
 	for (int idx = bufferSize; idx--;)
 		*in_ptr++ = *code_ptr++;
-}
-
-static void process_interrupt() {
-	
-	// This comment works fine receiving data from host with interrupt transaction
-	if (usb_device_state == CONFIGURED) {
-			
-		if (IS_IN_EP1) {
-			usb_read_buffer();
-			PORTB = ep1_rx_buffer[63];
-		}
-	}
 }
 
 static void process_control_transfer() {
@@ -303,6 +373,18 @@ static void process_control_transfer() {
 			prepare_for_setup_stage();
 		}
 	}
+	else if (IS_IN_EP1) {
+		if (usb_device_state == CONFIGURED) {
+            __flush_ep(EP1, 0, 64);
+			if (ep_pending_data[EP1] == 0) {
+				ep_pending_data[EP1]++;
+			}
+            
+            for(int i = 0; i < USB_EP_BUFFER_LEN; i++) {
+                temp[i] = ep1_rx_buffer[i];
+            }
+		}
+	}
 }
 
 void set_descriptors(codePtr devDesc, codePtr configDesc, codePtr hid_rpt01, codePtr *stringDescs) {
@@ -397,10 +479,8 @@ void usb_interrupt_handler() {
 	// A transaction has finished.  Try default processing on endpoint 0.
 
 	if (UIRbits.TRNIF && UIEbits.TRNIE) {
-		// PORTB++;
-		// PORTA++;
 		process_control_transfer();
-		process_interrupt();
+        // process_interrupt();
 		// Turn off interrupt
 		UIRbits.TRNIF = 0;
 	}

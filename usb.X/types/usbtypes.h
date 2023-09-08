@@ -146,9 +146,12 @@ typedef struct {
     BYTE setup_packet;
 } USB;
 
+extern BYTE ep_pending_data[];
 extern void usb_interrupt_handler();
 extern void usb_init();
 extern void set_descriptors(codePtr devDesc, codePtr configDesc, codePtr hid_rpt01, codePtr *stringDescs);
+extern int usb_read(int epid, BYTE* buffer, int bytes);
+extern int usb_write(int epid, BYTE* buffer, int bytes);
 
 #ifdef	__cplusplus
 }

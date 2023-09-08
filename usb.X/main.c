@@ -10,6 +10,9 @@ void __interrupt(high_priority) high_isr(void)
 	}
 }
 
+BYTE buffer[64];
+BYTE buffer_w[64];
+
 void main () {
     PORTB = 0;
     TRISB = 0;
@@ -23,10 +26,13 @@ void main () {
     UIEbits.TRNIE = 1;
     INTCONbits.PEIE = 1;
 	INTCONbits.GIE = 1;
+    buffer_w[63] = (BYTE)'H';
 
     while (1)
     {
+        usb_read(EP1, buffer, 64);
+        PORTB = buffer[63];
+        usb_write(EP1, buffer_w, 64);
         /* code */
     }
-    
 }
